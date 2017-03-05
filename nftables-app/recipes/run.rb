@@ -12,9 +12,6 @@ node['nftables']['instances'].each do |name, v|
     deploy_path ::File.join(Chef::Config[:file_cache_path], 'nftables', name)
     git_repo v['git_repo']
     git_branch v['git_branch']
-
-    keystore_data_bag 'deploy_config'
-    keystore_data_bag_item 'keystore'
     template_variables v['template_variables']
     action :deploy
   end
