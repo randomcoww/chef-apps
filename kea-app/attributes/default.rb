@@ -23,12 +23,20 @@ node.default['kea']['instances']['primary'] = {
             },
             {
               "name" => "domain-name-servers",
-              "data" => node['environment']['lan_vip_gateway']
+              "data" => "192.168.63.250"
             }
           ],
           "pools" => [
             {
              "pool" => node['environment']['lan_subnet_dhcp']
+            }
+          ]
+        },
+        {
+          "subnet" => node['environment']['vpn_subnet'],
+          "pools" => [
+            {
+             "pool" => node['environment']['vpn_subnet_dhcp']
             }
           ]
         }

@@ -1,18 +1,25 @@
-execute "pkg_update" do
-  command node['keepalived']['pkg_update_command']
-  action :run
+dbag = Dbag::Keystore.new(
+  node['keepalived']['auth_data_bag'],
+  node['keepalived']['auth_data_bag_item']
+)
+password = dbag.get('VG1')
+
+if password.nil?
+  password = SecureRandom.base64
+  dbag.put('VG1', password)
 end
 
-package node['keepalived']['pkg_names'] do
-  action :upgrade
+keepalived_vrrp_sync_group 'VG1' do
+  group [ "VI1" ]
 end
 
-node['keepalived']['instances'].each do |name, v|
-  keepalived name do
-    deploy_path ::File.join(Chef::Config[:file_cache_path], 'keepalived', name)
-    git_repo v['git_repo']
-    git_branch v['git_branch']
-    template_variables v['template_variables']
-    action :deploy
-  end
+keepalived_vrrp_instance 'VI1' do
+  state node['environment']['lan_vrrp_state']
+  interface node['environment']['lan_if']
+  virtual_router_id node['environment']['lan_vrrp_id']
+  priority node['environment']['lan_vrrp_priority']
+  authentication auth_type: 'PASS', auth_pass: password
+  virtual_ipaddress [ node['environment']['lan_vip_gateway'] ]
 end
+
+include_recipe 'keepalived::default'
