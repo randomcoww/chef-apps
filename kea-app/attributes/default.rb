@@ -19,16 +19,16 @@ node.default['kea']['instances']['primary'] = {
           "option-data" => [
             {
               "name" => "routers",
-              "data" => node['environment']['lan_gateway_ip']
+              "data" => node['environment']['lan_vip_gateway']
             },
             {
               "name" => "domain-name-servers",
-              "data" => node['environment']['lan_name_server_ip']
+              "data" => node['environment']['lan_vip_gateway']
             }
           ],
           "pools" => [
             {
-             "pool" => node['environment']['lan_dhcp_subnet']
+             "pool" => node['environment']['lan_subnet_dhcp']
             }
           ]
         }
