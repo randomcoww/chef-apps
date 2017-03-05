@@ -2,12 +2,12 @@ node.default['keepalived']['pkg_update_command'] = "apt-get update -qqy"
 node.default['keepalived']['pkg_names'] = ['git', 'keepalived']
 node.default['keepalived']['instances']['primary'] = {
   'git_repo' => 'https://github.com/randomcoww/keepalived-config.git',
-  'git_branch' => 'primary',
+  'git_branch' => 'master',
   'template_variables' => {
-    'if_lan' => 'brlan',
-    'state' => 'MASTER',
-    'id_lan' => 55,
-    'priority' => 200,
-    'vip_lan' => "192.168.63.89"
+    'lan_if' => node['environment']['lan_if'],
+    'state' => node['environment']['lan_vrrp_state'],
+    'lan_id' => node['environment']['lan_vrrp_id'],
+    'priority' => node['environment']['lan_vrrp_priority'],
+    'lan_vip' => node['environment']['lan_vip_gateway']
   }
 }
