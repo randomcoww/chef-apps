@@ -4,8 +4,6 @@ dbag = Dbag::Keystore.new(
 )
 password = dbag.get_or_create('VG1', SecureRandom.base64(8))
 
-include_recipe 'keepalived::default'
-
 keepalived_vrrp_sync_group 'VG1' do
   group [ "VI1" ]
 end
@@ -18,3 +16,5 @@ keepalived_vrrp_instance 'VI1' do
   authentication auth_type: 'PASS', auth_pass: password
   virtual_ipaddress [ node['environment']['lan_vip_gateway'] ]
 end
+
+include_recipe 'keepalived::default'
