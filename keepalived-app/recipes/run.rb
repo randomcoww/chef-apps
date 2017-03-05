@@ -1,8 +1,8 @@
-dbag = Dbag::Vrrp.new(
+dbag = Dbag::Keystore.new(
   node['keepalived']['auth_data_bag'],
   node['keepalived']['auth_data_bag_item']
 )
-password = dbag.get_or_create('VG1')
+password = dbag.get_or_create('VG1', SecureRandom.base64(8))
 
 include_recipe 'keepalived::default'
 
