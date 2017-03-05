@@ -16,14 +16,14 @@ node.default['kea']['instances']['primary'] = {
       "subnet4" => [
         {
           "subnet" => node['environment']['lan_subnet'],
-          "option-data": [
+          "option-data" => [
             {
-              "name": "routers",
-              "data": node['environment']['lan_gateway_ip']
+              "name" => "routers",
+              "data" => node['environment']['lan_gateway_ip']
             },
             {
-              "name": "domain-name-servers",
-              "data": node['environment']['lan_name_server_ip']
+              "name" => "domain-name-servers",
+              "data" => node['environment']['lan_name_server_ip']
             }
           ],
           "pools" => [

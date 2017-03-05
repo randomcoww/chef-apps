@@ -2,4 +2,5 @@ source "https://supermarket.chef.io"
 
 metadata
 
-cookbook "environment" github: "randomcoww/chef-app" rel: "environment"
+cookbook "nftables", github: "randomcoww/chef-nftables"
+cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
