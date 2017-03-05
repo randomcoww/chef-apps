@@ -2,7 +2,7 @@ dbag = Dbag::Keystore.new(
   node['keepalived']['auth_data_bag'],
   node['keepalived']['auth_data_bag_item']
 )
-password = dbag.get_or_create('VG1', SecureRandom.base64(8))
+password = dbag.get_or_create('VG1', SecureRandom.base64(6))
 
 keepalived_vrrp_sync_group 'VG1' do
   group [ "VI1" ]
