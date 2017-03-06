@@ -20,10 +20,10 @@ nsd_resource_rndc_key_config 'rndc-key' do
 end
 
 nsd_git_zones 'nsd-zones' do
-  git_repo node['nsd']['git_zone']['git_repo']
-  git_branch node['nsd']['git_zone']['git_branch']
-  release_path node['nsd']['git_zone']['release_path']
-  zone_options node['nsd']['git_zone']['zone_options']
+  git_repo node['nsd']['git_zones']['git_repo']
+  git_branch node['nsd']['git_zones']['git_branch']
+  release_path node['nsd']['git_zones']['release_path']
+  zone_options node['nsd']['git_zones']['zone_options']
 
   path '/etc/nsd/nsd.conf.d/zones.conf'
   notifies :reload, "service[nsd]", :delayed

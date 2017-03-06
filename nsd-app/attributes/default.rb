@@ -2,10 +2,10 @@ node.default['nsd']['rndc_keys']['rndc_keys_data_bag'] = 'deploy_config'
 node.default['nsd']['rndc_keys']['rndc_keys_data_bag_item'] = 'rndc_keys'
 node.default['nsd']['rndc_keys']['rndc_key_names'] = ['rndc-test-key']
 
-node.default['nsd']['git_zone']['git_repo'] = "https://github.com/randomcoww/nsd-config.git"
-node.default['nsd']['git_zone']['git_branch'] = "test"
-node.default['nsd']['git_zone']['release_path'] = ::File.join(Chef::Config[:file_cache_path], 'nsd')
-node.default['nsd']['git_zone']['zone_options'] = {
+node.default['nsd']['git_zones']['git_repo'] = "https://github.com/randomcoww/nsd-config.git"
+node.default['nsd']['git_zones']['git_branch'] = "test"
+node.default['nsd']['git_zones']['release_path'] = ::File.join(Chef::Config[:file_cache_path], 'nsd')
+node.default['nsd']['git_zones']['zone_options'] = {
   'zones' => {
     'allow-axfr-fallback' => true
   }
