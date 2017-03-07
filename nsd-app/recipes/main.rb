@@ -3,8 +3,6 @@ execute "pkg_update" do
   action :run
 end
 
-include_recipe "nsd::service"
-
 package node['nsd']['pkg_names'] do
   action :upgrade
   notifies :restart, "service[nsd]", :delayed
@@ -34,3 +32,5 @@ nsd_config 'nsd' do
   action :create
   notifies :restart, "service[nsd]", :delayed
 end
+
+include_recipe "nsd::service"

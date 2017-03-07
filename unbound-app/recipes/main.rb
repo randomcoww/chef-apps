@@ -3,17 +3,15 @@ execute "pkg_update" do
   action :run
 end
 
-include_recipe "unbound::service"
-
 package node['unbound']['pkg_names'] do
   action :upgrade
   notifies :restart, "service[unbound]", :delayed
 end
 
-nsd_resource_rndc_key_config 'rndc-key' do
-  rndc_keys_data_bag node['unbound']['rndc_keys']['rndc_keys_data_bag']
-  rndc_keys_data_bag_item node['unbound']['rndc_keys']['rndc_keys_data_bag_item']
-  rndc_key_names node['unbound']['rndc_keys']['rndc_key_names']
+nsd_resource_rndc_key_config 'main_rndc-key' do
+  rndc_keys_data_bag node['unbound']['main']['rndc_keys_data_bag']
+  rndc_keys_data_bag_item node['unbound']['main']['rndc_keys_data_bag_item']
+  rndc_key_names node['unbound']['main']['rndc_key_names']
 
   path '/etc/unbound/unbound.conf.d/rndc-key.conf'
   notifies :restart, "service[unbound]", :delayed
@@ -25,8 +23,10 @@ remote_file '/etc/unbound/root-hints.conf' do
   notifies :restart, "service[unbound]", :delayed
 end
 
-unbound_config 'unbound' do
-  config node['unbound']['config']
+unbound_config 'main' do
+  config node['unbound']['main']['config']
   action :create
   notifies :restart, "service[unbound]", :delayed
 end
+
+include_recipe "unbound::service"
