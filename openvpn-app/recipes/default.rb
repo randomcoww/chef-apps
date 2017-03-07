@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: openvpn_client-app
+# Cookbook Name:: openvpn-app
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

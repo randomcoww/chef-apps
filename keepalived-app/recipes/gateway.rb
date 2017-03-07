@@ -1,6 +1,6 @@
 dbag = Dbag::Keystore.new(
-  node['keepalived']['auth_data_bag'],
-  node['keepalived']['auth_data_bag_item']
+  node['keepalived']['gateway']['auth_data_bag'],
+  node['keepalived']['gateway']['auth_data_bag_item']
 )
 password = dbag.get_or_create('VG1', SecureRandom.base64(6))
 

@@ -1,4 +1,4 @@
-# openvpn_client-app-cookbook
+# openvpn-app-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['openvpn_client-app']['bacon']</tt></td>
+    <td><tt>['openvpn-app']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### openvpn_client-app::default
+### openvpn-app::default
 
-Include `openvpn_client-app` in your node's `run_list`:
+Include `openvpn-app` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[openvpn_client-app::default]"
+    "recipe[openvpn-app::default]"
   ]
 }
 ```
