@@ -22,7 +22,7 @@ node.default['kea']['dhcp4_config'] = {
           },
           {
             "name" => "domain-name-servers",
-            "data" => "192.168.63.250"
+            "data" => "192.168.62.250"
           }
         ],
         "pools" => [
