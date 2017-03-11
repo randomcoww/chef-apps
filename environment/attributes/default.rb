@@ -13,4 +13,4 @@ node.default['environment']['vpn_if'] = "brvpn"
 node.default['environment']['wan_if'] = "eth1"
 
 node.default['environment']['dns_if'] = "eth0"
-node.default['environment']['dns_vip'] = "192.168.62.250"
+node.default['environment']['dns_vip'] = "192.168.62.250/23"
