@@ -1,0 +1,6 @@
+source "https://supermarket.chef.io"
+
+metadata
+
+cookbook "libvirt", github: "randomcoww/chef-libvirt"
+cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
