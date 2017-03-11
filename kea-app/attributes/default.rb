@@ -12,6 +12,33 @@ node.default['kea']['dhcp4_config'] = {
       "type" => "memfile",
       "persist" => true
     },
+    "option-def" => [
+      {
+        "name" => "ubnt",
+        "code" => 241,
+        "space" => "vendor-encapsulated-options-space",
+        "type" => "ipv4-address",
+        "array" => true
+        "encapsulate" => "ubnt"
+      }
+    ],
+    "client-classes" => [
+      {
+        "name" => "ubnt",
+        "test" => "substring(option[60].hex,0,4) == 'ubnt'",
+        "option-data" => [
+          {
+            "name" => "ubnt",
+            "space" => "vendor-encapsulated-options-space",
+            "code" => 241,
+            "data" => "192.168.62.80"
+          },
+          {
+            "name" => "vendor-encapsulated-options"
+          }
+        ]
+      }
+    ],
     "subnet4" => [
       {
         "subnet" => node['environment']['lan_subnet'],
@@ -22,7 +49,8 @@ node.default['kea']['dhcp4_config'] = {
           },
           {
             "name" => "domain-name-servers",
-            "data" => "192.168.62.250"
+            "data" => "192.168.62.250,8.8.8.8",
+            "csv-format" => true
           }
         ],
         "pools" => [
