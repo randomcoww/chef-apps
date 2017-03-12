@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: libvirt-app
+# Cookbook Name:: system_update
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

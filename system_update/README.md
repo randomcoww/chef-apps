@@ -1,4 +1,4 @@
-# libvirt-app-cookbook
+# system_update-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['libvirt-app']['bacon']</tt></td>
+    <td><tt>['system_update']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### libvirt-app::default
+### system_update::default
 
-Include `libvirt-app` in your node's `run_list`:
+Include `system_update` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[libvirt-app::default]"
+    "recipe[system_update::default]"
   ]
 }
 ```
