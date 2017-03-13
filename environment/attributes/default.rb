@@ -17,5 +17,5 @@ node.default['environment']['dns_if'] = "eth0"
 node.default['environment']['dns_ip'] = "192.168.62.250"
 node.default['environment']['dns_vip'] = "192.168.62.250/23"
 node.default['environment']['dns_ha_state'] = "MASTER"
-node.default['environment']['dns_ha_id'] = 20
+node.default['environment']['dns_ha_id'] = 21
 node.default['environment']['dns_ha_priority'] = 200
