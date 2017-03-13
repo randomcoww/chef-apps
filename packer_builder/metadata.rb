@@ -1,0 +1,7 @@
+name             'packer_builder'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures packer_builder'
+long_description 'Installs/Configures packer_builder'
+version          '0.1.0'
