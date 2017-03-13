@@ -1,6 +1,25 @@
-node.default['packer']['debian_cloud_image'] = {
-  "builder" => {
-    "builders" => [
+node.default['packer']['debian_cloud_image']['scripts'] = [
+  "scripts/resolv_hack.sh",
+  "scripts/base.sh",
+  "scripts/ssh_sshd_config.sh",
+
+  "scripts/sysctl.sh",
+  "scripts/iptables_blacklist.sh",
+
+  "scripts/install_chef.sh",
+  "scripts/chef-secret-mount.sh",
+  "scripts/chef-client.sh",
+
+  "scripts/install_cloud-init.sh",
+  "scripts/cloud-init-mount.sh",
+
+  "scripts/systemd_networking.sh"
+]
+node.default['packer']['debian_cloud_image']['vm_name'] = 'cloud-image'
+node.default['packer']['debian_cloud_image']['output_directory'] = '/img/kvm'
+
+node.default['packer']['debian_cloud_image']['builder'] = {
+  "builders" => [
     {
       "boot_command" => [
          "<esc><wait>",
@@ -41,9 +60,9 @@ node.default['packer']['debian_cloud_image'] = {
       "type" => "qemu",
       "qemuargs" => [[ "-m", "1024M" ],[ "-smp", "2" ]],
       "accelerator" => "kvm",
-      "vm_name" => "{{user `vm_name`}}",
+      "vm_name" => node['packer']['debian_cloud_image']['vm_name'],
       "format" => "qcow2",
-      "output_directory" => "{{user `output_directory`}}"
+      "output_directory" => node['packer']['debian_cloud_image']['output_directory']
     }
   ],
   "provisioners"=> [
@@ -51,23 +70,7 @@ node.default['packer']['debian_cloud_image'] = {
       "pause_before" => "5s",
       "type" => "shell",
       "execute_command"=> "echo '{{user `password`}}'| {{.Vars}} sudo --preserve-env --stdin sh '{{.Path}}'",
-      "scripts" => [
-        "scripts/resolv_hack.sh",
-        "scripts/base.sh",
-        "scripts/ssh_sshd_config.sh",
-
-        "scripts/sysctl.sh",
-        "scripts/iptables_blacklist.sh",
-
-        "scripts/install_chef.sh",
-        "scripts/chef-secret-mount.sh",
-        "scripts/chef-client.sh",
-
-        "scripts/install_cloud-init.sh",
-        "scripts/cloud-init-mount.sh",
-
-        "scripts/systemd_networking.sh"
-      ]
+      "scripts" => node['packer']['debian_cloud_image']['scripts']
     }
   ],
   "variables"=> {
@@ -75,8 +78,6 @@ node.default['packer']['debian_cloud_image'] = {
     "uid"=> "10000",
     "password"=> "password",
     "hostname"=> "debian-cloud-image",
-    "domain"=> "local",
-    "output_directory"=> "output-qemu",
-    "vm_name"=> "debian-cloud-image"
+    "domain"=> "local"
   }
 }
