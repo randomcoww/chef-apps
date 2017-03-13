@@ -2,13 +2,13 @@ dbag = Dbag::Keystore.new(
   node['keepalived']['gateway']['auth_data_bag'],
   node['keepalived']['gateway']['auth_data_bag_item']
 )
-password = dbag.get_or_create('VG1', SecureRandom.base64(6))
+password = dbag.get_or_create('VG_gateway', SecureRandom.base64(6))
 
-keepalived_vrrp_sync_group 'VG1' do
-  group [ "VI1" ]
+keepalived_vrrp_sync_group 'VG_gateway' do
+  group [ "VI_gateway" ]
 end
 
-keepalived_vrrp_instance 'VI1' do
+keepalived_vrrp_instance 'VI_gateway' do
   state node['environment']['lan_vrrp_state']
   interface node['environment']['lan_if']
   virtual_router_id node['environment']['lan_vrrp_id']
