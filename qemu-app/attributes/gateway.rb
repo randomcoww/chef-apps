@@ -1,19 +1,56 @@
 node.default['qemu']['gateway']['cloud_config_hostname'] = 'gateway'
 node.default['qemu']['gateway']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway']['cloud_config_hostname']}"
+node.default['qemu']['gateway']['networking']['/etc/systemd/network/eth0.network'] = {
+  "Match" => {
+    "Name" => "eth0"
+  },
+  "Network" => {
+    "LinkLocalAddressing" => "no",
+    "DHCP" => "no",
+    "Address" => "192.168.62.242/23"
+  }
+}
+node.default['qemu']['gateway']['networking']['/etc/systemd/network/eth1.network'] = {
+  "Match" => {
+    "Name" => "eth1"
+  },
+  "Network" => {
+    "LinkLocalAddressing" => "no",
+    "DHCP" => "no"
+  }
+}
+node.default['qemu']['gateway']['networking']['/etc/systemd/network/eth2.network'] = {
+  "Match" => {
+    "Name" => "eth2"
+  },
+  "Network" => {
+    "LinkLocalAddressing" => "no",
+    "DHCP" => "yes"
+  }
+}
+
+
 node.default['qemu']['gateway']['cloud_config'] = {
+  "write_files" => [],
   "password" => "password",
   "chpasswd" => {
     "expire" => false
   },
-  "ssh_pwauth" => true,
+  "ssh_pwauth" => false,
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['gateway']['cloud_config_hostname']}.lan",
-  "ssh_authorized_keys" => [
-    "ssh-rsa" => "AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN"
+  "runcmd" => [
+    [ "systemctl", "restart", "systemd-networkd" ]
   ]
+  # "ssh_authorized_keys" => [
+  #   {
+  #     "ssh-rsa" => "AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN"
+  #   }
+  # ]
 }
+
 
 node.default['qemu']['gateway']['libvirt_config'] = {
   "domain"=>{
@@ -102,7 +139,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/dns.qcow2"
+            "file"=>"/img/kvm/gateway.qcow2"
           }
         },
         "target"=>{
@@ -172,6 +209,41 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           "source"=>{
             "#attributes"=>{
               "bridge"=>"brlan"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"bridge"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "bridge"=>"brvpn"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"bridge"
+          },
+          "mac"=>{
+            "#attributes"=>{
+              "address"=>node['environment']['wan_mac']
+            }
+          },
+          "source"=>{
+            "#attributes"=>{
+              "bridge"=>"brwan"
             }
           },
           "model"=>{
