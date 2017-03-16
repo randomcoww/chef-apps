@@ -21,4 +21,6 @@ node.default['environment']['dns_ha_state'] = "MASTER"
 node.default['environment']['dns_ha_id'] = 21
 node.default['environment']['dns_ha_priority'] = 200
 
+node.default['environment']['gateway_ip'] = "192.168.62.242/23"
+
 node.default['environment']['qualifying_suffix'] = 'static.lan'
