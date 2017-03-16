@@ -15,7 +15,7 @@ qemu_cloud_config 'gateway' do
   config node['qemu']['gateway']['cloud_config']
   systemd_hash node.default['qemu']['gateway']['networking']
   action :create
-  notifies :restart, "qemu_domain[gateway]", :delayed
+  # notifies :restart, "qemu_domain[gateway]", :delayed
 end
 
 qemu_domain 'gateway' do

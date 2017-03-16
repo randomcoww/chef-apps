@@ -12,10 +12,6 @@ node.default['kea']['dhcp4_config'] = {
       "type" => "memfile",
       "persist" => true
     },
-    "dhcp-ddns" => {
-      "enanble-updates" => false,
-      "qualifying-suffix" => node['environment']['qualifying_suffix']
-    },
     "subnet4" => [
       {
         "subnet" => node['environment']['lan_subnet'],
