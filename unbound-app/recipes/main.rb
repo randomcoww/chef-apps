@@ -8,14 +8,14 @@ package node['unbound']['pkg_names'] do
   notifies :restart, "service[unbound]", :delayed
 end
 
-nsd_resource_rndc_key_config 'main_rndc-key' do
-  rndc_keys_data_bag node['unbound']['main']['rndc_keys_data_bag']
-  rndc_keys_data_bag_item node['unbound']['main']['rndc_keys_data_bag_item']
-  rndc_key_names node['unbound']['main']['rndc_key_names']
-
-  path '/etc/unbound/unbound.conf.d/rndc-key.conf'
-  notifies :restart, "service[unbound]", :delayed
-end
+# nsd_resource_rndc_key_config 'main_rndc-key' do
+#   rndc_keys_data_bag node['unbound']['main']['rndc_keys_data_bag']
+#   rndc_keys_data_bag_item node['unbound']['main']['rndc_keys_data_bag_item']
+#   rndc_key_names node['unbound']['main']['rndc_key_names']
+#
+#   path '/etc/unbound/unbound.conf.d/rndc-key.conf'
+#   notifies :restart, "service[unbound]", :delayed
+# end
 
 remote_file '/etc/unbound/root-hints.conf' do
   source 'https://www.internic.net/domain/named.cache'

@@ -12,11 +12,12 @@ keepalived_vrrp_sync_group 'VG_dns' do
 end
 
 keepalived_vrrp_instance 'VI_dns' do
-  state node['environment']['dns_ha_state']
+  state 'BACKUP'
+  use_vmac ''
   interface node['environment']['dns_if']
   virtual_router_id node['environment']['dns_ha_id']
   priority node['environment']['dns_ha_priority']
-  authentication auth_type: 'PASS', auth_pass: password
+  authentication auth_type: 'AH', auth_pass: password
   virtual_ipaddress [ node['environment']['dns_vip'] ]
 end
 

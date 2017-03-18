@@ -11,6 +11,7 @@ node.default['unbound']['main']['config'] = {
     'do-udp' => true,
     'do-tcp' => true,
     'access-control' => [
+      "127.0.0.0/8 allow",
       "#{node['environment']['lan_subnet']} allow",
       "#{node['environment']['vpn_subnet']} allow"
     ],
@@ -37,6 +38,6 @@ node.default['unbound']['main']['config'] = {
   ]
 }
 
-node.default['nsd']['main']['rndc_keys_data_bag'] = 'deploy_config'
-node.default['nsd']['main']['rndc_keys_data_bag_item'] = 'rndc_keys'
-node.default['nsd']['main']['rndc_key_names'] = ['rndc-test-key']
+# node.default['nsd']['main']['rndc_keys_data_bag'] = 'deploy_config'
+# node.default['nsd']['main']['rndc_keys_data_bag_item'] = 'rndc_keys'
+# node.default['nsd']['main']['rndc_key_names'] = ['rndc-test-key']

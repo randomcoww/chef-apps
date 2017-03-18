@@ -13,11 +13,12 @@ end
 
 keepalived_vrrp_instance 'VI_gateway' do
   state 'BACKUP'
+  use_vmac ''
   interface node['environment']['lan_if']
   virtual_router_id node['environment']['lan_vrrp_id']
   priority node['environment']['lan_vrrp_priority']
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment']['lan_ip_gateway'] ]
+  virtual_ipaddress [ node['environment']['lan_vip_gateway'] ]
 end
 
 include_recipe 'keepalived::service'

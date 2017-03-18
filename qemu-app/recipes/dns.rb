@@ -13,8 +13,9 @@ qemu_cloud_config 'dns' do
   path node['qemu']['dns']['cloud_config_path']
   hostname node['qemu']['dns']['cloud_config_hostname']
   config node['qemu']['dns']['cloud_config']
+  systemd_hash node['qemu']['dns']['networking']
   action :create
-  notifies :restart, "qemu_domain[dns]", :delayed
+  # notifies :restart, "qemu_domain[dns]", :delayed
 end
 
 qemu_domain 'dns' do

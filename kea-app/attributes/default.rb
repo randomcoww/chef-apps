@@ -18,11 +18,11 @@ node.default['kea']['dhcp4_config'] = {
         "option-data" => [
           {
             "name" => "routers",
-            "data" => node['environment']['lan_ip_gateway']
+            "data" => node['environment']['lan_vip_gateway']
           },
           {
             "name" => "domain-name-servers",
-            "data" => "#{node['environment']['dns_ip']},8.8.8.8",
+            "data" => "#{node['environment']['lan_vip_gateway']},8.8.8.8",
             "csv-format" => true
           }
         ],
