@@ -53,8 +53,10 @@ node.default['qemu']['gateway']['networking'] = {
     "Network" => {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes",
-      "DNS" => "127.0.0.1",
-      "DNS" => "8.8.8.8"
+      "DNS" => [
+        "127.0.0.1",
+        "8.8.8.8"
+      ]
     },
     "DHCP" => {
       "UseDNS" => "false",
