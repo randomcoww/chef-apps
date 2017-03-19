@@ -1,6 +1,6 @@
-node.default['qemu']['dns']['cloud_config_hostname'] = 'dns'
-node.default['qemu']['dns']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dns']['cloud_config_hostname']}"
-node.default['qemu']['dns']['networking'] = {
+node.default['qemu']['unifi']['cloud_config_hostname'] = 'unifi'
+node.default['qemu']['unifi']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['unifi']['cloud_config_hostname']}"
+node.default['qemu']['unifi']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -12,12 +12,8 @@ node.default['qemu']['dns']['networking'] = {
   }
 }
 
-node.default['qemu']['gateway']['chef_recipes'] = [
-  "nsd-app::main",
-  "unbound-app::main",
-  "keepalived-app::dns"
-]
-node.default['qemu']['dns']['cloud_config'] = {
+node.default['qemu']['unifi']['cloud_config'] = {
+  "write_files" => [],
   "password" => "password",
   "chpasswd" => {
     "expire" => false
@@ -26,39 +22,48 @@ node.default['qemu']['dns']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['dns']['cloud_config_hostname']}.lan"
-  # "runcmd" => [
-  #   [
-  #     "chef-client", "-o",
-  #     node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
-  #     "-j", "/etc/chef/environment.json"
-  #   ]
+  "fqdn" => "#{node['qemu']['unifi']['cloud_config_hostname']}.lan",
+  "runcmd" => [
+    'apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr',
+    'apt-key adv --keyserver keyserver.ubuntu.com --recv C0A52C50',
+    'echo "deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list',
+    "apt-get -y update",
+    "apt-get -y install --no-install-recommends unifi",
+    "systemctl disable mongodb",
+    "systemctl start unifi",
+    "systemctl enable unifi"
+  ]
+  # "ssh_authorized_keys" => [
+  #   {
+  #     "ssh-rsa" => "AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN"
+  #   }
   # ]
 }
 
-node.default['qemu']['dns']['libvirt_config'] = {
+
+node.default['qemu']['unifi']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>"dns",
+    "name"=>node['qemu']['unifi']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"2"
+      "#text"=>"1"
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"2"
+      "#text"=>"1"
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"2"
+      "#text"=>"1"
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -94,7 +99,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"2",
+          "cores"=>"1",
           "threads"=>"1"
         }
       }
@@ -123,7 +128,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/dns.qcow2"
+            "file"=>"/img/kvm/unifi.qcow2"
           }
         },
         "target"=>{
@@ -157,24 +162,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>"/img/secret/chef"
-            }
-          },
-          "target"=>{
-            "#attributes"=>{
-              "dir"=>"chef-secret"
-            }
-          },
-          "readonly"=>""
-        },
-        {
-          "#attributes"=>{
-            "type"=>"mount",
-            "accessmode"=>"squash"
-          },
-          "source"=>{
-            "#attributes"=>{
-              "dir"=>node['qemu']['dns']['cloud_config_path']
+              "dir"=>node['qemu']['unifi']['cloud_config_path']
             }
           },
           "target"=>{
@@ -188,11 +176,12 @@ node.default['qemu']['dns']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"bridge"
+            "type"=>"direct"
           },
           "source"=>{
             "#attributes"=>{
-              "bridge"=>"brlan"
+              "dev"=>node['environment']['host_lan_if'],
+              "mode"=>"bridge"
             }
           },
           "model"=>{

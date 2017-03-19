@@ -23,7 +23,7 @@ node.default['environment']['gateway_ip'] = "192.168.62.242/23"
 
 node.default['environment']['qualifying_suffix'] = 'static.lan'
 
-node.default['environment']['host_lan_if'] = 'brlan'
-node.default['environment']['host_vpn_if'] = 'brvpn'
-node.default['environment']['host_wan_if'] = 'brwan'
-node.default['environment']['host_storage_if'] = 'brstore'
+node.default['environment']['host_lan_if'] = 'eno1'
+node.default['environment']['host_vpn_if'] = 'vpn'
+node.default['environment']['host_wan_if'] = 'wan'
+node.default['environment']['host_storage_if'] = 'enp7s0'

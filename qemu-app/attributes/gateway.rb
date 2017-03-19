@@ -85,7 +85,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>"dns",
+    "name"=>node['qemu']['gateway']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
