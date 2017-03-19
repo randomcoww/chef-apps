@@ -7,8 +7,11 @@ node.default['qemu']['gateway']['networking'] = {
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "no",
+      "DHCP" => "yes",
       "Address" => node['environment']['gateway_ip']
+    },
+    "DHCP" => {
+      "RouteMetric" => 2048
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -64,7 +67,8 @@ node.default['qemu']['gateway']['networking'] = {
       "SendHostname" => "false",
       "UseHostname" => "false",
       "UseDomains" => "false",
-      "UseTimezone" => "no"
+      "UseTimezone" => "no",
+      "RouteMetric" => 1024
     }
   }
 }

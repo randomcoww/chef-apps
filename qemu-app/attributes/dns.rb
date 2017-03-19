@@ -26,18 +26,13 @@ node.default['qemu']['dns']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['dns']['cloud_config_hostname']}.lan",
-  "runcmd" => [
-    [
-      "chef-client", "-o",
-      node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
-      "-j", "/etc/chef/environment.json"
-    ]
-  ]
-  # "ssh_authorized_keys" => [
-  #   {
-  #     "ssh-rsa" => "AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN"
-  #   }
+  "fqdn" => "#{node['qemu']['dns']['cloud_config_hostname']}.lan"
+  # "runcmd" => [
+  #   [
+  #     "chef-client", "-o",
+  #     node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+  #     "-j", "/etc/chef/environment.json"
+  #   ]
   # ]
 }
 
