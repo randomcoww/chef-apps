@@ -20,33 +20,7 @@ node.default['qemu']['gateway']['networking'] = {
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "no",
-      "Bridge" => "brvpn"
-    }
-  },
-  '/etc/systemd/network/tap.network' => {
-    "Match" => {
-      "Name" => "tap*"
-    },
-    "Network" => {
-      "LinkLocalAddressing" => "no",
-      "DHCP" => "no",
-      "Bridge" => "brvpn"
-    }
-  },
-  '/etc/systemd/network/brvpn.netdev' => {
-    "NetDev" => {
-      "Kind" => "bridge",
-      "Name" => "brvpn"
-    }
-  },
-  '/etc/systemd/network/brvpn.network' => {
-    "Match" => {
-      "Name" => "brvpn"
-    },
-    "Network" => {
-      "LinkLocalAddressing" => "no",
-      "DHCP" => "no",
+      "DHCP" => "no"
     }
   },
   '/etc/systemd/network/eth2.network' => {
@@ -258,11 +232,13 @@ node.default['qemu']['gateway']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"bridge"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{
-              "bridge"=>"brlan"
+              "dev"=>node['environment']['host_lan_if'],
+              "mode"=>"bridge"
             }
           },
           "model"=>{
@@ -273,11 +249,12 @@ node.default['qemu']['gateway']['libvirt_config'] = {
         },
         {
           "#attributes"=>{
-            "type"=>"bridge"
+            "type"=>"direct"
           },
           "source"=>{
             "#attributes"=>{
-              "bridge"=>"brvpn"
+              "dev"=>node['environment']['host_vpn_if'],
+              "mode"=>"bridge"
             }
           },
           "model"=>{
@@ -288,7 +265,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
         },
         {
           "#attributes"=>{
-            "type"=>"bridge"
+            "type"=>"direct"
           },
           "mac"=>{
             "#attributes"=>{
@@ -297,7 +274,8 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "bridge"=>"brwan"
+              "dev"=>node['environment']['host_wan_if'],
+              "mode"=>"bridge"
             }
           },
           "model"=>{
