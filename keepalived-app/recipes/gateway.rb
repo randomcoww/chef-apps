@@ -13,7 +13,7 @@ end
 
 keepalived_vrrp_instance 'VI_gateway' do
   state 'BACKUP'
-  use_vmac 'vrrp20'
+  # use_vmac 'vrrp20'
   nopreempt true
   interface node['environment']['lan_if']
   virtual_router_id node['environment']['lan_vrrp_id']
