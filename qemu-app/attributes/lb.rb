@@ -157,6 +157,23 @@ node.default['qemu']['lb']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
+              "dir"=>"/img/secret/chef"
+            }
+          },
+          "target"=>{
+            "#attributes"=>{
+              "dir"=>"chef-secret"
+            }
+          },
+          "readonly"=>""
+        },
+        {
+          "#attributes"=>{
+            "type"=>"mount",
+            "accessmode"=>"squash"
+          },
+          "source"=>{
+            "#attributes"=>{
               "dir"=>node['qemu']['lb']['cloud_config_path']
             }
           },
@@ -171,7 +188,8 @@ node.default['qemu']['lb']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{

@@ -8,6 +8,7 @@ node.default['kea']['dhcp4_config'] = {
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },
+    "match-client-id" => false,
     "lease-database" => {
       "type" => "memfile",
       "persist" => true
@@ -22,7 +23,11 @@ node.default['kea']['dhcp4_config'] = {
           },
           {
             "name" => "domain-name-servers",
-            "data" => "#{node['environment']['lan_vip_gateway']},8.8.8.8",
+            "data" => [
+              node['environment']['dns_vip'],
+              node['environment']['lan_vip_gateway'],
+              '8.8.8.8'
+            ].join(','),
             "csv-format" => true
           }
         ],
