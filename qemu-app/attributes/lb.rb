@@ -14,7 +14,7 @@ node.default['qemu']['lb']['networking'] = {
 
 node.default['qemu']['lb']['chef_recipes'] = [
   "keepalived-app::lb",
-  "haproxy-app::main"
+  "haproxy-app::lb"
 ]
 
 node.default['qemu']['lb']['cloud_config'] = {
@@ -31,7 +31,7 @@ node.default['qemu']['lb']['cloud_config'] = {
   "runcmd" => [
     [
       "chef-client", "-o",
-      node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['lb']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
     ]
   ]
