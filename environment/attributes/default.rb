@@ -14,14 +14,13 @@ node.default['environment']['wan_if'] = "eth2"
 
 node.default['environment']['dns_if'] = "eth0"
 node.default['environment']['dns_vip'] = "192.168.62.250"
-node.default['environment']['dns_ip'] = "192.168.62.252/23"
-node.default['environment']['dns_ha_state'] = "MASTER"
 node.default['environment']['dns_ha_id'] = 21
-node.default['environment']['dns_ha_priority'] = 200
+
+node.default['environment']['lb_if'] = "eth0"
+node.default['environment']['lb_vip'] = "192.168.62.230"
+node.default['environment']['lb_ha_id'] = 22
 
 node.default['environment']['gateway_ip'] = "192.168.62.242/23"
-
-node.default['environment']['qualifying_suffix'] = 'static.lan'
 
 node.default['environment']['host_lan_if'] = 'eno1'
 node.default['environment']['host_vpn_if'] = 'vpn'

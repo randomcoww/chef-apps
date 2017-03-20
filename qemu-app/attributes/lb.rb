@@ -13,8 +13,10 @@ node.default['qemu']['lb']['networking'] = {
 }
 
 node.default['qemu']['lb']['chef_recipes'] = [
+  "keepalived-app::lb",
   "haproxy-app::main"
 ]
+
 node.default['qemu']['lb']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -26,13 +28,13 @@ node.default['qemu']['lb']['cloud_config'] = {
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['lb']['cloud_config_hostname']}.lan",
-  # "runcmd" => [
-  #   [
-  #     "chef-client", "-o",
-  #     node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
-  #     "-j", "/etc/chef/environment.json"
-  #   ]
-  # ]
+  "runcmd" => [
+    [
+      "chef-client", "-o",
+      node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      "-j", "/etc/chef/environment.json"
+    ]
+  ]
 }
 
 

@@ -2,24 +2,24 @@ dbag = Dbag::Keystore.new(
   node['keepalived']['auth_data_bag'],
   node['keepalived']['auth_data_bag_item']
 )
-password = dbag.get_or_create('VG_dns', SecureRandom.base64(6))
+password = dbag.get_or_create('VG_lb', SecureRandom.base64(6))
 
 include_recipe 'keepalived::install'
 include_recipe 'keepalived::configure'
 
-keepalived_vrrp_sync_group 'VG_dns' do
-  group [ "VI_dns" ]
+keepalived_vrrp_sync_group 'VG_lb' do
+  group [ "VI_lb" ]
 end
 
-keepalived_vrrp_instance 'VI_dns' do
+keepalived_vrrp_instance 'VI_lb' do
   state 'BACKUP'
   # use_vmac 'vrrp20'
   nopreempt true
-  interface node['environment']['dns_if']
-  virtual_router_id node['environment']['dns_ha_id']
+  interface node['environment']['lb_if']
+  virtual_router_id node['environment']['lb_ha_id']
   priority 100
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment']['dns_vip'] ]
+  virtual_ipaddress [ node['environment']['lb_vip'] ]
 end
 
 include_recipe 'keepalived::service'
