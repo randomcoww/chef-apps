@@ -52,7 +52,8 @@ node.default['qemu']['gateway']['chef_recipes'] = [
   "kea-app::dhcp4",
   "nsd-app::main",
   "unbound-app::main",
-  "keepalived-app::gateway"
+  "keepalived-app::gateway",
+  "ddclient-app::freedns"
 ]
 node.default['qemu']['gateway']['cloud_config'] = {
   "write_files" => [],
