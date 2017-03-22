@@ -139,7 +139,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"2",
+          "cores"=>"1",
           "threads"=>"1"
         }
       }
