@@ -9,7 +9,6 @@ node.default['openvpn']['client'] = {
     "resolv-retry" => "infinite",
     "nobind"  => true,
     "persist-key" => true,
-    "persist-tun" => true,
     "ca" => 'ca.crt',
     "tls-client" => true,
     "remote-cert-tls" => "server",

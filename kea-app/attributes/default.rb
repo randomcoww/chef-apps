@@ -35,6 +35,12 @@ node.default['kea']['dhcp4_config'] = {
           {
            "pool" => node['environment']['lan_subnet_dhcp']
           }
+        ],
+        "reservations" => [
+          {
+            "hw-address" => "52:54:00:ac:da:f3",
+            "ip-address" => "192.168.62.99"
+          }
         ]
       },
       {
