@@ -3,9 +3,12 @@ execute "pkg_update" do
   action :run
 end
 
+## service starts automatically with default configs on install
+## this conflicts with unbound running on default port
+## stop until configs are written to run on another port
 package node['nsd']['pkg_names'] do
   action :upgrade
-  notifies :restart, "service[nsd]", :delayed
+  notifies :stop, "service[nsd]", :immediately
 end
 
 nsd_resource_rndc_key_config 'main_rndc-key' do
