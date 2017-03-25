@@ -18,8 +18,18 @@ node.default['qemu']['docker']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no"
     }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
+    }
   }
 }
+
+
 
 node.default['qemu']['docker']['cloud_config'] = {
   "write_files" => [],
