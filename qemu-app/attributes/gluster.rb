@@ -1,6 +1,6 @@
-node.default['qemu']['dns']['cloud_config_hostname'] = 'dns'
-node.default['qemu']['dns']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dns']['cloud_config_hostname']}"
-node.default['qemu']['dns']['networking'] = {
+node.default['qemu']['gluster']['cloud_config_hostname'] = 'gluster'
+node.default['qemu']['gluster']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster']['cloud_config_hostname']}"
+node.default['qemu']['gluster']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -9,16 +9,20 @@ node.default['qemu']['dns']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes"
     }
+  },
+  '/etc/systemd/network/eth1.network' => {
+    "Match" => {
+      "Name" => "eth1"
+    },
+    "Network" => {
+      "LinkLocalAddressing" => "no",
+      "DHCP" => "no",
+      "Address" => node['environment']['gluster_ip']
+    }
   }
 }
 
-node.default['qemu']['dns']['chef_recipes'] = [
-  "nsd-app::main",
-  "unbound-app::main",
-  "keepalived-app::dns",
-  "openvpn-app::client"
-]
-node.default['qemu']['dns']['cloud_config'] = {
+node.default['qemu']['gluster']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -28,23 +32,19 @@ node.default['qemu']['dns']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['dns']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['gluster']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    [
-      "chef-client", "-o",
-      node['qemu']['dns']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
-      "-j", "/etc/chef/environment.json"
-    ]
+    "apt-get -y install glusterfs-server"
   ]
 }
 
 
-node.default['qemu']['dns']['libvirt_config'] = {
+node.default['qemu']['gluster']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['dns']['cloud_config_hostname'],
+    "name"=>node['qemu']['gluster']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -126,7 +126,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/dns.qcow2"
+            "file"=>"/img/kvm/gluster.qcow2"
           }
         },
         "target"=>{
@@ -177,7 +177,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['dns']['cloud_config_path']
+              "dir"=>node['qemu']['gluster']['cloud_config_path']
             }
           },
           "target"=>{
@@ -191,12 +191,27 @@ node.default['qemu']['dns']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct",
-            "trustGuestRxFilters"=>"yes"
+            "type"=>"direct"
           },
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment']['host_lan_if'],
+              "mode"=>"bridge"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"direct"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dev"=>node['environment']['host_storage_if'],
               "mode"=>"bridge"
             }
           },

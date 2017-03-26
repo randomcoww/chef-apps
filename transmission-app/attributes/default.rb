@@ -1,6 +1,19 @@
 node.default['transmission']['pkg_update_command'] = "apt-get update -qqy"
 node.default['transmission']['pkg_names'] = ['transmission-daemon']
 
+node.default['transmission']['main']['incomplete-dir'] = "/data/transmission/incomplete"
+node.default['transmission']['main']['watch-dir'] = "/data/transmission/watch"
+node.default['transmission']['main']['downloads-dir'] = "/data/transmission/downloads"
+# node.default['transmission']['main']['info-dir'] = "/data/transmission"
+
+node.default['transmission']['main']['user'] = 'debian-transmission'
+node.default['transmission']['main']['group'] = 'debian-transmission'
+node.default['transmission']['main']['uid'] = 10006
+node.default['transmission']['main']['gid'] = 10006
+
+node.default['transmission']['main']['home'] = "/data/transmission"
+node.default['transmission']['main']['config_path'] = ::File.join(node['transmission']['main']['home'], '.config/transmission-daemon/settings.json')
+
 node.default['transmission']['main']['config'] = {
   "alt-speed-down" => 1900,
   "alt-speed-enabled" => true,
@@ -15,7 +28,7 @@ node.default['transmission']['main']['config'] = {
   "blocklist-url" => "http://www.example.com/blocklist",
   "cache-size-mb" => 4,
   "dht-enabled" => true,
-  "download-dir" => "/data/downloads",
+  "download-dir" => node['transmission']['main']['downloads-dir'],
   "download-limit" => 100,
   "download-limit-enabled" => 0,
   "download-queue-enabled" => true,
@@ -23,7 +36,7 @@ node.default['transmission']['main']['config'] = {
   "encryption" => 1,
   "idle-seeding-limit" => 30,
   "idle-seeding-limit-enabled" => false,
-  "incomplete-dir" => "/data/incomplete",
+  "incomplete-dir" => node['transmission']['main']['incomplete-dir'],
   "incomplete-dir-enabled" => true,
   "lpd-enabled" => false,
   "max-peers-global" => 200,
@@ -70,6 +83,6 @@ node.default['transmission']['main']['config'] = {
   "upload-limit-enabled" => 0,
   "upload-slots-per-torrent" => 14,
   "utp-enabled" => true,
-  "watch-dir" => "/data/watch",
+  "watch-dir" => node['transmission']['main']['watch-dir'],
   "watch-dir-enabled" => true
 }

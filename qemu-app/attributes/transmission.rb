@@ -1,6 +1,6 @@
-node.default['qemu']['dns']['cloud_config_hostname'] = 'dns'
-node.default['qemu']['dns']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dns']['cloud_config_hostname']}"
-node.default['qemu']['dns']['networking'] = {
+node.default['qemu']['transmission']['cloud_config_hostname'] = 'transmission'
+node.default['qemu']['transmission']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['transmission']['cloud_config_hostname']}"
+node.default['qemu']['transmission']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -9,16 +9,24 @@ node.default['qemu']['dns']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes"
     }
+  },
+  '/etc/systemd/network/eth1.network' => {
+    "Match" => {
+      "Name" => "eth1"
+    },
+    "Network" => {
+      "LinkLocalAddressing" => "yes",
+      "DHCP" => "no"
+    }
   }
 }
 
-node.default['qemu']['dns']['chef_recipes'] = [
-  "nsd-app::main",
-  "unbound-app::main",
-  "keepalived-app::dns",
-  "openvpn-app::client"
+node.default['qemu']['transmission']['chef_recipes'] = [
+  "nftables-app::filter",
+  "openvpn-app::client",
+  "transmission-app::main"
 ]
-node.default['qemu']['dns']['cloud_config'] = {
+node.default['qemu']['transmission']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -28,23 +36,24 @@ node.default['qemu']['dns']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['dns']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['transmission']['cloud_config_hostname']}.lan",
   "runcmd" => [
+    "apt-get -y install glusterfs-client",
     [
       "chef-client", "-o",
-      node['qemu']['dns']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['transmission']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
     ]
   ]
 }
 
 
-node.default['qemu']['dns']['libvirt_config'] = {
+node.default['qemu']['transmission']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['dns']['cloud_config_hostname'],
+    "name"=>node['qemu']['transmission']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -126,7 +135,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/dns.qcow2"
+            "file"=>"/img/kvm/transmission.qcow2"
           }
         },
         "target"=>{
@@ -177,7 +186,7 @@ node.default['qemu']['dns']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['dns']['cloud_config_path']
+              "dir"=>node['qemu']['transmission']['cloud_config_path']
             }
           },
           "target"=>{
@@ -191,12 +200,27 @@ node.default['qemu']['dns']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct",
-            "trustGuestRxFilters"=>"yes"
+            "type"=>"direct"
           },
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment']['host_lan_if'],
+              "mode"=>"bridge"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"direct"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dev"=>node['environment']['host_storage_if'],
               "mode"=>"bridge"
             }
           },
