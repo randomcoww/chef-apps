@@ -24,3 +24,5 @@ node.default['environment']['host_lan_if'] = 'eno1'
 node.default['environment']['host_vpn_if'] = 'vpn'
 node.default['environment']['host_wan_if'] = 'wan'
 node.default['environment']['host_storage_if'] = 'enp7s0'
+
+node.default['environment']['gluster_ip'] = '169.254.127.31/16'
