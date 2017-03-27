@@ -16,7 +16,7 @@ node.default['qemu']['dns']['chef_recipes'] = [
   "nsd-app::main",
   "unbound-app::main",
   "keepalived-app::dns",
-  "openvpn-app::client"
+  "openvpn-app::pia_client"
 ]
 node.default['qemu']['dns']['cloud_config'] = {
   "write_files" => [],

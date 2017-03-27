@@ -23,7 +23,7 @@ node.default['qemu']['transmission']['networking'] = {
 
 node.default['qemu']['transmission']['chef_recipes'] = [
   "nftables-app::filter",
-  "openvpn-app::client",
+  "openvpn-app::pia_client",
   "transmission-app::main"
 ]
 node.default['qemu']['transmission']['cloud_config'] = {
