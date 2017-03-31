@@ -49,10 +49,10 @@ node.default['qemu']['gateway']['networking'] = {
 
 node.default['qemu']['gateway']['chef_recipes'] = [
   "nftables-app::gateway",
-  "keepalived-app::gateway",
-  "unbound-app::main",
+  "kea-app::dhcp4",
   "nsd-app::main",
-  "kea-app::dhcp4"
+  "unbound-app::main",
+  "keepalived-app::gateway"
 ]
 node.default['qemu']['gateway']['cloud_config'] = {
   "write_files" => [],

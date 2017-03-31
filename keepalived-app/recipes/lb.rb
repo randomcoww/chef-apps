@@ -12,12 +12,9 @@ keepalived_vrrp_sync_group 'VG_lb' do
 end
 
 keepalived_vrrp_instance 'VI_lb' do
-  state 'BACKUP'
-  # use_vmac 'vrrp20'
   nopreempt true
   interface node['environment']['lb_if']
   virtual_router_id node['environment']['lb_ha_id']
-  priority 100
   authentication auth_type: 'AH', auth_pass: password
   virtual_ipaddress [ node['environment']['lb_vip'] ]
 end

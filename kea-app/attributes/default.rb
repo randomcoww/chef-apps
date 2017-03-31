@@ -8,7 +8,6 @@ node.default['kea']['dhcp4_config'] = {
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },
-    "match-client-id" => false,
     "lease-database" => {
       "type" => "memfile",
       "persist" => true
