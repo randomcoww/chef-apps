@@ -16,7 +16,7 @@ keepalived_vrrp_instance 'VI_gateway' do
   interface node['environment']['lan_if']
   virtual_router_id node['environment']['lan_vrrp_id']
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment']['lan_vip_gateway'] ]
+  virtual_ipaddress [ "#{node['environment']['lan_vip_gateway']}/#{node['environment']['lan_subnet'].split('/').last}" ]
   notify_master %Q{"/sbin/ip link set #{node['environment']['wan_if']} up"}
   notify_backup %Q{"/sbin/ip link set #{node['environment']['wan_if']} down"}
   notify_fault %Q{"/sbin/ip link set #{node['environment']['wan_if']} down"}

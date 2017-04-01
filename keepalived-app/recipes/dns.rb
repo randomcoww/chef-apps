@@ -16,7 +16,7 @@ keepalived_vrrp_instance 'VI_dns' do
   interface node['environment']['dns_if']
   virtual_router_id node['environment']['dns_ha_id']
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment']['dns_vip'] ]
+  virtual_ipaddress [ "#{node['environment']['dns_vip']}/#{node['environment']['lan_subnet'].split('/').last}" ]
 end
 
 include_recipe 'keepalived::service'
