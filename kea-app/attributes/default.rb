@@ -2,9 +2,9 @@ node.default['kea']['pkg_update_command'] = "apt-get update -qqy"
 node.default['kea']['pkg_names'] = ['kea-dhcp4-server']
 node.default['kea']['dhcp4_config'] = {
   "Dhcp4" => {
-    "valid-lifetime" => 4000,
-    "renew-timer" => 1000,
-    "rebind-timer" => 2000,
+    "valid-lifetime" => 300,
+    # "renew-timer" => 300,
+    # "rebind-timer" => 300,
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },
@@ -23,7 +23,7 @@ node.default['kea']['dhcp4_config'] = {
           {
             "name" => "domain-name-servers",
             "data" => [
-              node['environment']['dns_vip'],
+              node['environment']['lb_vip'],
               node['environment']['lan_vip_gateway'],
               '8.8.8.8'
             ].join(','),

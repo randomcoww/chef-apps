@@ -11,7 +11,7 @@ package node['nsd']['pkg_names'] do
   notifies :stop, "service[nsd]", :immediately
 end
 
-nsd_resource_rndc_key_config 'main_rndc-key' do
+nsd_resource_rndc_key_config 'docker_rndc-key' do
   rndc_keys_data_bag node['nsd']['main']['rndc_keys_data_bag']
   rndc_keys_data_bag_item node['nsd']['main']['rndc_keys_data_bag_item']
   rndc_key_names node['nsd']['main']['rndc_key_names']

@@ -18,12 +18,19 @@ node.default['qemu']['transmission']['networking'] = {
       "LinkLocalAddressing" => "yes",
       "DHCP" => "no"
     }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
+    }
   }
 }
 
 node.default['qemu']['transmission']['chef_recipes'] = [
   "nftables-app::filter",
-  "openvpn-app::pia_client",
   "transmission-app::main"
 ]
 node.default['qemu']['transmission']['cloud_config'] = {
@@ -43,7 +50,8 @@ node.default['qemu']['transmission']['cloud_config'] = {
       "chef-client", "-o",
       node['qemu']['transmission']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
-    ]
+    ],
+    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
 }
 

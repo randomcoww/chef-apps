@@ -19,6 +19,14 @@ node.default['qemu']['gluster']['networking'] = {
       "DHCP" => "no",
       "Address" => node['environment']['gluster_ip']
     }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
+    }
   }
 }
 

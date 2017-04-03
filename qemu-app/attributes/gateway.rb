@@ -7,11 +7,14 @@ node.default['qemu']['gateway']['networking'] = {
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "yes",
+      "DHCP" => "no"
+    },
+    "Address" => {
       "Address" => node['environment']['gateway_ip']
     },
-    "DHCP" => {
-      "RouteMetric" => 2048
+    "Route" => {
+      "Gateway" => node['environment']['lan_vip_gateway'],
+      "Metric" => 2048
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -43,6 +46,14 @@ node.default['qemu']['gateway']['networking'] = {
       "UseDomains" => "false",
       "UseTimezone" => "no",
       "RouteMetric" => 1024
+    }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald --iptables=false"
+      ]
     }
   }
 }

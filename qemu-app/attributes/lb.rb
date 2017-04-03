@@ -7,16 +7,36 @@ node.default['qemu']['lb']['networking'] = {
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "yes"
+      "DHCP" => "no",
+      "DNS" => [
+        "127.0.0.1",
+        "8.8.8.8"
+      ]
+    },
+    "Address" => {
+      "Address" => node['environment']['lb_ip']
+    },
+    "Route" => {
+      "Gateway" => node['environment']['lan_vip_gateway'],
+      "Metric" => 2048
+    }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
     }
   }
 }
 
 node.default['qemu']['lb']['chef_recipes'] = [
   "keepalived-app::lb",
-  "haproxy-app::lb"
+  "haproxy-app::lb",
+  "nsd-app::main",
+  "unbound-app::main"
 ]
-
 node.default['qemu']['lb']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -33,7 +53,8 @@ node.default['qemu']['lb']['cloud_config'] = {
       "chef-client", "-o",
       node['qemu']['lb']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
-    ]
+    ],
+    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
 }
 

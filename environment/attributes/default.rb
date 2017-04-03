@@ -10,10 +10,6 @@ node.default['environment']['vpn_subnet_dhcp'] = "192.168.30.32/27"
 
 node.default['environment']['wan_if'] = "eth2"
 
-node.default['environment']['dns_if'] = "eth0"
-node.default['environment']['dns_vip'] = "192.168.62.250"
-node.default['environment']['dns_ha_id'] = 21
-
 node.default['environment']['lb_if'] = "eth0"
 node.default['environment']['lb_vip'] = "192.168.62.230"
 node.default['environment']['lb_ha_id'] = 22
