@@ -10,10 +10,10 @@ node.default['qemu']['gateway']['networking'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => node['environment']['gateway_ip']
+      "Address" => "#{node['environment_v2']['gateway_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment']['lan_vip_gateway'],
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
       "Metric" => 2048
     }
   },
@@ -248,7 +248,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_lan_if'],
+              "dev"=>node['environment_v2']['host_lan_if'],
               "mode"=>"bridge"
             }
           },
@@ -264,7 +264,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_vpn_if'],
+              "dev"=>node['environment_v2']['host_vpn_if'],
               "mode"=>"bridge"
             }
           },
@@ -280,12 +280,12 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "mac"=>{
             "#attributes"=>{
-              "address"=>node['environment']['wan_mac']
+              "address"=>node['environment_v2']['host_wan_mac']
             }
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_wan_if'],
+              "dev"=>node['environment_v2']['host_wan_if'],
               "mode"=>"bridge"
             }
           },

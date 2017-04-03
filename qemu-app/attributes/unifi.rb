@@ -175,7 +175,7 @@ node.default['qemu']['unifi']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_lan_if'],
+              "dev"=>node['environment_v2']['host_lan_if'],
               "mode"=>"bridge"
             }
           },

@@ -7,7 +7,18 @@ node.default['qemu']['gluster']['networking'] = {
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "yes"
+      "DHCP" => "no",
+      "DNS" => [
+        node['environment_v2']['lb_lan_vip'],
+        "8.8.8.8"
+      ]
+    },
+    "Address" => {
+      "Address" => node['environment_v2']['gluster_lan_ip']
+    },
+    "Route" => {
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
+      "Metric" => 2048
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -17,7 +28,9 @@ node.default['qemu']['gluster']['networking'] = {
     "Network" => {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
-      "Address" => node['environment']['gluster_ip']
+    },
+    "Address" => {
+      "Address" => node['environment_v2']['gluster_store_ip']
     }
   },
   '/etc/systemd/system/docker.service.d/log-driver.conf' => {
@@ -203,7 +216,7 @@ node.default['qemu']['gluster']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_lan_if'],
+              "dev"=>node['environment_v2']['host_lan_if'],
               "mode"=>"bridge"
             }
           },
@@ -219,7 +232,7 @@ node.default['qemu']['gluster']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_storage_if'],
+              "dev"=>node['environment_v2']['host_store_if'],
               "mode"=>"bridge"
             }
           },

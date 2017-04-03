@@ -1,0 +1,37 @@
+{
+  "name": "host_vm1",
+  "description": "",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+    "environment_v2": {
+      "host_lan_if": "eno1",
+      "host_vpn_if": "vpn",
+      "host_wan_if": "wan",
+      "host_store_if": "enp5s0",
+      "host_wan_mac": "52:54:00:63:6e:b0"
+    }
+  },
+  "chef_type": "role",
+  "run_list": [
+
+  ],
+  "env_run_lists": {
+
+  }
+}
+
+
+{
+  "gateway_lan_ip": {
+    "machine-id": "192.168.62.241"
+  },
+  "res2": "machine-id2",
+
+  "machine-id1": "ip",
+  "machine-id2": "ip",
+
+
+}

@@ -203,7 +203,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_lan_if'],
+              "dev"=>node['environment_v2']['host_lan_if'],
               "mode"=>"bridge"
             }
           },
@@ -219,7 +219,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_vpn_if'],
+              "dev"=>node['environment_v2']['host_vpn_if'],
               "mode"=>"bridge"
             }
           },

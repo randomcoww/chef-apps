@@ -14,10 +14,10 @@ node.default['qemu']['lb']['networking'] = {
       ]
     },
     "Address" => {
-      "Address" => node['environment']['lb_ip']
+      "Address" => "#{node['environment_v2']['lb_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment']['lan_vip_gateway'],
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
       "Metric" => 2048
     }
   },
@@ -216,7 +216,7 @@ node.default['qemu']['lb']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment']['host_lan_if'],
+              "dev"=>node['environment_v2']['host_lan_if'],
               "mode"=>"bridge"
             }
           },
