@@ -18,6 +18,7 @@ node.default['environment']['lb_if'] = "eth0"
 node.default['environment']['lb_vip'] = "192.168.62.230"
 node.default['environment']['lb_ha_id'] = 22
 
+node.default['environment']['lb_ip'] = "192.168.62.252/23"
 node.default['environment']['gateway_ip'] = "192.168.62.242/23"
 
 node.default['environment']['host_lan_if'] = 'eno1'
