@@ -12,6 +12,31 @@ module EnvironmentResource
   #   }
   # }
 
+
+  class Ip
+    def initialize(node)
+      @vars = node['environment_resource']
+    end
+
+    def get(key)
+      @vars[key].each do |ip|
+        next if host_up?(ip)
+        return ip
+      end
+    end
+
+
+    private
+
+    def host_up?(ip)
+      # check = Net::Ping::External.new(ip)
+      # check.ping?
+      system("ping #{ip} -c 3")
+      return $?.success?
+    end
+  end
+
+
   class Data
     require 'socket'
     require 'ipaddr'
