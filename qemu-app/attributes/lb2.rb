@@ -1,6 +1,7 @@
-node.default['qemu']['gluster']['cloud_config_hostname'] = 'gluster'
-node.default['qemu']['gluster']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster']['cloud_config_hostname']}"
-node.default['qemu']['gluster']['networking'] = {
+node.default['qemu']['lb2']['cloud_config_hostname'] = 'lb2'
+node.default['qemu']['lb2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['lb2']['cloud_config_hostname']}"
+
+node.default['qemu']['lb2']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -9,28 +10,16 @@ node.default['qemu']['gluster']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['lb_lan_vip'],
+        "127.0.0.1",
         "8.8.8.8"
       ]
     },
     "Address" => {
-      "Address" => node['environment_v2']['gluster_lan_ip']
+      "Address" => "#{node['environment_v2']['lb2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['gateway_lan_vip'],
       "Metric" => 2048
-    }
-  },
-  '/etc/systemd/network/eth1.network' => {
-    "Match" => {
-      "Name" => "eth1"
-    },
-    "Network" => {
-      "LinkLocalAddressing" => "no",
-      "DHCP" => "no",
-    },
-    "Address" => {
-      "Address" => node['environment_v2']['gluster_store_ip']
     }
   },
   '/etc/systemd/system/docker.service.d/log-driver.conf' => {
@@ -43,7 +32,13 @@ node.default['qemu']['gluster']['networking'] = {
   }
 }
 
-node.default['qemu']['gluster']['cloud_config'] = {
+node.default['qemu']['lb2']['chef_recipes'] = [
+  "keepalived-app::lb",
+  "haproxy-app::lb",
+  "nsd-app::main",
+  "unbound-app::main"
+]
+node.default['qemu']['lb2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -53,19 +48,24 @@ node.default['qemu']['gluster']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['gluster']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['lb2']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install glusterfs-server"
+    [
+      "chef-client", "-o",
+      node['qemu']['lb2']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      "-j", "/etc/chef/environment.json"
+    ],
+    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
 }
 
 
-node.default['qemu']['gluster']['libvirt_config'] = {
+node.default['qemu']['lb2']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['gluster']['cloud_config_hostname'],
+    "name"=>node['qemu']['lb2']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -147,7 +147,7 @@ node.default['qemu']['gluster']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/gluster.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['lb2']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -198,7 +198,7 @@ node.default['qemu']['gluster']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['gluster']['cloud_config_path']
+              "dir"=>node['qemu']['lb2']['cloud_config_path']
             }
           },
           "target"=>{
@@ -212,27 +212,12 @@ node.default['qemu']['gluster']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment_v2']['host_lan_if'],
-              "mode"=>"bridge"
-            }
-          },
-          "model"=>{
-            "#attributes"=>{
-              "type"=>"virtio-net"
-            }
-          }
-        },
-        {
-          "#attributes"=>{
-            "type"=>"direct"
-          },
-          "source"=>{
-            "#attributes"=>{
-              "dev"=>node['environment_v2']['host_store_if'],
               "mode"=>"bridge"
             }
           },

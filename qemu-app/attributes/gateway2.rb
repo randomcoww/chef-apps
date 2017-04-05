@@ -1,6 +1,7 @@
-node.default['qemu']['gateway']['cloud_config_hostname'] = 'gateway'
-node.default['qemu']['gateway']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway']['cloud_config_hostname']}"
-node.default['qemu']['gateway']['networking'] = {
+node.default['qemu']['gateway2']['cloud_config_hostname'] = 'gateway2'
+node.default['qemu']['gateway2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway2']['cloud_config_hostname']}"
+
+node.default['qemu']['gateway2']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -10,7 +11,7 @@ node.default['qemu']['gateway']['networking'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['gateway_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['gateway2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['gateway_lan_vip'],
@@ -58,14 +59,15 @@ node.default['qemu']['gateway']['networking'] = {
   }
 }
 
-node.default['qemu']['gateway']['chef_recipes'] = [
+node.default['qemu']['gateway2']['chef_recipes'] = [
+  "environment_resource::delete_resources",
   "nftables-app::gateway",
-  "kea-app::dhcp4",
+  "kea-app::pool2",
   "nsd-app::main",
   "unbound-app::main",
   "keepalived-app::gateway"
 ]
-node.default['qemu']['gateway']['cloud_config'] = {
+node.default['qemu']['gateway2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -75,11 +77,11 @@ node.default['qemu']['gateway']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['gateway']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['gateway2']['cloud_config_hostname']}.lan",
   "runcmd" => [
     [
       "chef-client", "-o",
-      node['qemu']['gateway']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['gateway2']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
     ]
   ]
@@ -91,12 +93,12 @@ node.default['qemu']['gateway']['cloud_config'] = {
 }
 
 
-node.default['qemu']['gateway']['libvirt_config'] = {
+node.default['qemu']['gateway2']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['gateway']['cloud_config_hostname'],
+    "name"=>node['qemu']['gateway2']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -178,7 +180,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/gateway.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['gateway2']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -229,7 +231,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['gateway']['cloud_config_path']
+              "dir"=>node['qemu']['gateway2']['cloud_config_path']
             }
           },
           "target"=>{
@@ -280,7 +282,7 @@ node.default['qemu']['gateway']['libvirt_config'] = {
           },
           "mac"=>{
             "#attributes"=>{
-              "address"=>node['environment_v2']['host_wan_mac']
+              "address"=>node['environment_v2']['gateway2_wan_mac']
             }
           },
           "source"=>{

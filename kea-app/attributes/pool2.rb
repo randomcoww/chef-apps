@@ -1,8 +1,4 @@
-node.default['kea']['main']['reservations'] = {
-  "52:54:00:ac:da:f3" => "192.168.62.99"
-}
-
-node.default['kea']['main'] = {
+node.default['kea']['pool2']['config'] = {
   "Dhcp4" => {
     "valid-lifetime" => 300,
     # "renew-timer" => 300,
@@ -34,10 +30,10 @@ node.default['kea']['main'] = {
         ],
         "pools" => [
           {
-           "pool" => node['environment_v2']['lan_dhcp_pool']
+           "pool" => node['environment_v2']['lan_dhcp_pool2']
           }
         ],
-        "reservations" => node['kea']['main']['reservations'].map { |k, v|
+        "reservations" => node['kea']['lan_reservations'].map { |k, v|
           {
             "hw-address" => k,
             "ip-address" => v
@@ -48,7 +44,7 @@ node.default['kea']['main'] = {
         "subnet" => node['environment_v2']['vpn_subnet'],
         "pools" => [
           {
-           "pool" => node['environment_v2']['vpn_dhcp_pool']
+           "pool" => node['environment_v2']['vpn_dhcp_pool2']
           }
         ]
       }

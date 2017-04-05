@@ -22,16 +22,3 @@
 
   }
 }
-
-
-{
-  "gateway_lan_ip": {
-    "machine-id": "192.168.62.241"
-  },
-  "res2": "machine-id2",
-
-  "machine-id1": "ip",
-  "machine-id2": "ip",
-
-
-}

@@ -1,19 +1,44 @@
-node.default['qemu']['unifi']['cloud_config_hostname'] = 'unifi'
-node.default['qemu']['unifi']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['unifi']['cloud_config_hostname']}"
+node.default['qemu']['lb1']['cloud_config_hostname'] = 'lb1'
+node.default['qemu']['lb1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['lb1']['cloud_config_hostname']}"
 
-node.default['qemu']['unifi']['networking'] = {
+node.default['qemu']['lb1']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "yes"
+      "DHCP" => "no",
+      "DNS" => [
+        "127.0.0.1",
+        "8.8.8.8"
+      ]
+    },
+    "Address" => {
+      "Address" => "#{node['environment_v2']['lb1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+    },
+    "Route" => {
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
+      "Metric" => 2048
+    }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
     }
   }
 }
 
-node.default['qemu']['unifi']['cloud_config'] = {
+node.default['qemu']['lb1']['chef_recipes'] = [
+  "keepalived-app::lb",
+  "haproxy-app::lb",
+  "nsd-app::main",
+  "unbound-app::main"
+]
+node.default['qemu']['lb1']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -23,26 +48,24 @@ node.default['qemu']['unifi']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['unifi']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['lb1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    'apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr',
-    'apt-key adv --keyserver keyserver.ubuntu.com --recv C0A52C50',
-    'echo "deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list',
-    "apt-get -y update",
-    "apt-get -y install --no-install-recommends unifi",
-    "systemctl disable mongodb",
-    "systemctl start unifi",
-    "systemctl enable unifi"
+    [
+      "chef-client", "-o",
+      node['qemu']['lb1']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      "-j", "/etc/chef/environment.json"
+    ],
+    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
 }
 
 
-node.default['qemu']['unifi']['libvirt_config'] = {
+node.default['qemu']['lb1']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['unifi']['cloud_config_hostname'],
+    "name"=>node['qemu']['lb1']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -124,7 +147,7 @@ node.default['qemu']['unifi']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{['qemu']['unifi']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['lb1']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -158,7 +181,24 @@ node.default['qemu']['unifi']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['unifi']['cloud_config_path']
+              "dir"=>"/img/secret/chef"
+            }
+          },
+          "target"=>{
+            "#attributes"=>{
+              "dir"=>"chef-secret"
+            }
+          },
+          "readonly"=>""
+        },
+        {
+          "#attributes"=>{
+            "type"=>"mount",
+            "accessmode"=>"squash"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dir"=>node['qemu']['lb1']['cloud_config_path']
             }
           },
           "target"=>{
@@ -172,7 +212,8 @@ node.default['qemu']['unifi']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{

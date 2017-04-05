@@ -1,8 +1,0 @@
-name             'environment_resource'
-maintainer       'YOUR_NAME'
-maintainer_email 'YOUR_EMAIL'
-license          'All rights reserved'
-description      'Installs/Configures environment_resource'
-long_description 'Installs/Configures environment_resource'
-version          '0.1.0'
-depends          'dbag'

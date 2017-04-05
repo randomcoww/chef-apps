@@ -1,14 +1,21 @@
-node.default['qemu']['transmission']['cloud_config_hostname'] = 'transmission'
-node.default['qemu']['transmission']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['transmission']['cloud_config_hostname']}"
+node.default['qemu']['gateway1']['cloud_config_hostname'] = 'gateway1'
+node.default['qemu']['gateway1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway1']['cloud_config_hostname']}"
 
-node.default['qemu']['transmission']['networking'] = {
+node.default['qemu']['gateway1']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
     },
     "Network" => {
       "LinkLocalAddressing" => "no",
-      "DHCP" => "yes"
+      "DHCP" => "no"
+    },
+    "Address" => {
+      "Address" => "#{node['environment_v2']['gateway1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+    },
+    "Route" => {
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
+      "Metric" => 2048
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -16,25 +23,51 @@ node.default['qemu']['transmission']['networking'] = {
       "Name" => "eth1"
     },
     "Network" => {
-      "LinkLocalAddressing" => "yes",
+      "LinkLocalAddressing" => "no",
       "DHCP" => "no"
+    }
+  },
+  '/etc/systemd/network/eth2.network' => {
+    "Match" => {
+      "Name" => "eth2"
+    },
+    "Network" => {
+      "LinkLocalAddressing" => "no",
+      "DHCP" => "yes",
+      "DNS" => [
+        "127.0.0.1",
+        "8.8.8.8"
+      ]
+    },
+    "DHCP" => {
+      "UseDNS" => "false",
+      "UseNTP" => "false",
+      "SendHostname" => "false",
+      "UseHostname" => "false",
+      "UseDomains" => "false",
+      "UseTimezone" => "no",
+      "RouteMetric" => 1024
     }
   },
   '/etc/systemd/system/docker.service.d/log-driver.conf' => {
     "Service" => {
       "ExecStart" => [
         '',
-        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+        "/usr/bin/dockerd -H fd:// --log-driver=journald --iptables=false"
       ]
     }
   }
 }
 
-node.default['qemu']['transmission']['chef_recipes'] = [
-  "nftables-app::filter",
-  "transmission-app::main"
+node.default['qemu']['gateway1']['chef_recipes'] = [
+  "environment_resource::delete_resources",
+  "nftables-app::gateway",
+  "kea-app::pool1",
+  "nsd-app::main",
+  "unbound-app::main",
+  "keepalived-app::gateway"
 ]
-node.default['qemu']['transmission']['cloud_config'] = {
+node.default['qemu']['gateway1']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -44,25 +77,28 @@ node.default['qemu']['transmission']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['transmission']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['gateway1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install glusterfs-client",
     [
       "chef-client", "-o",
-      node['qemu']['transmission']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['gateway1']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
       "-j", "/etc/chef/environment.json"
-    ],
-    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
+    ]
   ]
+  # "ssh_authorized_keys" => [
+  #   {
+  #     "ssh-rsa" => "AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN"
+  #   }
+  # ]
 }
 
 
-node.default['qemu']['transmission']['libvirt_config'] = {
+node.default['qemu']['gateway1']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['transmission']['cloud_config_hostname'],
+    "name"=>node['qemu']['gateway1']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -144,7 +180,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['transmission']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['gateway1']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -195,7 +231,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['transmission']['cloud_config_path']
+              "dir"=>node['qemu']['gateway1']['cloud_config_path']
             }
           },
           "target"=>{
@@ -209,7 +245,8 @@ node.default['qemu']['transmission']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{
@@ -229,7 +266,28 @@ node.default['qemu']['transmission']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_store_if'],
+              "dev"=>node['environment_v2']['host_vpn_if'],
+              "mode"=>"bridge"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"direct"
+          },
+          "mac"=>{
+            "#attributes"=>{
+              "address"=>node['environment_v2']['gateway1_wan_mac']
+            }
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dev"=>node['environment_v2']['host_wan_if'],
               "mode"=>"bridge"
             }
           },

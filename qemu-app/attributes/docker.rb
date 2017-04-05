@@ -1,5 +1,6 @@
 node.default['qemu']['docker']['cloud_config_hostname'] = 'docker'
 node.default['qemu']['docker']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['docker']['cloud_config_hostname']}"
+
 node.default['qemu']['docker']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
@@ -134,7 +135,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/docker.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['docker']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{

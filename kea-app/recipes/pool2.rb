@@ -8,8 +8,8 @@ package node['kea']['pkg_names'] do
   notifies :restart, "service[kea-dhcp4-server]", :delayed
 end
 
-kea_dhcp4_config 'kea-main' do
-  config node['kea']['main']
+kea_dhcp4_config 'kea-pool2' do
+  config node['kea']['pool2']['config']
   action :create
   notifies :restart, "service[kea-dhcp4-server]", :delayed
 end

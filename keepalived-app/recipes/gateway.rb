@@ -4,13 +4,6 @@ dbag = Dbag::Keystore.new(
 )
 password = dbag.get_or_create('VG_gateway', SecureRandom.base64(6))
 
-environment_resource = EnvironmentResource::Register.new(
-  node['environment_v2']['lan_subnet'],
-  node['environment_resource']['data_bag'],
-  node['environment_resource']['data_bag_item']
-)
-
-
 execute "pkg_update" do
   command node['keepalived']['pkg_update_command']
   action :run
@@ -28,7 +21,7 @@ keepalived_vrrp_instance 'VI_gateway' do
   interface node['keepalived']['gateway']['lan_if']
   virtual_router_id 20
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ "#{node['environment_v2']['lb_lan_vip']}/#{node['environment_v2']['lan_subnet'].split('/').last}" ]
+  virtual_ipaddress [ node['environment_v2']['gateway_lan_vip'] ]
   notify_master %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} up"}
   notify_backup %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
   notify_fault %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
