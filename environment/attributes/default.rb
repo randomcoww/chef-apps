@@ -1,3 +1,13 @@
+node.default['environment_v2']['vm1']['host_lan_if'] = "eno1"
+node.default['environment_v2']['vm1']['host_vpn_if'] = "vpn"
+node.default['environment_v2']['vm1']['host_wan_if'] = "wan"
+node.default['environment_v2']['vm1']['host_store_if'] = "enp5s0"
+
+node.default['environment_v2']['vm2']['host_lan_if'] = "eno1"
+node.default['environment_v2']['vm2']['host_vpn_if'] = "vpn"
+node.default['environment_v2']['vm2']['host_wan_if'] = "wan"
+node.default['environment_v2']['vm2']['host_store_if'] = "enp7s0"
+
 ## common
 node.default['environment_v2']['gateway_lan_vip'] = "192.168.62.240"
 node.default['environment_v2']['lb_lan_vip'] = "192.168.62.230"
@@ -27,8 +37,8 @@ node.default['environment_v2']['vpn_dhcp_pool1'] = "192.168.30.32/27"
 node.default['environment_v2']['vpn_dhcp_pool2'] = "192.168.30.64/27"
 
 ##
-if !node['environment_v2']["_#{node['hostname']}"].nil?
-  node['environment_v2']["_#{node['hostname']}"].each do |k, v|
-    node.override['environment_v2'][k] = v
+if !node['environment_v2'][node['hostname']].nil?
+  node['environment_v2'][node['hostname']].each do |k, v|
+    node.default['environment_v2'][k] = v
   end
 end
