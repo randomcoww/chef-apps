@@ -60,8 +60,7 @@ node.default['qemu']['gateway2']['networking'] = {
 }
 
 node.default['qemu']['gateway2']['chef_recipes'] = [
-  "recipe[#{node['hostname']}]",
-  "recipe[environment_resource::delete_resources]",
+  "recipe[environment::#{node['hostname']}]",
   "recipe[nftables-app::gateway]",
   "recipe[kea-app::pool2]",
   "recipe[nsd-app::main]",

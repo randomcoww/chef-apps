@@ -31,7 +31,7 @@ node.default['qemu']['transmission']['networking'] = {
 }
 
 node.default['qemu']['transmission']['chef_recipes'] = [
-  "recipe[#{node['hostname']}]",
+  "recipe[environment::#{node['hostname']}]",
   "recipe[nftables-app::filter]",
   "recipe[transmission-app::main]"
 ]

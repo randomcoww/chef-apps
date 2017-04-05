@@ -124,7 +124,7 @@ node.default['qemu']['unifi']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{['qemu']['unifi']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['unifi']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{

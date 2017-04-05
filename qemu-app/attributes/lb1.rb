@@ -33,7 +33,7 @@ node.default['qemu']['lb1']['networking'] = {
 }
 
 node.default['qemu']['lb1']['chef_recipes'] = [
-  "recipe[#{node['hostname']}]",
+  "recipe[environment::#{node['hostname']}]",
   "recipe[keepalived-app::lb]",
   "recipe[haproxy-app::lb]",
   "recipe[nsd-app::main]",
