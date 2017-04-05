@@ -1,3 +1,5 @@
+include_attributes "environment::#{node['hostname']}"
+
 ## common
 node.default['environment_v2']['gateway_lan_vip'] = "192.168.62.240"
 node.default['environment_v2']['lb_lan_vip'] = "192.168.62.230"
