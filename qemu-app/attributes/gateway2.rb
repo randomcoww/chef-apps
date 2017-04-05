@@ -60,12 +60,13 @@ node.default['qemu']['gateway2']['networking'] = {
 }
 
 node.default['qemu']['gateway2']['chef_recipes'] = [
-  "environment_resource::delete_resources",
-  "nftables-app::gateway",
-  "kea-app::pool2",
-  "nsd-app::main",
-  "unbound-app::main",
-  "keepalived-app::gateway"
+  "recipe[#{node['hostname']}]",
+  "recipe[environment_resource::delete_resources]",
+  "recipe[nftables-app::gateway]",
+  "recipe[kea-app::pool2]",
+  "recipe[nsd-app::main]",
+  "recipe[unbound-app::main]",
+  "recipe[keepalived-app::gateway]"
 ]
 node.default['qemu']['gateway2']['cloud_config'] = {
   "write_files" => [],
@@ -81,7 +82,7 @@ node.default['qemu']['gateway2']['cloud_config'] = {
   "runcmd" => [
     [
       "chef-client", "-o",
-      node['qemu']['gateway2']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['gateway2']['chef_recipes'].join(','),
       "-j", "/etc/chef/environment.json"
     ]
   ]

@@ -31,8 +31,9 @@ node.default['qemu']['transmission']['networking'] = {
 }
 
 node.default['qemu']['transmission']['chef_recipes'] = [
-  "nftables-app::filter",
-  "transmission-app::main"
+  "recipe[#{node['hostname']}]",
+  "recipe[nftables-app::filter]",
+  "recipe[transmission-app::main]"
 ]
 node.default['qemu']['transmission']['cloud_config'] = {
   "write_files" => [],
@@ -49,7 +50,7 @@ node.default['qemu']['transmission']['cloud_config'] = {
     "apt-get -y install glusterfs-client",
     [
       "chef-client", "-o",
-      node['qemu']['transmission']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['transmission']['chef_recipes'].join(','),
       "-j", "/etc/chef/environment.json"
     ],
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"

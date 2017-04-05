@@ -33,10 +33,11 @@ node.default['qemu']['lb1']['networking'] = {
 }
 
 node.default['qemu']['lb1']['chef_recipes'] = [
-  "keepalived-app::lb",
-  "haproxy-app::lb",
-  "nsd-app::main",
-  "unbound-app::main"
+  "recipe[#{node['hostname']}]",
+  "recipe[keepalived-app::lb]",
+  "recipe[haproxy-app::lb]",
+  "recipe[nsd-app::main]",
+  "recipe[unbound-app::main]"
 ]
 node.default['qemu']['lb1']['cloud_config'] = {
   "write_files" => [],
@@ -52,7 +53,7 @@ node.default['qemu']['lb1']['cloud_config'] = {
   "runcmd" => [
     [
       "chef-client", "-o",
-      node['qemu']['lb1']['chef_recipes'].map { |e| "recipe[#{e}]" }.join(','),
+      node['qemu']['lb1']['chef_recipes'].join(','),
       "-j", "/etc/chef/environment.json"
     ],
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
