@@ -20,8 +20,9 @@ keepalived_vrrp_instance 'VI_gateway' do
   nopreempt true
   interface node['keepalived']['gateway']['lan_if']
   virtual_router_id 20
+  # use_vmac 'vrrp20'
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment_v2']['gateway_lan_vip'] ]
+  virtual_ipaddress [ "#{node['environment_v2']['gateway_lan_vip']}/#{node['environment_v2']['lan_subnet'].split('/').last}" ]
   notify_master %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} up"}
   notify_backup %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
   notify_fault %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}

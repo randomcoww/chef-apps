@@ -8,7 +8,9 @@ node.default['unbound']['main']['config'] = {
     'do-udp' => true,
     'do-tcp' => true,
     'access-control' => [
-      "127.0.0.0/8 allow"
+      "127.0.0.0/8 allow",
+      "#{node['environment_v2']['lan_subnet']} allow",
+      "#{node['environment_v2']['vpn_subnet']} allow"
     ],
     'private-domain' => "lan.",
     "do-not-query-localhost" => false,

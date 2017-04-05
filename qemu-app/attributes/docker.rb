@@ -42,6 +42,11 @@ node.default['qemu']['docker']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['docker']['cloud_config_hostname']}.lan",
   "runcmd" => [
+    "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
+    "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
+    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
+    "apt-get -y update",
+    "apt-get -y --allow-unauthenticated install docker-engine",
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --name sshd -p 2222:22 randomcoww/chef-client:entrypoint -o recipe[sshd-app::docker]",
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --name ddclient randomcoww/chef-client:entrypoint -o recipe[ddclient-app::freedns]"
   ]

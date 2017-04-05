@@ -32,14 +32,6 @@ node.default['qemu']['gluster2']['networking'] = {
     "Address" => {
       "Address" => "#{node['environment_v2']['gluster2_store_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
     }
-  },
-  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
-    "Service" => {
-      "ExecStart" => [
-        '',
-        "/usr/bin/dockerd -H fd:// --log-driver=journald"
-      ]
-    }
   }
 }
 

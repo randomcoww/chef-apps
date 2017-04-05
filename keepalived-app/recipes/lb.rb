@@ -20,8 +20,9 @@ keepalived_vrrp_instance 'VI_lb' do
   nopreempt true
   interface node['keepalived']['lb']['lan_if']
   virtual_router_id 22
+  # use_vmac 'vrrp22'
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ node['environment_v2']['lb_lan_vip'] ]
+  virtual_ipaddress [ "#{node['environment_v2']['lb_lan_vip']}/#{node['environment_v2']['lan_subnet'].split('/').last}" ]
 end
 
 include_recipe 'keepalived::service'

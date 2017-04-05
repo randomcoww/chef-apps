@@ -47,11 +47,15 @@ node.default['qemu']['transmission']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['transmission']['cloud_config_hostname']}.lan",
   "runcmd" => [
+    "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
+    "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
+    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
+    "apt-get -y update",
+    "apt-get -y --allow-unauthenticated install docker-engine",
     "apt-get -y install glusterfs-client",
     [
       "chef-client", "-o",
-      node['qemu']['transmission']['chef_recipes'].join(','),
-      "-j", "/etc/chef/environment.json"
+      node['qemu']['transmission']['chef_recipes'].join(',')
     ],
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
