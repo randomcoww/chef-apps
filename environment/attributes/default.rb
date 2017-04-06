@@ -4,10 +4,27 @@ node.default['environment_v2']['vm1']['host_vpn_if'] = "vpn"
 node.default['environment_v2']['vm1']['host_wan_if'] = "wan"
 node.default['environment_v2']['vm1']['host_store_if'] = "enp5s0"
 
+node.default['environment_v2']['vm1']['hba_source'] = {
+  'domain' => "0x0000"
+  'bus' => "0x03"
+  'slot' => "0x00"
+  'function' => "0x0"
+  'file' => "/img/kvm/firmware/mptsas2.rom"
+}
+
 node.default['environment_v2']['vm2']['host_lan_if'] = "eno1"
 node.default['environment_v2']['vm2']['host_vpn_if'] = "vpn"
 node.default['environment_v2']['vm2']['host_wan_if'] = "wan"
 node.default['environment_v2']['vm2']['host_store_if'] = "enp7s0"
+
+node.default['environment_v2']['vm2']['hba_source'] = {
+  'domain' => "0x0000"
+  'bus' => "0x03"
+  'slot' => "0x00"
+  'function' => "0x0"
+  'file' => "/img/kvm/firmware/mptsas3.rom"
+}
+
 
 ## common
 node.default['environment_v2']['ssh_authorized_keys'] = [
