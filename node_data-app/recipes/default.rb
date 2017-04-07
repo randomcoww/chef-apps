@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: register_resource
+# Cookbook Name:: node_data-app
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

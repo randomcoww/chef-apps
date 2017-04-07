@@ -35,6 +35,9 @@ node.default['qemu']['gluster1']['networking'] = {
   }
 }
 
+node.default['qemu']['gluster1']['chef_recipes'] = [
+  "recipe[keepalived-app::gluster]"
+]
 node.default['qemu']['gluster1']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -47,7 +50,11 @@ node.default['qemu']['gluster1']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['gluster1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install glusterfs-server"
+    "apt-get -y install glusterfs-server",
+    [
+      "chef-client", "-o",
+      node['qemu']['gluster1']['chef_recipes'].join(',')
+    ]
   ]
 }
 
@@ -62,19 +69,19 @@ node.default['qemu']['gluster1']['libvirt_config'] = {
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"32"
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"32"
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"1"
+      "#text"=>"4"
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -110,7 +117,7 @@ node.default['qemu']['gluster1']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"1",
+          "cores"=>"4",
           "threads"=>"1"
         }
       }
@@ -204,7 +211,8 @@ node.default['qemu']['gluster1']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{
@@ -220,7 +228,8 @@ node.default['qemu']['gluster1']['libvirt_config'] = {
         },
         {
           "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
           },
           "source"=>{
             "#attributes"=>{
@@ -267,6 +276,35 @@ node.default['qemu']['gluster1']['libvirt_config'] = {
           "#attributes"=>{
             "type"=>"keyboard",
             "bus"=>"ps2"
+          }
+        }
+      ],
+      "hostdev" => [
+        {
+          "#attributes"=>{
+            "mode"=>"subsystem",
+            "type"=>"pci",
+            "managed"=>"yes"
+          },
+          "driver"=>{
+            "#attributes"=>{
+              "name"=>"vfio"
+            }
+          },
+          "source"=>{
+            "address"=>{
+              "#attributes"=>{
+                "domain"=>node['environment_v2']['hba_source']['domain'],
+                "bus"=>node['environment_v2']['hba_source']['bus'],
+                "slot"=>node['environment_v2']['hba_source']['slot'],
+                "function"=>node['environment_v2']['hba_source']['function'],
+              }
+            }
+          },
+          "rom"=>{
+            "#attributes"=>{
+              "file"=>node['environment_v2']['hba_source']['file']
+            }
           }
         }
       ],

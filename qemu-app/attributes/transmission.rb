@@ -31,7 +31,6 @@ node.default['qemu']['transmission']['networking'] = {
 }
 
 node.default['qemu']['transmission']['chef_recipes'] = [
-  "recipe[environment::#{node['hostname']}]",
   "recipe[nftables-app::filter]",
   "recipe[transmission-app::main]"
 ]
@@ -72,19 +71,19 @@ node.default['qemu']['transmission']['libvirt_config'] = {
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"2"
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"2"
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"1"
+      "#text"=>"2"
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -120,7 +119,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"1",
+          "cores"=>"2",
           "threads"=>"1"
         }
       }

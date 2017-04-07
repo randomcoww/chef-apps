@@ -1,4 +1,4 @@
-# register_resource-cookbook
+# node_data-app-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['register_resource']['bacon']</tt></td>
+    <td><tt>['node_data-app']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### register_resource::default
+### node_data-app::default
 
-Include `register_resource` in your node's `run_list`:
+Include `node_data-app` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[register_resource::default]"
+    "recipe[node_data-app::default]"
   ]
 }
 ```

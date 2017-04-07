@@ -70,7 +70,6 @@ node.default['qemu']['gateway1']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['gateway1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "systemctl daemon-reload",
     [
       "chef-client", "-o",
       node['qemu']['gateway1']['chef_recipes'].join(',')

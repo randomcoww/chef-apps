@@ -2,7 +2,7 @@ dbag = Dbag::Keystore.new(
   node['keepalived']['auth_data_bag'],
   node['keepalived']['auth_data_bag_item']
 )
-password = dbag.get_or_create('VG_lb', SecureRandom.base64(6))
+password = dbag.get_or_create('VI_lb', SecureRandom.base64(6))
 
 execute "pkg_update" do
   command node['keepalived']['pkg_update_command']

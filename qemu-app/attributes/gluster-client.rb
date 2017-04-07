@@ -1,7 +1,7 @@
-node.default['qemu']['docker']['cloud_config_hostname'] = 'docker'
-node.default['qemu']['docker']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['docker']['cloud_config_hostname']}"
+node.default['qemu']['gluster-client']['cloud_config_hostname'] = 'gluster-client'
+node.default['qemu']['gluster-client']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster-client']['cloud_config_hostname']}"
 
-node.default['qemu']['docker']['networking'] = {
+node.default['qemu']['gluster-client']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -16,21 +16,13 @@ node.default['qemu']['docker']['networking'] = {
       "Name" => "eth1"
     },
     "Network" => {
-      "LinkLocalAddressing" => "no",
-      "DHCP" => "no"
-    }
-  },
-  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
-    "Service" => {
-      "ExecStart" => [
-        '',
-        "/usr/bin/dockerd -H fd:// --log-driver=journald"
-      ]
+      "LinkLocalAddressing" => "ipv4",
+      "DHCP" => "no",
     }
   }
 }
 
-node.default['qemu']['docker']['cloud_config'] = {
+node.default['qemu']['gluster-client']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -40,25 +32,19 @@ node.default['qemu']['docker']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['docker']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['gluster-client']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
-    "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
-    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
-    "apt-get -y update",
-    "apt-get -y --allow-unauthenticated install docker-engine",
-    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --name sshd -p 2222:22 randomcoww/chef-client:entrypoint -o recipe[sshd-app::docker]",
-    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --name ddclient randomcoww/chef-client:entrypoint -o recipe[ddclient-app::freedns]"
+    "apt-get -y install glusterfs-client"
   ]
 }
 
 
-node.default['qemu']['docker']['libvirt_config'] = {
+node.default['qemu']['gluster-client']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['docker']['cloud_config_hostname'],
+    "name"=>node['qemu']['gluster-client']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -140,7 +126,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['docker']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['gluster-client']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -174,7 +160,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['docker']['cloud_config_path']
+              "dir"=>node['qemu']['gluster-client']['cloud_config_path']
             }
           },
           "target"=>{
@@ -208,7 +194,7 @@ node.default['qemu']['docker']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_vpn_if'],
+              "dev"=>node['environment_v2']['host_store_if'],
               "mode"=>"bridge"
             }
           },

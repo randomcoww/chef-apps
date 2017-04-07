@@ -4,14 +4,14 @@ execute "pkg_update" do
 end
 
 ## mount the data
-directory '/data' do
+directory '/data/transmission' do
   recursive true
   action :create
 end
 
-mount '/data/' do
+mount '/data/transmission' do
   fstype 'glusterfs'
-  device '169.254.127.30:/gluster_test'
+  device "#{node['environment_v2']['gluster_store_vip']}:/ctorrent"
   action [:mount, :enable]
 end
 
@@ -33,6 +33,13 @@ end
 package node['transmission']['pkg_names'] do
   action :upgrade
   notifies :stop, "service[transmission-daemon]", :immediately
+end
+
+directory ::File.dirname(node['transmission']['main']['config_path']) do
+  recursive true
+  owner node['transmission']['main']['user']
+  group node['transmission']['main']['group']
+  action :create
 end
 
 transmission_config "transmission" do

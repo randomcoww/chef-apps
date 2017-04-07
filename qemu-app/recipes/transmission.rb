@@ -15,7 +15,6 @@ qemu_cloud_config 'transmission' do
   config node['qemu']['transmission']['cloud_config']
   systemd_hash node.default['qemu']['transmission']['networking']
   action :create
-  # notifies :restart, "qemu_domain[docker]", :delayed
 end
 
 qemu_domain 'transmission' do
