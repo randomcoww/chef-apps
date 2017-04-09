@@ -57,11 +57,16 @@ node.default['environment_v2']['dhcp1_lan_ip'] = "192.168.62.221"
 node.default['environment_v2']['dhcp2_lan_ip'] = "192.168.62.222"
 node.default['environment_v2']['dhcp1_vpn_ip'] = "192.168.30.221"
 node.default['environment_v2']['dhcp2_vpn_ip'] = "192.168.30.222"
+# node.default['environment_v2']['dhcp1_store_ip'] = "169.254.127.221"
+# node.default['environment_v2']['dhcp2_store_ip'] = "169.254.127.222"
 
 node.default['environment_v2']['lan_dhcp_pool1'] = "192.168.62.32/27"
 node.default['environment_v2']['lan_dhcp_pool2'] = "192.168.62.64/27"
 node.default['environment_v2']['vpn_dhcp_pool1'] = "192.168.30.32/27"
 node.default['environment_v2']['vpn_dhcp_pool2'] = "192.168.30.64/27"
+
+node.default['environment_v2']['lan_dhcp_pool'] = "192.168.62.32/27"
+node.default['environment_v2']['vpn_dhcp_pool'] = "192.168.30.32/27"
 
 ##
 if !node['environment_v2'][node['hostname']].nil?
