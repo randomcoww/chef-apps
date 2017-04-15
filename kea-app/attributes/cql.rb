@@ -19,8 +19,7 @@ node.default['kea']['cql']['kea_config'] = {
           {
             "name" => "domain-name-servers",
             "data" => [
-              node['environment_v2']['lb_lan_vip'],
-              node['environment_v2']['gateway_lan_vip'],
+              node['environment_v2']['dns_lan_vip'],
               '8.8.8.8'
             ].join(','),
             "csv-format" => true

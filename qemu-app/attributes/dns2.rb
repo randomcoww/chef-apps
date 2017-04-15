@@ -1,7 +1,7 @@
-node.default['qemu']['lb2']['cloud_config_hostname'] = 'lb2'
-node.default['qemu']['lb2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['lb2']['cloud_config_hostname']}"
+node.default['qemu']['dns2']['cloud_config_hostname'] = 'dns2'
+node.default['qemu']['dns2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dns2']['cloud_config_hostname']}"
 
-node.default['qemu']['lb2']['networking'] = {
+node.default['qemu']['dns2']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -15,7 +15,7 @@ node.default['qemu']['lb2']['networking'] = {
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['lb2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['dns2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['gateway_lan_vip'],
@@ -32,13 +32,12 @@ node.default['qemu']['lb2']['networking'] = {
   }
 }
 
-node.default['qemu']['lb2']['chef_recipes'] = [
-  "recipe[keepalived-app::lb]",
-  "recipe[haproxy-app::lb]",
+node.default['qemu']['dns2']['chef_recipes'] = [
+  "recipe[keepalived-app::dns]",
   "recipe[nsd-app::main]",
   "recipe[unbound-app::main]"
 ]
-node.default['qemu']['lb2']['cloud_config'] = {
+node.default['qemu']['dns2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -48,7 +47,7 @@ node.default['qemu']['lb2']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['lb2']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['dns2']['cloud_config_hostname']}.lan",
   "runcmd" => [
     "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
@@ -57,19 +56,19 @@ node.default['qemu']['lb2']['cloud_config'] = {
     "apt-get -y --allow-unauthenticated install docker-engine",
     [
       "chef-client", "-o",
-      node['qemu']['lb2']['chef_recipes'].join(',')
+      node['qemu']['dns2']['chef_recipes'].join(',')
     ],
     "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
   ]
 }
 
 
-node.default['qemu']['lb2']['libvirt_config'] = {
+node.default['qemu']['dns2']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['lb2']['cloud_config_hostname'],
+    "name"=>node['qemu']['dns2']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -151,7 +150,7 @@ node.default['qemu']['lb2']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['lb2']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['dns2']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -202,7 +201,7 @@ node.default['qemu']['lb2']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['lb2']['cloud_config_path']
+              "dir"=>node['qemu']['dns2']['cloud_config_path']
             }
           },
           "target"=>{

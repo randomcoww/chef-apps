@@ -35,7 +35,7 @@ node.default['qemu']['gateway1']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes",
       "DNS" => [
-        "127.0.0.1",
+        node['environment_v2']['dns_lan_vip'],
         "8.8.8.8"
       ]
     },
@@ -53,9 +53,8 @@ node.default['qemu']['gateway1']['networking'] = {
 
 node.default['qemu']['gateway1']['chef_recipes'] = [
   "recipe[nftables-app::gateway]",
-  "recipe[nsd-app::main]",
-  "recipe[unbound-app::main]",
-  "recipe[keepalived-app::gateway]"
+  "recipe[keepalived-app::gateway]",
+  "recipe[ddclient-app::freedns]"
 ]
 node.default['qemu']['gateway1']['cloud_config'] = {
   "write_files" => [],

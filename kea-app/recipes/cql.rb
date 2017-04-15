@@ -7,6 +7,7 @@ end
 
 docker_image 'randomcoww/kea-cql' do
   action :pull_if_missing
+  read_timeout 600
   # notifies :restart, "docker_container[kea-cql]", :delayed
 end
 

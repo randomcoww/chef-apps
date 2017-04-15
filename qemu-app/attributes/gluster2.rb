@@ -10,7 +10,7 @@ node.default['qemu']['gluster2']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['lb_lan_vip'],
+        node['environment_v2']['dns_lan_vip'],
         "8.8.8.8"
       ]
     },
