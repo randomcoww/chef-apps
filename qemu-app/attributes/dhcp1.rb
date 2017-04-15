@@ -44,12 +44,20 @@ node.default['qemu']['dhcp1']['networking'] = {
     "Address" => {
       "Address" => "#{node['environment_v2']['dhcp1_store_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
     }
+  },
+  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
+    "Service" => {
+      "ExecStart" => [
+        '',
+        "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      ]
+    }
   }
 }
 
 node.default['qemu']['dhcp1']['chef_recipes'] = [
   "recipe[cql-app::kea_leases]",
-  "recipe[kea-app::cql]",
+  "recipe[kea-app::cql]"
 ]
 node.default['qemu']['dhcp1']['cloud_config'] = {
   "write_files" => [],
@@ -63,16 +71,11 @@ node.default['qemu']['dhcp1']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['dhcp1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    'echo "deb http://www.apache.org/dist/cassandra/debian 310x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list',
-    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
-    "wget -q -O - https://www.apache.org/dist/cassandra/KEYS | apt-key add -",
-
-    'apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr',
-    'apt-key adv --keyserver pool.sks-keyservers.net --recv-key A278B781FE4B2BDA',
+    "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
-
+    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
     "apt-get -y update",
-    "apt-get -y --allow-unauthenticated install cassandra docker-engine",
+    "apt-get -y --allow-unauthenticated install docker-engine",
     [
       "chef-client", "-o",
       node['qemu']['dhcp1']['chef_recipes'].join(',')
@@ -91,13 +94,13 @@ node.default['qemu']['dhcp1']['libvirt_config'] = {
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"2"
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>"2"
     },
     "vcpu"=>{
       "#attributes"=>{

@@ -6,8 +6,8 @@ kea_config 'kea-cql' do
 end
 
 docker_image 'randomcoww/kea-cql' do
-  action :pull
-  notifies :restart, "docker_container[kea-cql]", :delayed
+  action :pull_if_missing
+  # notifies :restart, "docker_container[kea-cql]", :delayed
 end
 
 docker_container 'kea-cql' do
