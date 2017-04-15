@@ -50,8 +50,8 @@ node.default['environment_v2']['gluster2_lan_ip'] = "192.168.62.252"
 node.default['environment_v2']['gluster1_store_ip'] = "169.254.127.251"
 node.default['environment_v2']['gluster2_store_ip'] = "169.254.127.252"
 
-node.default['environment_v2']['lb1_lan_ip'] = "192.168.62.231"
-node.default['environment_v2']['lb2_lan_ip'] = "192.168.62.232"
+node.default['environment_v2']['dns1_lan_ip'] = "192.168.62.231"
+node.default['environment_v2']['dns2_lan_ip'] = "192.168.62.232"
 
 node.default['environment_v2']['dhcp1_lan_ip'] = "192.168.62.221"
 node.default['environment_v2']['dhcp2_lan_ip'] = "192.168.62.222"
