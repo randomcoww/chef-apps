@@ -1,4 +1,5 @@
 node.default['openvpn']['server'] = {
+  'pkg_names' => ['openvpn', 'easy-rsa'],
   'config' => {
     "port" => 1194,
     "proto" => "udp",

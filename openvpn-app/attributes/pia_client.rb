@@ -1,4 +1,5 @@
 node.default['openvpn']['pia_client'] = {
+  'pkg_names' => ['openvpn'],
   'config' => {
     "client" => true,
     "dev" => "tun",

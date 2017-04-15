@@ -21,21 +21,14 @@ node.default['qemu']['dns2']['networking'] = {
       "Gateway" => node['environment_v2']['gateway_lan_vip'],
       "Metric" => 2048
     }
-  },
-  '/etc/systemd/system/docker.service.d/log-driver.conf' => {
-    "Service" => {
-      "ExecStart" => [
-        '',
-        "/usr/bin/dockerd -H fd:// --log-driver=journald"
-      ]
-    }
   }
 }
 
 node.default['qemu']['dns2']['chef_recipes'] = [
   "recipe[keepalived-app::dns]",
   "recipe[nsd-app::main]",
-  "recipe[unbound-app::main]"
+  "recipe[unbound-app::main]",
+  "recipe[openvpn-app::pia_client]"
 ]
 node.default['qemu']['dns2']['cloud_config'] = {
   "write_files" => [],
@@ -49,16 +42,10 @@ node.default['qemu']['dns2']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['dns2']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
-    "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
-    "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
-    "apt-get -y update",
-    "apt-get -y --allow-unauthenticated install docker-engine",
     [
       "chef-client", "-o",
       node['qemu']['dns2']['chef_recipes'].join(',')
-    ],
-    "docker run -d --restart unless-stopped -v /etc/chef:/etc/chef --net host --cap-add=NET_ADMIN --device /dev/net/tun randomcoww/chef-client:entrypoint -o recipe[openvpn-app::pia_client]"
+    ]
   ]
 }
 

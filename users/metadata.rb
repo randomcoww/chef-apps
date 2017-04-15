@@ -1,7 +1,0 @@
-name             'users'
-maintainer       'YOUR_NAME'
-maintainer_email 'YOUR_EMAIL'
-license          'All rights reserved'
-description      'Installs/Configures users'
-long_description 'Installs/Configures users'
-version          '0.1.0'

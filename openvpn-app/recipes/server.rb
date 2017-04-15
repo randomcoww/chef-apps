@@ -3,7 +3,7 @@ execute "pkg_update" do
   action :run
 end
 
-package node['openvpn']['pkg_names'] do
+package node['openvpn']['server']['pkg_names'] do
   action :upgrade
   notifies :stop, "service[openvpn@server]", :immediately
 end

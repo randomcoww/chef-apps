@@ -3,15 +3,15 @@ execute "pkg_update" do
   action :run
 end
 
-package node['openvpn']['pkg_names'] do
+package node['openvpn']['pia_client']['pkg_names'] do
   action :upgrade
-  notifies :stop, "service[openvpn]", :immediately
+  notifies :stop, "service[openvpn@client]", :immediately
 end
 
 openvpn_config_client 'pia_client' do
   config node['openvpn']['pia_client']['config']
   action :create
-  notifies :restart, "service[openvpn]", :delayed
+  notifies :restart, "service[openvpn@client]", :delayed
 end
 
 openvpn_credentials 'client_auth' do
@@ -19,7 +19,7 @@ openvpn_credentials 'client_auth' do
   data_bag_item node['openvpn']['pia_client']['auth-user-pass']['data_bag_item']
   key node['openvpn']['pia_client']['auth-user-pass']['key']
   action :create
-  notifies :restart, "service[openvpn]", :delayed
+  notifies :restart, "service[openvpn@client]", :delayed
 end
 
 openvpn_credentials 'ca.crt' do
@@ -27,7 +27,7 @@ openvpn_credentials 'ca.crt' do
   data_bag_item node['openvpn']['pia_client']['ca']['data_bag_item']
   key node['openvpn']['pia_client']['ca']['key']
   action :create
-  notifies :restart, "service[openvpn]", :delayed
+  notifies :restart, "service[openvpn@client]", :delayed
 end
 
-include_recipe "openvpn::client_init_service"
+include_recipe "openvpn::client_service"
