@@ -13,8 +13,10 @@ end
 
 docker_container 'kea-cql' do
   repo 'randomcoww/kea-cql'
-  volumes [ "#{::File.join(Chef::Config[:file_cache_path], 'kea-cql')}:/etc/kea/kea-cql.conf" ]
-  command "-c /etc/kea/kea-cql.conf"
+  volumes [
+    "#{::File.join(Chef::Config[:file_cache_path], 'kea-cql')}:/etc/kea/kea-cql.conf",
+  ]
+  command "kea-dhcp4 -c /etc/kea/kea-cql.conf"
   network_mode 'host'
   restart_policy 'unless-stopped'
   action :run

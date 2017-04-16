@@ -8,7 +8,7 @@ node.default['cql']['kea_leases']['seeds'] = [
   node['environment_v2']['dhcp2_lan_ip']
 ]
 
-node.default['cql']['kea_leases']['create_keyspace_query'] = %Q{CREATE KEYSPACE IF NOT EXISTS #{node['cql']['kea_leases']['keyspace_name']} WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': #{node['cql']['kea_leases']['seeds'].length} };}
+node.default['cql']['kea_leases']['create_keyspace_query'] = %Q{CREATE KEYSPACE IF NOT EXISTS #{node['cql']['kea_leases']['keyspace_name']} WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': 1 };}
 node.default['cql']['kea_leases']['create_tables_query'] = [
   %Q{CREATE TABLE IF NOT EXISTS lease4 (
       address int,
