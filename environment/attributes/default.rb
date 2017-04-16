@@ -55,8 +55,13 @@ node.default['environment_v2']['dns2_lan_ip'] = "192.168.62.232"
 
 node.default['environment_v2']['dhcp1_lan_ip'] = "192.168.62.221"
 node.default['environment_v2']['dhcp2_lan_ip'] = "192.168.62.222"
+node.default['environment_v2']['dhcp3_lan_ip'] = "192.168.62.223"
+node.default['environment_v2']['dhcp4_lan_ip'] = "192.168.62.224"
+
 node.default['environment_v2']['dhcp1_vpn_ip'] = "192.168.30.221"
 node.default['environment_v2']['dhcp2_vpn_ip'] = "192.168.30.222"
+node.default['environment_v2']['dhcp3_vpn_ip'] = "192.168.30.223"
+node.default['environment_v2']['dhcp4_vpn_ip'] = "192.168.30.224"
 # node.default['environment_v2']['dhcp1_store_ip'] = "169.254.127.221"
 # node.default['environment_v2']['dhcp2_store_ip'] = "169.254.127.222"
 
