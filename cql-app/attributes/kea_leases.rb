@@ -2,13 +2,14 @@ node.default['cql']['kea_leases']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node
 
 node.default['cql']['kea_leases']['cluster_name'] = "kea_leases"
 node.default['cql']['kea_leases']['keyspace_name'] = 'keatest'
+node.default['cql']['kea_leases']['datacenter'] = 'datacenter1'
 
 node.default['cql']['kea_leases']['seeds'] = [
   node['environment_v2']['dhcp1_lan_ip'],
   node['environment_v2']['dhcp2_lan_ip']
 ]
 
-node.default['cql']['kea_leases']['create_keyspace_query'] = %Q{CREATE KEYSPACE IF NOT EXISTS #{node['cql']['kea_leases']['keyspace_name']} WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': 1 };}
+node.default['cql']['kea_leases']['create_keyspace_query'] = %Q{CREATE KEYSPACE IF NOT EXISTS #{node['cql']['kea_leases']['keyspace_name']} WITH replication = { 'class': 'NetworkTopologyStrategy', '#{node['cql']['kea_leases']['datacenter']}': 3;}
 node.default['cql']['kea_leases']['create_tables_query'] = [
   %Q{CREATE TABLE IF NOT EXISTS lease4 (
       address int,

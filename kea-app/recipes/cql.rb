@@ -1,9 +1,4 @@
-kea_config 'kea-cql' do
-  config node['kea']['cql']['kea_config']
-  path ::File.join(Chef::Config[:file_cache_path], 'kea-cql')
-  action :create
-  notifies :reload, "docker_container[kea-cql]", :delayed
-end
+kea_config = ::File.join(Chef::Config[:file_cache_path], 'kea-cql.conf')
 
 docker_image 'randomcoww/kea-cql' do
   action :pull_if_missing
@@ -11,10 +6,17 @@ docker_image 'randomcoww/kea-cql' do
   # notifies :restart, "docker_container[kea-cql]", :delayed
 end
 
+kea_config 'kea-cql' do
+  config node['kea']['cql']['kea_config']
+  path kea_config
+  action :create
+  notifies :restart, "docker_container[kea-cql]", :immediately
+end
+
 docker_container 'kea-cql' do
   repo 'randomcoww/kea-cql'
   volumes [
-    "#{::File.join(Chef::Config[:file_cache_path], 'kea-cql')}:/etc/kea/kea-cql.conf",
+    "#{kea_config}:/etc/kea/kea-cql.conf",
   ]
   command "kea-dhcp4 -c /etc/kea/kea-cql.conf"
   network_mode 'host'

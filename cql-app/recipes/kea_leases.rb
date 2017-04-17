@@ -10,7 +10,9 @@ env = {
   'CASSANDRA_LISTEN_ADDRESS' => node['cql']['kea_leases']['node_ip'],
   'CASSANDRA_BROADCAST_ADDRESS' => node['cql']['kea_leases']['node_ip'],
   'CASSANDRA_CLUSTER_NAME' => node['cql']['kea_leases']['cluster_name'],
-  'CASSANDRA_SEEDS' => node['cql']['kea_leases']['seeds'].join(',')
+  'CASSANDRA_SEEDS' => node['cql']['kea_leases']['seeds'].join(','),
+  'CASSANDRA_DC' => node['cql']['kea_leases']['datacenter'],
+  'CASSANDRA_ENDPOINT_SNITCH' => 'GossipingPropertyFileSnitch'
 }
 
 docker_container 'cassandra_kea_leases' do
