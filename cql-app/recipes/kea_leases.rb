@@ -1,10 +1,10 @@
 chef_gem 'cassandra-driver' do
-  action :upgrade
-end
+  action :nothing
+end.run_action(:upgrade)
 
 docker_image 'cassandra' do
-  action :pull_if_missing
-end
+  action :nothing
+end.run_action(:pull_if_missing)
 
 env = {
   'CASSANDRA_LISTEN_ADDRESS' => node['cql']['kea_leases']['node_ip'],
@@ -20,23 +20,29 @@ docker_container 'cassandra_kea_leases' do
   network_mode 'host'
   env (env.map { |i, j| [i, j].join('=') })
   restart_policy 'unless-stopped'
-  action :run
-end
+  action :nothing
+end.run_action(:run)
 
-cassandra_query 'create_keyspace' do
-  query node['cql']['kea_leases']['create_keyspace_query']
-  keyspace 'system_schema'
-  timeout 120
-  ignore_already_exists true
-  action :run
-end
+c = CassandraCluster.new({}, 120)
 
+## create keyspace
+Chef::Log.info(node['cql']['kea_leases']['create_keyspace_query'])
+c.query('system_schema', node['cql']['kea_leases']['create_keyspace_query'])
+
+## create tables
 node['cql']['kea_leases']['create_tables_query'].each do |k|
-  cassandra_query k do
-    query k
-    keyspace node['cql']['kea_leases']['keyspace_name']
-    timeout 120
-    ignore_already_exists true
-    action :run
+  Chef::Log.info(k)
+  c.query(node['cql']['kea_leases']['keyspace_name'], k)
+end
+
+## remove dead nodes
+c.cluster.each_host do |h|
+  if h.down?
+    Chef::Log.info("Remove node: #{h.id}")
+
+    docker_exec "Remove node: #{h.id}" do
+      container 'cassandra_kea_leases'
+      command ["nodetool", "removenode", h.id]
+    end
   end
 end

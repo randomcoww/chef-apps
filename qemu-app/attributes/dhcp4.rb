@@ -1,7 +1,7 @@
-node.default['qemu']['dhcp1']['cloud_config_hostname'] = 'dhcp1'
-node.default['qemu']['dhcp1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dhcp1']['cloud_config_hostname']}"
+node.default['qemu']['dhcp4']['cloud_config_hostname'] = 'dhcp4'
+node.default['qemu']['dhcp4']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['dhcp4']['cloud_config_hostname']}"
 
-node.default['qemu']['dhcp1']['networking'] = {
+node.default['qemu']['dhcp4']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -15,7 +15,7 @@ node.default['qemu']['dhcp1']['networking'] = {
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['dhcp1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['dhcp4_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['gateway_lan_vip']
@@ -30,7 +30,7 @@ node.default['qemu']['dhcp1']['networking'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['dhcp1_vpn_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['dhcp4_vpn_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
     }
   },
   '/etc/systemd/network/eth2.network' => {
@@ -42,7 +42,7 @@ node.default['qemu']['dhcp1']['networking'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['dhcp1_store_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['dhcp4_store_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
     }
   },
   '/etc/systemd/system/docker.service.d/log-driver.conf' => {
@@ -55,11 +55,11 @@ node.default['qemu']['dhcp1']['networking'] = {
   }
 }
 
-node.default['qemu']['dhcp1']['chef_recipes'] = [
+node.default['qemu']['dhcp4']['chef_recipes'] = [
   "recipe[cql-app::kea_leases]",
   "recipe[kea-app::cql]"
 ]
-node.default['qemu']['dhcp1']['cloud_config'] = {
+node.default['qemu']['dhcp4']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -69,7 +69,7 @@ node.default['qemu']['dhcp1']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['dhcp1']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['dhcp4']['cloud_config_hostname']}.lan",
   "runcmd" => [
     "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
@@ -78,18 +78,18 @@ node.default['qemu']['dhcp1']['cloud_config'] = {
     "apt-get -y --allow-unauthenticated install docker-engine",
     [
       "chef-client", "-o",
-      node['qemu']['dhcp1']['chef_recipes'].join(',')
+      node['qemu']['dhcp4']['chef_recipes'].join(',')
     ]
   ]
 }
 
 
-node.default['qemu']['dhcp1']['libvirt_config'] = {
+node.default['qemu']['dhcp4']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['dhcp1']['cloud_config_hostname'],
+    "name"=>node['qemu']['dhcp4']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -171,7 +171,7 @@ node.default['qemu']['dhcp1']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['dhcp1']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['dhcp4']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -222,7 +222,7 @@ node.default['qemu']['dhcp1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['dhcp1']['cloud_config_path']
+              "dir"=>node['qemu']['dhcp4']['cloud_config_path']
             }
           },
           "target"=>{
