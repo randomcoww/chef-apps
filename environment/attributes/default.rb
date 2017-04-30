@@ -58,8 +58,6 @@ node.default['environment_v2']['dns2_lan_ip'] = "192.168.62.232"
 node.default['environment_v2']['mysql-mgm_lan_ip'] = "192.168.62.211"
 node.default['environment_v2']['mysql-ndb1_lan_ip'] = "192.168.62.213"
 node.default['environment_v2']['mysql-ndb2_lan_ip'] = "192.168.62.214"
-node.default['environment_v2']['mysql-api1_lan_ip'] = "192.168.62.215"
-node.default['environment_v2']['mysql-api2_lan_ip'] = "192.168.62.216"
 
 node.default['environment_v2']['dhcp1_lan_ip'] = "192.168.62.221"
 node.default['environment_v2']['dhcp2_lan_ip'] = "192.168.62.222"
