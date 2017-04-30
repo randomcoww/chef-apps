@@ -36,6 +36,7 @@ node.default['environment_v2']['dns_lan_vip'] = "192.168.62.230"
 node.default['environment_v2']['cql_lan_vip'] = "192.168.62.220"
 node.default['environment_v2']['gluster_lan_vip'] = "192.168.62.250"
 node.default['environment_v2']['gluster_store_vip'] = "169.254.127.250"
+node.default['environment_v2']['mysql_lan_vip'] = "192.168.62.210"
 
 node.default['environment_v2']['lan_subnet'] = "192.168.62.0/23"
 node.default['environment_v2']['store_subnet'] = "169.254.0.0/16"
@@ -53,6 +54,9 @@ node.default['environment_v2']['gluster2_store_ip'] = "169.254.127.252"
 
 node.default['environment_v2']['dns1_lan_ip'] = "192.168.62.231"
 node.default['environment_v2']['dns2_lan_ip'] = "192.168.62.232"
+
+node.default['environment_v2']['mysql1_lan_ip'] = "192.168.62.211"
+node.default['environment_v2']['mysql2_lan_ip'] = "192.168.62.212"
 
 node.default['environment_v2']['dhcp1_lan_ip'] = "192.168.62.221"
 node.default['environment_v2']['dhcp2_lan_ip'] = "192.168.62.222"
