@@ -40,6 +40,7 @@ node.default['environment_v2']['dns_lan_vip'] = "192.168.62.230"
 node.default['environment_v2']['gluster_lan_vip'] = "192.168.62.250"
 node.default['environment_v2']['gluster_store_vip'] = "169.254.127.250"
 node.default['environment_v2']['mysql_lan_vip'] = "192.168.62.210"
+node.default['environment_v2']['haproxy_lan_vip'] = "192.168.62.220"
 
 node.default['environment_v2']['gateway1_lan_ip'] = "192.168.62.241"
 node.default['environment_v2']['gateway2_lan_ip'] = "192.168.62.242"
@@ -57,6 +58,9 @@ node.default['environment_v2']['dns2_lan_ip'] = "192.168.62.232"
 node.default['environment_v2']['mysql-mgm_lan_ip'] = "192.168.62.211"
 node.default['environment_v2']['mysql-ndb1_lan_ip'] = "192.168.62.213"
 node.default['environment_v2']['mysql-ndb2_lan_ip'] = "192.168.62.214"
+
+node.default['environment_v2']['haproxy1_lan_ip'] = "192.168.62.221"
+node.default['environment_v2']['haproxy2_lan_ip'] = "192.168.62.222"
 
 node.default['environment_v2']['lan_dhcp_pool'] = "192.168.62.32/27"
 node.default['environment_v2']['vpn_dhcp_pool'] = "192.168.30.32/27"
