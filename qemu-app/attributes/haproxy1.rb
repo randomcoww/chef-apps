@@ -24,9 +24,8 @@ node.default['qemu']['haproxy1']['networking'] = {
 }
 
 node.default['qemu']['haproxy1']['chef_recipes'] = [
-  "recipe[haproxy-app::global]",
-  "recipe[haproxy-app::unifi]",
-  "recipe[haproxy-app::transmission]"
+  "recipe[haproxy-app::nodes]",
+  "recipe[keepalived-app::haproxy]",
 ]
 node.default['qemu']['haproxy1']['cloud_config'] = {
   "write_files" => [],
