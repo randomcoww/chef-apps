@@ -34,6 +34,7 @@ cookbook_file kea_tables_path do
 end
 
 ## this may be provisioned by another host and fail
+## should be moved to kea-app cookbook and called with kea-admin
 bash "provision_kea_tables" do
   code %Q{mysql \
     --user="#{node['mysql-cluster']['kea']['username']}" \

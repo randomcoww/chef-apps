@@ -5,11 +5,11 @@ end
 
 package node['kea']['pkg_names'] do
   action :upgrade
-  notifies :restart, "service[kea-dhcp4-server]", :delayed
+  notifies :stop, "service[kea-dhcp4-server]", :immediately
 end
 
-kea_dhcp4_config 'kea-pool2' do
-  config node['kea']['pool2']['config']
+kea_dhcp4_config 'kea-mysql' do
+  config node['kea']['mysql']['config']
   action :create
   notifies :restart, "service[kea-dhcp4-server]", :delayed
 end

@@ -1,4 +1,8 @@
-node.default['kea']['pool2']['config'] = {
+node.default['kea']['mysql']['kea_password'] = Dbag::Keystore.new(
+  'deploy_config', 'mysql-cluster'
+).get_or_create('kea_password', SecureRandom.hex)
+
+node.default['kea']['mysql']['config'] = {
   "Dhcp4" => {
     "valid-lifetime" => 300,
     # "renew-timer" => 300,
@@ -7,7 +11,11 @@ node.default['kea']['pool2']['config'] = {
       "interfaces" => [ '*' ]
     },
     "lease-database" => {
-      "type" => "memfile",
+      "type" => "mysql",
+      "name" => "Kea",
+      "host" => "localhost",
+      "user" => "Keauser",
+      "password" => node['kea']['mysql']['kea_password'],
       "persist" => true
     },
     "subnet4" => [
@@ -29,7 +37,7 @@ node.default['kea']['pool2']['config'] = {
         ],
         "pools" => [
           {
-           "pool" => node['environment_v2']['lan_dhcp_pool2']
+           "pool" => node['environment_v2']['lan_dhcp_pool']
           }
         ],
         "reservations" => node['kea']['lan_reservations'].map { |k, v|
@@ -43,7 +51,7 @@ node.default['kea']['pool2']['config'] = {
         "subnet" => node['environment_v2']['vpn_subnet'],
         "pools" => [
           {
-           "pool" => node['environment_v2']['vpn_dhcp_pool2']
+           "pool" => node['environment_v2']['vpn_dhcp_pool']
           }
         ]
       }
