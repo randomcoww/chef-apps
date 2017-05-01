@@ -1,7 +1,7 @@
-node.default['qemu']['mysql-ndb2']['cloud_config_hostname'] = 'mysql-ndb2'
-node.default['qemu']['mysql-ndb2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['mysql-ndb2']['cloud_config_hostname']}"
+node.default['qemu']['haproxy1']['cloud_config_hostname'] = 'haproxy1'
+node.default['qemu']['haproxy1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['haproxy1']['cloud_config_hostname']}"
 
-node.default['qemu']['mysql-ndb2']['networking'] = {
+node.default['qemu']['haproxy1']['networking'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -14,25 +14,21 @@ node.default['qemu']['mysql-ndb2']['networking'] = {
         "8.8.8.8"
       ]
     },
-    "Address" => [
-      {
-        "Address" => "#{node['environment_v2']['mysql-ndb2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
-      }
-    ],
+    "Address" => {
+      "Address" => "#{node['environment_v2']['haproxy1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+    },
     "Route" => {
-      "Gateway" => node['environment_v2']['gateway_lan_vip']
+      "Gateway" => node['environment_v2']['gateway_lan_vip'],
     }
   }
 }
 
-node.default['qemu']['mysql-ndb2']['chef_recipes'] = [
-  "recipe[mysql-cluster-app::ndb]",
-  "recipe[mysql-cluster-app::api]",
-  "recipe[mysql-cluster-app::kea]",
-  "recipe[kea-app::mysql]",
-  "recipe[keepalived-app::mysql]",
+node.default['qemu']['haproxy1']['chef_recipes'] = [
+  "recipe[haproxy-app::global]",
+  "recipe[haproxy-app::unifi]",
+  "recipe[haproxy-app::transmission]"
 ]
-node.default['qemu']['mysql-ndb2']['cloud_config'] = {
+node.default['qemu']['haproxy1']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -42,24 +38,23 @@ node.default['qemu']['mysql-ndb2']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['mysql-ndb2']['cloud_config_hostname']}.lan",
-  "runcmd" =>  [
-    "echo deb http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
-    "echo deb-src http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
+  "fqdn" => "#{node['qemu']['haproxy1']['cloud_config_hostname']}.lan",
+  "runcmd" => [
+    "apt-get -y install default-libmysqlclient-dev",
     [
       "chef-client", "-o",
-      node['qemu']['mysql-ndb2']['chef_recipes'].join(',')
+      node['qemu']['haproxy1']['chef_recipes'].join(',')
     ]
   ]
 }
 
 
-node.default['qemu']['mysql-ndb2']['libvirt_config'] = {
+node.default['qemu']['haproxy1']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['mysql-ndb2']['cloud_config_hostname'],
+    "name"=>node['qemu']['haproxy1']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -141,7 +136,7 @@ node.default['qemu']['mysql-ndb2']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['mysql-ndb2']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['haproxy1']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -192,7 +187,7 @@ node.default['qemu']['mysql-ndb2']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['mysql-ndb2']['cloud_config_path']
+              "dir"=>node['qemu']['haproxy1']['cloud_config_path']
             }
           },
           "target"=>{
