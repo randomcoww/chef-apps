@@ -28,7 +28,8 @@ node.default['qemu']['mysql-ndb2']['networking'] = {
 node.default['qemu']['mysql-ndb2']['chef_recipes'] = [
   "recipe[mysql-cluster-app::ndb]",
   "recipe[mysql-cluster-app::api]",
-  "recipe[mysql-cluster-app::kea]"
+  "recipe[mysql-cluster-app::kea]",
+  "recipe[kea-app::mysql]"
 ]
 node.default['qemu']['mysql-ndb2']['cloud_config'] = {
   "write_files" => [],

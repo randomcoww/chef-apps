@@ -14,4 +14,4 @@ kea_dhcp4_config 'kea-mysql' do
   notifies :restart, "service[kea-dhcp4-server]", :delayed
 end
 
-include_recipe "kea::dhcp4_service"
+include_recipe "kea::dhcp4_service_mysql"

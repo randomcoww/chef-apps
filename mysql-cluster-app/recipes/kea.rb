@@ -29,7 +29,7 @@ kea_tables_path = ::File.join(Chef::Config[:file_cache_path], 'kea_database.sql'
 
 cookbook_file kea_tables_path do
   source 'kea_tables.sql'
-  notifies :run, "bash[provision_kea_tables]", :delayed
+  notifies :run, "bash[provision_kea_tables]", :immediately
   action :create_if_missing
 end
 
