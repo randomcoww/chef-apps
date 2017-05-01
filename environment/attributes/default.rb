@@ -39,6 +39,7 @@ node.default['environment_v2']['gateway_lan_vip'] = "192.168.62.240"
 node.default['environment_v2']['dns_lan_vip'] = "192.168.62.230"
 node.default['environment_v2']['gluster_lan_vip'] = "192.168.62.250"
 node.default['environment_v2']['gluster_store_vip'] = "169.254.127.250"
+node.default['environment_v2']['mysql_lan_vip'] = "192.168.62.210"
 
 node.default['environment_v2']['gateway1_lan_ip'] = "192.168.62.241"
 node.default['environment_v2']['gateway2_lan_ip'] = "192.168.62.242"
