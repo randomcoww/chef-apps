@@ -27,6 +27,13 @@ node['environment_v2']['host'].each do |hostname, d|
   end
 end
 
+node['environment_v2']['vip'].each do |hostname, ip|
+  if !ip.nil?
+    static_hosts[hostname] = ip
+  end
+end
+
+
 nsd_zonefile 'static.lan' do
   domain 'static.lan'
   name_server 'ns1.static.lan'
