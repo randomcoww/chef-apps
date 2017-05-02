@@ -2,6 +2,6 @@ node.default['mysql-cluster']['ndb']['pkg_names'] = ['mysql-cluster-community-da
 
 node.default['mysql-cluster']['ndb']['options'] = {
   'ndb-connectstring' => [
-    node['environment_v2']['mysql-mgm_lan_ip']
+    node['environment_v2']['host']['mysql-mgm']['ip_lan']
   ].join(',')
 }
