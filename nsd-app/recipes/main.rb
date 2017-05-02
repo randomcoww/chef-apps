@@ -11,7 +11,7 @@ package node['nsd']['pkg_names'] do
   notifies :stop, "service[nsd]", :immediately
 end
 
-nsd_resource_rndc_key_config 'docker_rndc-key' do
+nsd_resource_rndc_key_config 'rndc-key' do
   rndc_keys_data_bag node['nsd']['main']['rndc_keys_data_bag']
   rndc_keys_data_bag_item node['nsd']['main']['rndc_keys_data_bag_item']
   rndc_key_names node['nsd']['main']['rndc_key_names']
@@ -20,18 +20,30 @@ nsd_resource_rndc_key_config 'docker_rndc-key' do
   notifies :restart, "service[nsd]", :delayed
 end
 
-nsd_git_zones 'main_nsd-zones' do
-  git_repo node['nsd']['main']['git_repo']
-  git_branch node['nsd']['main']['git_branch']
-  release_path node['nsd']['main']['release_path']
-  zone_options node['nsd']['main']['zone_options']
+static_hosts = {}
+node['environment_v2']['host'].each do |hostname, d|
+  if !d['ip_lan'].nil?
+    static_hosts[hostname] = d['ip_lan']
+  end
+end
 
-  path '/etc/nsd/nsd.conf.d/zones.conf'
+nsd_zonefile 'static.lan' do
+  domain 'static.lan'
+  name_server 'ns1.static.lan'
+  email_addr 'root.static.lan'
+  hosts static_hosts
   notifies :reload, "service[nsd]", :delayed
 end
 
 nsd_config 'nsd' do
-  config node['nsd']['main']['config']
+  config node['nsd']['main']['config'].merge({
+    'zone' => [
+      {
+        'name' => 'static.lan',
+        'zonefile' => ::File.join(Chef::Config[:file_cache_path], 'nsd', 'static.lan')
+      }
+    ]
+  })
   action :create
   notifies :restart, "service[nsd]", :delayed
 end
