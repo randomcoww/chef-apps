@@ -21,7 +21,7 @@ keepalived_vrrp_instance 'VI_mysql' do
   interface node['keepalived']['mysql']['lan_if']
   virtual_router_id 41
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ "#{node['environment_v2']['mysql_lan_vip']}/#{node['environment_v2']['lan_subnet'].split('/').last}" ]
+  virtual_ipaddress [ "#{node['environment_v2']['vip']['mysql_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]
 end
 
 include_recipe 'keepalived::service'

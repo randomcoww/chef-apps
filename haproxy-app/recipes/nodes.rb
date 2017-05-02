@@ -39,7 +39,7 @@ kea_password = Dbag::Keystore.new(
 mysql_client = MysqlConfig::Client.new(120,
   username: 'Keauser',
   database: 'Kea',
-  host: node['environment_v2']['mysql_lan_vip'],
+  host: node['environment_v2']['vip']['mysql_lan'],
   password: kea_password
 )
 

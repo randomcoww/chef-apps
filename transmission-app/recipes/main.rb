@@ -11,7 +11,7 @@ end
 
 mount '/data/transmission' do
   fstype 'glusterfs'
-  device "#{node['environment_v2']['gluster_store_vip']}:/ctorrent"
+  device "#{node['environment_v2']['vip']['gluster_store']}:/ctorrent"
   action [:mount, :enable]
 end
 

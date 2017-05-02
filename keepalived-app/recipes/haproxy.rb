@@ -21,7 +21,7 @@ keepalived_vrrp_instance 'VI_haproxy' do
   interface node['keepalived']['haproxy']['lan_if']
   virtual_router_id 31
   authentication auth_type: 'AH', auth_pass: password
-  virtual_ipaddress [ "#{node['environment_v2']['haproxy_lan_vip']}/#{node['environment_v2']['lan_subnet'].split('/').last}" ]
+  virtual_ipaddress [ "#{node['environment_v2']['vip']['haproxy_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]
 end
 
 include_recipe 'keepalived::service'

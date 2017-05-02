@@ -20,16 +20,16 @@ node.default['kea']['mysql']['config'] = {
     },
     "subnet4" => [
       {
-        "subnet" => node['environment_v2']['lan_subnet'],
+        "subnet" => node['environment_v2']['subnet']['lan'],
         "option-data" => [
           {
             "name" => "routers",
-            "data" => node['environment_v2']['gateway_lan_vip']
+            "data" => node['environment_v2']['vip']['gateway_lan']
           },
           {
             "name" => "domain-name-servers",
             "data" => [
-              node['environment_v2']['dns_lan_vip'],
+              node['environment_v2']['vip']['dns_lan'],
               '8.8.8.8'
             ].join(','),
             "csv-format" => true
@@ -37,7 +37,7 @@ node.default['kea']['mysql']['config'] = {
         ],
         "pools" => [
           {
-           "pool" => node['environment_v2']['lan_dhcp_pool']
+           "pool" => node['environment_v2']['subnet']['lan_dhcp_pool']
           }
         ],
         "reservations" => node['kea']['lan_reservations'].map { |k, v|
@@ -48,10 +48,10 @@ node.default['kea']['mysql']['config'] = {
         }
       },
       {
-        "subnet" => node['environment_v2']['vpn_subnet'],
+        "subnet" => node['environment_v2']['subnet']['vpn'],
         "pools" => [
           {
-           "pool" => node['environment_v2']['vpn_dhcp_pool']
+           "pool" => node['environment_v2']['subnet']['vpn_dhcp_pool']
           }
         ]
       }

@@ -204,7 +204,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_lan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_lan'],
               "mode"=>"bridge"
             }
           },
@@ -220,7 +220,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_store_if'],
+              "dev"=>node['environment_v2']['current_host']['if_store'],
               "mode"=>"bridge"
             }
           },

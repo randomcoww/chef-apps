@@ -10,15 +10,15 @@ node.default['qemu']['mysql-mgm']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['dns_lan_vip'],
+        node['environment_v2']['vip']['dns_lan'],
         "8.8.8.8"
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['mysql-mgm_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['mysql-mgm']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['gateway_lan_vip']
+      "Gateway" => node['environment_v2']['vip']['gateway_lan']
     }
   }
 }
@@ -205,7 +205,7 @@ node.default['qemu']['mysql-mgm']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_lan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_lan'],
               "mode"=>"bridge"
             }
           },

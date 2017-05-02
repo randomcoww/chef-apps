@@ -11,10 +11,10 @@ node.default['qemu']['gateway1']['networking'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['gateway1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['gateway1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['gateway_lan_vip'],
+      "Gateway" => node['environment_v2']['vip']['gateway_lan'],
       "Metric" => 2048
     }
   },
@@ -35,7 +35,7 @@ node.default['qemu']['gateway1']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes",
       "DNS" => [
-        node['environment_v2']['dns_lan_vip'],
+        node['environment_v2']['vip']['dns_lan'],
         "8.8.8.8"
       ]
     },
@@ -233,7 +233,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_lan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_lan'],
               "mode"=>"bridge"
             }
           },
@@ -249,7 +249,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_vpn_if'],
+              "dev"=>node['environment_v2']['current_host']['if_vpn'],
               "mode"=>"bridge"
             }
           },
@@ -265,12 +265,12 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
           },
           "mac"=>{
             "#attributes"=>{
-              "address"=>node['environment_v2']['gateway1_wan_mac']
+              "address"=>node['environment_v2']['host']['gateway1']['mac_wan']
             }
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_wan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_wan'],
               "mode"=>"bridge"
             }
           },

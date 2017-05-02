@@ -10,15 +10,15 @@ node.default['qemu']['gluster2']['networking'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['dns_lan_vip'],
+        node['environment_v2']['vip']['dns_lan'],
         "8.8.8.8"
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['gluster2_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['gluster2']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['gateway_lan_vip']
+      "Gateway" => node['environment_v2']['vip']['gateway_lan']
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -30,7 +30,7 @@ node.default['qemu']['gluster2']['networking'] = {
       "DHCP" => "no",
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['gluster2_store_ip']}/#{node['environment_v2']['store_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['gluster2']['ip_store']}/#{node['environment_v2']['subnet']['store'].split('/').last}"
     }
   }
 }
@@ -216,7 +216,7 @@ node.default['qemu']['gluster2']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_lan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_lan'],
               "mode"=>"bridge"
             }
           },
@@ -233,7 +233,7 @@ node.default['qemu']['gluster2']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_store_if'],
+              "dev"=>node['environment_v2']['current_host']['if_store'],
               "mode"=>"bridge"
             }
           },
@@ -294,16 +294,16 @@ node.default['qemu']['gluster2']['libvirt_config'] = {
           "source"=>{
             "address"=>{
               "#attributes"=>{
-                "domain"=>node['environment_v2']['hba_source']['domain'],
-                "bus"=>node['environment_v2']['hba_source']['bus'],
-                "slot"=>node['environment_v2']['hba_source']['slot'],
-                "function"=>node['environment_v2']['hba_source']['function'],
+                "domain"=>node['environment_v2']['current_host']['passthrough_hba']['domain'],
+                "bus"=>node['environment_v2']['current_host']['passthrough_hba']['bus'],
+                "slot"=>node['environment_v2']['current_host']['passthrough_hba']['slot'],
+                "function"=>node['environment_v2']['current_host']['passthrough_hba']['function'],
               }
             }
           },
           "rom"=>{
             "#attributes"=>{
-              "file"=>node['environment_v2']['hba_source']['file']
+              "file"=>node['environment_v2']['current_host']['passthrough_hba']['file']
             }
           }
         }

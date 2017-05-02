@@ -15,23 +15,23 @@ node.default['mysql-cluster']['mgm']['config'] = {
   },
   'ndb_mgmd' => [
     {
-      'hostname' => node['environment_v2']['mysql-mgm_lan_ip']
+      'hostname' => node['environment_v2']['host']['mysql-mgm']['ip_lan']
     }
   ],
   'ndbd' => [
     {
-      'hostname' => node['environment_v2']['mysql-ndb1_lan_ip']
+      'hostname' => node['environment_v2']['host']['mysql-ndb1']['ip_lan']
     },
     {
-      'hostname' => node['environment_v2']['mysql-ndb2_lan_ip']
+      'hostname' => node['environment_v2']['host']['mysql-ndb2']['ip_lan']
     }
   ],
   'mysqld' => [
     {
-      'hostname' => node['environment_v2']['mysql-ndb1_lan_ip']
+      'hostname' => node['environment_v2']['host']['mysql-ndb1']['ip_lan']
     },
     {
-      'hostname' => node['environment_v2']['mysql-ndb2_lan_ip']
+      'hostname' => node['environment_v2']['host']['mysql-ndb2']['ip_lan']
     }
   ]
 }

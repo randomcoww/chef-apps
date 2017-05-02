@@ -15,10 +15,10 @@ node.default['qemu']['dns1']['networking'] = {
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['dns1_lan_ip']}/#{node['environment_v2']['lan_subnet'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['dns1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['gateway_lan_vip'],
+      "Gateway" => node['environment_v2']['vip']['gateway_lan'],
       "Metric" => 2048
     }
   }
@@ -207,7 +207,7 @@ node.default['qemu']['dns1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['host_lan_if'],
+              "dev"=>node['environment_v2']['current_host']['if_lan'],
               "mode"=>"bridge"
             }
           },
