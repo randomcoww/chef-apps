@@ -28,7 +28,6 @@ node.default['qemu']['mysql-ndb1']['networking'] = {
 node.default['qemu']['mysql-ndb1']['chef_recipes'] = [
   "recipe[mysql-cluster-app::ndb]",
   "recipe[mysql-cluster-app::api]",
-  "recipe[mysql-cluster-app::kea]",
   "recipe[kea-app::mysql]",
   "recipe[keepalived-app::mysql]",
 ]
