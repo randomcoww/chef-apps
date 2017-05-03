@@ -4,6 +4,4 @@ node.default['kea']['pkg_names'] = [
   'default-libmysqlclient-dev'
 ]
 
-node.default['kea']['lan_reservations'] = {
-  "52:54:00:ac:da:f3" => "192.168.62.99"
-}
+node.default['kea']['lan_reservations'] = {}
