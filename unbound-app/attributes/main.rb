@@ -12,16 +12,15 @@ node.default['unbound']['main']['config'] = {
       "#{node['environment_v2']['subnet']['lan']} allow",
       "#{node['environment_v2']['subnet']['vpn']} allow"
     ],
-    'private-domain' => "lan.",
     "do-not-query-localhost" => false,
     'local-zone' => [
-      'static.lan nodefault'
+      'lan nodefault',
     ],
     "private-domain" => [
-      "static.lan"
+      "lan",
     ],
     "domain-insecure" => [
-      "static.lan"
+      "lan",
     ]
   },
   'remote-control' => {
@@ -29,7 +28,7 @@ node.default['unbound']['main']['config'] = {
   },
   'stub-zone' => [
     {
-      'name' => 'static.lan',
+      'name' => 'lan',
       'stub-addr' => '127.0.0.1@53530'
     }
   ]
