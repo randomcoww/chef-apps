@@ -2,6 +2,8 @@ source "https://supermarket.chef.io"
 
 metadata
 
-cookbook "kea", github: "randomcoww/chef-kea", branch: "attr"
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
+cookbook "mysql-credentials", github: "randomcoww/chef-apps", rel: "mysql-credentials"
+cookbook "kea", github: "randomcoww/chef-kea", branch: "attr"
 cookbook "dbag", github: "randomcoww/chef-dbag"
+cookbook "mysql-cluster", github: "randomcoww/chef-mysql-cluster"

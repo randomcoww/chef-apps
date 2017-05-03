@@ -2,7 +2,9 @@ source "https://supermarket.chef.io"
 
 metadata
 
+cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
+cookbook "mysql-credentials", github: "randomcoww/chef-apps", rel: "mysql-credentials"
+cookbook "mysql-cluster", github: "randomcoww/chef-mysql-cluster"
 cookbook "nsd", github: "randomcoww/chef-nsd"
 cookbook "nsd_resource", github: "randomcoww/chef-nsd_resource"
 cookbook "dbag", github: "randomcoww/chef-dbag"
-cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"

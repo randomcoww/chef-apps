@@ -1,7 +1,3 @@
-node.default['kea']['mysql']['kea_password'] = Dbag::Keystore.new(
-  'deploy_config', 'mysql-cluster'
-).get_or_create('kea_password', SecureRandom.hex)
-
 node.default['kea']['mysql']['config'] = {
   "Dhcp4" => {
     "valid-lifetime" => 300,
@@ -12,10 +8,10 @@ node.default['kea']['mysql']['config'] = {
     },
     "lease-database" => {
       "type" => "mysql",
-      "name" => "Kea",
+      "name" => node['mysql-credentials']['kea']['database'],
       "host" => "localhost",
-      "user" => "Keauser",
-      "password" => node['kea']['mysql']['kea_password'],
+      "user" => node['mysql-credentials']['kea']['username'],
+      "password" => node['mysql-credentials']['kea']['password'],
       "persist" => true
     },
     "subnet4" => [
