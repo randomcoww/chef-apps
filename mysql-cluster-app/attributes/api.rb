@@ -12,7 +12,3 @@ node.default['mysql-cluster']['api']['config'] = {
     'bind-address' => '0.0.0.0'
   }
 }
-
-node.default['mysql-cluster']['api']['root_password'] = Dbag::Keystore.new(
-  'deploy_config', 'mysql-cluster'
-).get_or_create('root_password', SecureRandom.hex)

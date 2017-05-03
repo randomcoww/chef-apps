@@ -4,12 +4,12 @@ execute "pkg_update" do
 end
 
 bash "debconf_root-pass" do
-  code %Q{debconf-set-selections <<< "mysql-cluster-community-server mysql-cluster-community-server/root-pass password #{node['mysql-cluster']['api']['root_password']}"}
+  code %Q{debconf-set-selections <<< "mysql-cluster-community-server mysql-cluster-community-server/root-pass password #{node['mysql-credentials']['root']['password']}"}
   action :nothing
 end
 
 bash "debconf_re-root-pass" do
-  code %Q{debconf-set-selections <<< "mysql-cluster-community-server mysql-cluster-community-server/re-root-pass password #{node['mysql-cluster']['api']['root_password']}"}
+  code %Q{debconf-set-selections <<< "mysql-cluster-community-server mysql-cluster-community-server/re-root-pass password #{node['mysql-credentials']['root']['password']}"}
   action :nothing
 end
 
