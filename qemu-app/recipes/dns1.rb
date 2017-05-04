@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['qemu']['pkg_update_command']
-  action :run
-end
-
 package node['qemu']['pkg_names'] do
   action :upgrade
 end
@@ -13,9 +8,8 @@ qemu_cloud_config 'dns1' do
   path node['qemu']['dns1']['cloud_config_path']
   hostname node['qemu']['dns1']['cloud_config_hostname']
   config node['qemu']['dns1']['cloud_config']
-  systemd_hash node.default['qemu']['dns1']['networking']
+  systemd_hash node.default['qemu']['dns1']['systemd_config']
   action :create
-  # notifies :restart, "qemu_domain[lb]", :delayed
 end
 
 qemu_domain 'dns1' do

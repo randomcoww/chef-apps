@@ -1,6 +1,6 @@
 require 'chef/mixin/shell_out'
 
-profile = node['system_update']['debian']
+profile = node['system-update']['debian']
 profile['commands'].each do |e|
   Chef::Log.info("Run update #{e} #{profile['opts']}")
   r = Mixlib::ShellOut.new(e, profile['opts'])

@@ -4,11 +4,6 @@ dbag = Dbag::Keystore.new(
 )
 config = dbag.get('freedns')
 
-execute "pkg_update" do
-  command node['ddclient']['pkg_update_command']
-  action :run
-end
-
 package node['ddclient']['pkg_names'] do
   action :upgrade
   notifies :restart, "service[ddclient]", :delayed

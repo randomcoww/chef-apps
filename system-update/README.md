@@ -1,4 +1,4 @@
-# system_update-cookbook
+# system-update-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['system_update']['bacon']</tt></td>
+    <td><tt>['system-update']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### system_update::default
+### system-update::default
 
-Include `system_update` in your node's `run_list`:
+Include `system-update` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[system_update::default]"
+    "recipe[system-update::default]"
   ]
 }
 ```

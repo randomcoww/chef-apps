@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['nftables']['pkg_update_command']
-  action :run
-end
-
 package node['nftables']['pkg_names'] do
   action :upgrade
 end

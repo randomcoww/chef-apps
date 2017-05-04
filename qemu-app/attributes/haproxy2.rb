@@ -1,7 +1,13 @@
 node.default['qemu']['haproxy2']['cloud_config_hostname'] = 'haproxy2'
 node.default['qemu']['haproxy2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['haproxy2']['cloud_config_hostname']}"
 
-node.default['qemu']['haproxy2']['networking'] = {
+node.default['qemu']['haproxy2']['chef_recipes'] = [
+  "recipe[system-update::debian]",
+  "recipe[haproxy-app::nodes]",
+  "recipe[keepalived-app::haproxy]",
+]
+
+node.default['qemu']['haproxy2']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -20,13 +26,33 @@ node.default['qemu']['haproxy2']['networking'] = {
     "Route" => {
       "Gateway" => node['environment_v2']['vip']['gateway_lan'],
     }
+  },
+  '/etc/systemd/system/chef-client.service' => {
+    "Unit" => {
+      "Description" => "Chef Client daemon",
+      "After" => "network.target auditd.service"
+    },
+    "Service" => {
+      "Type" => "oneshot",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['haproxy2']['chef_recipes'].join(',')}",
+      "ExecReload" => "/bin/kill -HUP $MAINPID",
+      "SuccessExitStatus" => 3
+    }
+  },
+  '/etc/systemd/system/chef-client.timer' => {
+    "Unit" => {
+      "Description" => "chef-client periodic run"
+    },
+    "Install" => {
+      "WantedBy" => "timers.target"
+    },
+    "Timer" => {
+      "OnStartupSec" => "1min",
+      "OnUnitActiveSec" => "30min"
+    }
   }
 }
 
-node.default['qemu']['haproxy2']['chef_recipes'] = [
-  "recipe[haproxy-app::nodes]",
-  "recipe[keepalived-app::haproxy]",
-]
 node.default['qemu']['haproxy2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -43,7 +69,9 @@ node.default['qemu']['haproxy2']['cloud_config'] = {
     [
       "chef-client", "-o",
       node['qemu']['haproxy2']['chef_recipes'].join(',')
-    ]
+    ],
+    "systemctl enable chef-client.timer",
+    "systemctl start chef-client.timer"
   ]
 }
 

@@ -1,4 +1,4 @@
-node.default['system_update']['debian'] = {
+node.default['system-update']['debian'] = {
   'commands' => [
     "apt-get update -qqy",
     "apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' dist-upgrade",

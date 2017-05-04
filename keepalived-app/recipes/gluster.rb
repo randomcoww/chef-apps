@@ -5,11 +5,6 @@ dbag = Dbag::Keystore.new(
 lan_password = dbag.get_or_create('VI_lan_gluster', SecureRandom.base64(6))
 store_password = dbag.get_or_create('VI_store_gluster', SecureRandom.base64(6))
 
-execute "pkg_update" do
-  command node['keepalived']['pkg_update_command']
-  action :run
-end
-
 include_recipe 'keepalived::install'
 include_recipe 'keepalived::configure'
 

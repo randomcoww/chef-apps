@@ -1,4 +1,3 @@
-node.default['sshd']['pkg_update_command'] = "apt-get update -qqy"
 node.default['sshd']['pkg_names'] = ['openssh-server', 'git']
 
 node.default['sshd']['docker']['config'] = {

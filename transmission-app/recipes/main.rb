@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['transmission']['pkg_update_command']
-  action :run
-end
-
 ## mount the data
 directory '/data/transmission' do
   recursive true

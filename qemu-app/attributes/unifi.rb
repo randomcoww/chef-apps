@@ -1,7 +1,7 @@
 node.default['qemu']['unifi']['cloud_config_hostname'] = 'unifi'
 node.default['qemu']['unifi']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['unifi']['cloud_config_hostname']}"
 
-node.default['qemu']['unifi']['networking'] = {
+node.default['qemu']['unifi']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"

@@ -1,7 +1,14 @@
 node.default['qemu']['transmission']['cloud_config_hostname'] = 'transmission'
 node.default['qemu']['transmission']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['transmission']['cloud_config_hostname']}"
 
-node.default['qemu']['transmission']['networking'] = {
+node.default['qemu']['transmission']['chef_recipes'] = [
+  "recipe[system-update::debian]",
+  "recipe[nftables-app::filter]",
+  "recipe[transmission-app::main]",
+  "recipe[openvpn-app::pia_client]"
+]
+
+node.default['qemu']['transmission']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -19,14 +26,34 @@ node.default['qemu']['transmission']['networking'] = {
       "LinkLocalAddressing" => "yes",
       "DHCP" => "no"
     }
+  },
+  '/etc/systemd/system/chef-client.service' => {
+    "Unit" => {
+      "Description" => "Chef Client daemon",
+      "After" => "network.target auditd.service"
+    },
+    "Service" => {
+      "Type" => "oneshot",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['transmission']['chef_recipes'].join(',')}",
+      "ExecReload" => "/bin/kill -HUP $MAINPID",
+      "SuccessExitStatus" => 3
+    }
+  },
+  '/etc/systemd/system/chef-client.timer' => {
+    "Unit" => {
+      "Description" => "chef-client periodic run"
+    },
+    "Install" => {
+      "WantedBy" => "timers.target"
+    },
+    "Timer" => {
+      "OnStartupSec" => "1min",
+      "OnUnitActiveSec" => "30min"
+    }
   }
 }
 
-node.default['qemu']['transmission']['chef_recipes'] = [
-  "recipe[nftables-app::filter]",
-  "recipe[transmission-app::main]",
-  "recipe[openvpn-app::pia_client]"
-]
+
 node.default['qemu']['transmission']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -43,7 +70,9 @@ node.default['qemu']['transmission']['cloud_config'] = {
     [
       "chef-client", "-o",
       node['qemu']['transmission']['chef_recipes'].join(',')
-    ]
+    ],
+    "systemctl enable chef-client.timer",
+    "systemctl start chef-client.timer"
   ]
 }
 

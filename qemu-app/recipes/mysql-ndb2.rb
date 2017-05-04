@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['qemu']['pkg_update_command']
-  action :run
-end
-
 package node['qemu']['pkg_names'] do
   action :upgrade
 end
@@ -13,9 +8,8 @@ qemu_cloud_config 'mysql-ndb2' do
   path node['qemu']['mysql-ndb2']['cloud_config_path']
   hostname node['qemu']['mysql-ndb2']['cloud_config_hostname']
   config node['qemu']['mysql-ndb2']['cloud_config']
-  systemd_hash node.default['qemu']['mysql-ndb2']['networking']
+  systemd_hash node.default['qemu']['mysql-ndb2']['systemd_config']
   action :create
-  # notifies :restart, "qemu_domain[lb]", :delayed
 end
 
 qemu_domain 'mysql-ndb2' do

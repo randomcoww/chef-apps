@@ -4,11 +4,6 @@ dbag = Dbag::Keystore.new(
 )
 password = dbag.get_or_create('VI_gateway', SecureRandom.base64(6))
 
-execute "pkg_update" do
-  command node['keepalived']['pkg_update_command']
-  action :run
-end
-
 include_recipe 'keepalived::install'
 include_recipe 'keepalived::configure'
 

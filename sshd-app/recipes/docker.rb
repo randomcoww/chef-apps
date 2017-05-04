@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['sshd']['pkg_update_command']
-  action :run
-end
-
 package node['sshd']['pkg_names'] do
   action :upgrade
   notifies :restart, "service[sshd]", :delayed

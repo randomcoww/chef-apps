@@ -1,7 +1,15 @@
 node.default['qemu']['mysql-ndb1']['cloud_config_hostname'] = 'mysql-ndb1'
 node.default['qemu']['mysql-ndb1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['mysql-ndb1']['cloud_config_hostname']}"
 
-node.default['qemu']['mysql-ndb1']['networking'] = {
+node.default['qemu']['mysql-ndb1']['chef_recipes'] = [
+  "recipe[system-update::debian]",
+  "recipe[mysql-cluster-app::ndb]",
+  "recipe[mysql-cluster-app::api]",
+  "recipe[kea-app::mysql]",
+  "recipe[keepalived-app::mysql]",
+]
+
+node.default['qemu']['mysql-ndb1']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -22,15 +30,33 @@ node.default['qemu']['mysql-ndb1']['networking'] = {
     "Route" => {
       "Gateway" => node['environment_v2']['vip']['gateway_lan']
     }
+  },
+  '/etc/systemd/system/chef-client.service' => {
+    "Unit" => {
+      "Description" => "Chef Client daemon",
+      "After" => "network.target auditd.service"
+    },
+    "Service" => {
+      "Type" => "oneshot",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['mysql-ndb1']['chef_recipes'].join(',')}",
+      "ExecReload" => "/bin/kill -HUP $MAINPID",
+      "SuccessExitStatus" => 3
+    }
+  },
+  '/etc/systemd/system/chef-client.timer' => {
+    "Unit" => {
+      "Description" => "chef-client periodic run"
+    },
+    "Install" => {
+      "WantedBy" => "timers.target"
+    },
+    "Timer" => {
+      "OnStartupSec" => "1min",
+      "OnUnitActiveSec" => "30min"
+    }
   }
 }
 
-node.default['qemu']['mysql-ndb1']['chef_recipes'] = [
-  "recipe[mysql-cluster-app::ndb]",
-  "recipe[mysql-cluster-app::api]",
-  "recipe[kea-app::mysql]",
-  "recipe[keepalived-app::mysql]",
-]
 node.default['qemu']['mysql-ndb1']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
@@ -45,10 +71,13 @@ node.default['qemu']['mysql-ndb1']['cloud_config'] = {
   "runcmd" =>  [
     "echo deb http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
     "echo deb-src http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
+    "apt-get -y update",
     [
       "chef-client", "-o",
       node['qemu']['mysql-ndb1']['chef_recipes'].join(',')
-    ]
+    ],
+    "systemctl enable chef-client.timer",
+    "systemctl start chef-client.timer"
   ]
 }
 

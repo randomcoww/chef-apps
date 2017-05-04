@@ -1,7 +1,12 @@
 node.default['qemu']['gluster2']['cloud_config_hostname'] = 'gluster2'
 node.default['qemu']['gluster2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster2']['cloud_config_hostname']}"
 
-node.default['qemu']['gluster2']['networking'] = {
+node.default['qemu']['gluster2']['chef_recipes'] = [
+  "recipe[system-update::debian]",
+  "recipe[keepalived-app::gluster]"
+]
+
+node.default['qemu']['gluster2']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -32,6 +37,30 @@ node.default['qemu']['gluster2']['networking'] = {
     "Address" => {
       "Address" => "#{node['environment_v2']['host']['gluster2']['ip_store']}/#{node['environment_v2']['subnet']['store'].split('/').last}"
     }
+  },
+  '/etc/systemd/system/chef-client.service' => {
+    "Unit" => {
+      "Description" => "Chef Client daemon",
+      "After" => "network.target auditd.service"
+    },
+    "Service" => {
+      "Type" => "oneshot",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['gluster2']['chef_recipes'].join(',')}",
+      "ExecReload" => "/bin/kill -HUP $MAINPID",
+      "SuccessExitStatus" => 3
+    }
+  },
+  '/etc/systemd/system/chef-client.timer' => {
+    "Unit" => {
+      "Description" => "chef-client periodic run"
+    },
+    "Install" => {
+      "WantedBy" => "timers.target"
+    },
+    "Timer" => {
+      "OnStartupSec" => "1min",
+      "OnUnitActiveSec" => "30min"
+    }
   }
 }
 
@@ -54,7 +83,9 @@ node.default['qemu']['gluster2']['cloud_config'] = {
     [
       "chef-client", "-o",
       node['qemu']['gluster2']['chef_recipes'].join(',')
-    ]
+    ],
+    "systemctl enable chef-client.timer",
+    "systemctl start chef-client.timer"
   ]
 }
 

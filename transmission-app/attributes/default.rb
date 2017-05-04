@@ -1,4 +1,3 @@
-node.default['transmission']['pkg_update_command'] = "apt-get update -qqy"
 node.default['transmission']['pkg_names'] = ['transmission-daemon']
 
 node.default['transmission']['main']['incomplete-dir'] = "/data/transmission/incomplete"

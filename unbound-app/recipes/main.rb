@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['unbound']['pkg_update_command']
-  action :run
-end
-
 package node['unbound']['pkg_names'] do
   action :upgrade
   notifies :stop, "service[unbound]", :immediately

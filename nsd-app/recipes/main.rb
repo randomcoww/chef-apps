@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['nsd']['pkg_update_command']
-  action :run
-end
-
 ## service starts automatically with default configs on install
 ## this conflicts with unbound running on default port
 ## stop until configs are written to run on another port

@@ -1,7 +1,7 @@
 node.default['qemu']['gluster-client']['cloud_config_hostname'] = 'gluster-client'
 node.default['qemu']['gluster-client']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster-client']['cloud_config_hostname']}"
 
-node.default['qemu']['gluster-client']['networking'] = {
+node.default['qemu']['gluster-client']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"

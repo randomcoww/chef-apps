@@ -1,5 +1,3 @@
-node.default['keepalived']['pkg_update_command'] = "apt-get update -qqy"
-
 node.default['keepalived']['package'] = 'keepalived'
 
 node.default['keepalived']['auth_data_bag'] = 'deploy_config'

@@ -1,4 +1,3 @@
-node.default['ddclient']['pkg_update_command'] = "apt-get update -qqy"
 node.default['ddclient']['pkg_names'] = ['ddclient']
 
 node.default['ddclient']['data_bag'] = 'deploy_config'

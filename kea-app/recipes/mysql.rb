@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['kea']['pkg_update_command']
-  action :run
-end
-
 package node['kea']['pkg_names'] do
   action :upgrade
   notifies :stop, "service[kea-dhcp4-server]", :immediately

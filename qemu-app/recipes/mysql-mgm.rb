@@ -1,8 +1,3 @@
-execute "pkg_update" do
-  command node['qemu']['pkg_update_command']
-  action :run
-end
-
 package node['qemu']['pkg_names'] do
   action :upgrade
 end
@@ -13,9 +8,8 @@ qemu_cloud_config 'mysql-mgm' do
   path node['qemu']['mysql-mgm']['cloud_config_path']
   hostname node['qemu']['mysql-mgm']['cloud_config_hostname']
   config node['qemu']['mysql-mgm']['cloud_config']
-  systemd_hash node.default['qemu']['mysql-mgm']['networking']
+  systemd_hash node.default['qemu']['mysql-mgm']['systemd_config']
   action :create
-  # notifies :restart, "qemu_domain[lb]", :delayed
 end
 
 qemu_domain 'mysql-mgm' do

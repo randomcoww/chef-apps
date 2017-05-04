@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: system_update
+# Cookbook Name:: system-update
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME
