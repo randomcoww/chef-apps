@@ -3,6 +3,6 @@ source "https://supermarket.chef.io"
 metadata
 
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
-cookbook "mysql-credentials", github: "randomcoww/chef-apps", rel: "mysql-credentials"
+cookbook "mysql_credentials", github: "randomcoww/chef-apps", rel: "mysql_credentials"
 cookbook "mysql-cluster", github: "randomcoww/chef-mysql-cluster"
 cookbook "dbag", github: "randomcoww/chef-dbag"

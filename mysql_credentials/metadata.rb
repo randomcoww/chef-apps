@@ -1,0 +1,7 @@
+name             'mysql_credentials'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures mysql_credentials'
+long_description 'Installs/Configures mysql_credentials'
+version          '0.1.0'

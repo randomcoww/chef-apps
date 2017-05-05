@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: mysql-credentials
+# Cookbook Name:: system_update
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

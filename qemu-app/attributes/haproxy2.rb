@@ -2,7 +2,7 @@ node.default['qemu']['haproxy2']['cloud_config_hostname'] = 'haproxy2'
 node.default['qemu']['haproxy2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['haproxy2']['cloud_config_hostname']}"
 
 node.default['qemu']['haproxy2']['chef_recipes'] = [
-  "recipe[system-update::debian]",
+  "recipe[system_update::debian]",
   "recipe[haproxy-app::nodes]",
   "recipe[keepalived-app::haproxy]",
 ]

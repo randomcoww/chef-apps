@@ -2,7 +2,7 @@ node.default['qemu']['gluster1']['cloud_config_hostname'] = 'gluster1'
 node.default['qemu']['gluster1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gluster1']['cloud_config_hostname']}"
 
 node.default['qemu']['gluster1']['chef_recipes'] = [
-  "recipe[system-update::debian]",
+  "recipe[system_update::debian]",
   "recipe[keepalived-app::gluster]"
 ]
 

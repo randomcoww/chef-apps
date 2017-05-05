@@ -8,10 +8,10 @@ node.default['kea']['mysql']['config'] = {
     },
     "lease-database" => {
       "type" => "mysql",
-      "name" => node['mysql-credentials']['kea']['database'],
+      "name" => node['mysql_credentials']['kea']['database'],
       "host" => "localhost",
-      "user" => node['mysql-credentials']['kea']['username'],
-      "password" => node['mysql-credentials']['kea']['password'],
+      "user" => node['mysql_credentials']['kea']['username'],
+      "password" => node['mysql_credentials']['kea']['password'],
       "persist" => true
     },
     "subnet4" => [

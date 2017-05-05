@@ -1,4 +1,4 @@
-# system-update-cookbook
+# mysql_credentials-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['system-update']['bacon']</tt></td>
+    <td><tt>['mysql_credentials']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### system-update::default
+### mysql_credentials::default
 
-Include `system-update` in your node's `run_list`:
+Include `mysql_credentials` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[system-update::default]"
+    "recipe[mysql_credentials::default]"
   ]
 }
 ```

@@ -2,7 +2,7 @@ node.default['qemu']['transmission']['cloud_config_hostname'] = 'transmission'
 node.default['qemu']['transmission']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['transmission']['cloud_config_hostname']}"
 
 node.default['qemu']['transmission']['chef_recipes'] = [
-  "recipe[system-update::debian]",
+  "recipe[system_update::debian]",
   "recipe[nftables-app::filter]",
   "recipe[transmission-app::main]",
   "recipe[openvpn-app::pia_client]"

@@ -2,7 +2,7 @@ node.default['qemu']['gateway1']['cloud_config_hostname'] = 'gateway1'
 node.default['qemu']['gateway1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway1']['cloud_config_hostname']}"
 
 node.default['qemu']['gateway1']['chef_recipes'] = [
-  "recipe[system-update::debian]",
+  "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
   "recipe[keepalived-app::gateway]",
   "recipe[ddclient-app::freedns]"

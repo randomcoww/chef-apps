@@ -50,10 +50,10 @@ nsd_kea_zonefile 'dy.lan' do
   domain 'dy.lan'
   name_server 'ns1.dy.lan'
   email_addr 'root.dy.lan'
-  username node['mysql-credentials']['kea']['username']
-  database node['mysql-credentials']['kea']['database']
+  username node['mysql_credentials']['kea']['username']
+  database node['mysql_credentials']['kea']['database']
   host node['environment_v2']['vip']['mysql_lan']
-  password node['mysql-credentials']['kea']['password']
+  password node['mysql_credentials']['kea']['password']
   notifies :reload, "service[nsd]", :delayed
 end
 

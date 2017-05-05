@@ -2,7 +2,7 @@ node.default['qemu']['mysql-mgm']['cloud_config_hostname'] = 'mysql-mgm'
 node.default['qemu']['mysql-mgm']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['mysql-mgm']['cloud_config_hostname']}"
 
 node.default['qemu']['mysql-mgm']['chef_recipes'] = [
-  "recipe[system-update::debian]",
+  "recipe[system_update::debian]",
   "recipe[mysql-cluster-app::mgm]"
 ]
 

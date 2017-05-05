@@ -1,8 +1,0 @@
-name             'mysql-credentials'
-maintainer       'YOUR_NAME'
-maintainer_email 'YOUR_EMAIL'
-license          'All rights reserved'
-description      'Installs/Configures mysql-credentials'
-long_description 'Installs/Configures mysql-credentials'
-version          '0.1.0'
-depends          'dbag'
