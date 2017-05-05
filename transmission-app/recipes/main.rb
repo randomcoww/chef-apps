@@ -1,14 +1,4 @@
-## mount the data
-directory '/data/transmission' do
-  recursive true
-  action :create
-end
-
-mount '/data/transmission' do
-  fstype 'glusterfs'
-  device "#{node['environment_v2']['vip']['gluster_store']}:/ctorrent"
-  action [:mount, :enable]
-end
+include_recipe "transmission-app::mounts"
 
 ## pre-generate user with desired home, GID and UID to match share on glusterfs
 group node['transmission']['main']['group'] do
@@ -46,4 +36,4 @@ transmission_config "transmission" do
   notifies :stop, "service[transmission-daemon]", :before
 end
 
-include_recipe "transmission::service"
+include_recipe "transmission-app::service"
