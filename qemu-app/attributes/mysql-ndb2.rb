@@ -3,8 +3,8 @@ node.default['qemu']['mysql-ndb2']['cloud_config_path'] = "/img/cloud-init/#{nod
 
 node.default['qemu']['mysql-ndb2']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[mysql-cluster-app::ndb]",
-  "recipe[mysql-cluster-app::api]",
+  "recipe[mysql_cluster-app::ndb]",
+  "recipe[mysql_cluster-app::api]",
   "recipe[kea-app::mysql]",
   "recipe[keepalived-app::mysql]",
 ]

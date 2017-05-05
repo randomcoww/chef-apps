@@ -11,7 +11,7 @@ end
 ## service starts automatically with default configs on install
 ## this conflicts with unbound running on default port
 ## stop until configs are written to run on another port
-apt_package node['mysql-cluster']['api']['pkg_names'] do
+apt_package node['mysql_cluster']['api']['pkg_names'] do
   action :install
   options [
     '--no-install-recommends',
@@ -24,8 +24,8 @@ end
 
 mysql_cluster_config 'api' do
   path '/etc/mysql/my.cnf'
-  config node['mysql-cluster']['api']['config']
+  config node['mysql_cluster']['api']['config']
   action :create
 end
 
-include_recipe 'mysql-cluster::service'
+include_recipe 'mysql_cluster::service'

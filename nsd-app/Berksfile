@@ -4,7 +4,7 @@ metadata
 
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
 cookbook "mysql_credentials", github: "randomcoww/chef-apps", rel: "mysql_credentials"
-cookbook "mysql-cluster", github: "randomcoww/chef-mysql-cluster"
+cookbook "mysql_cluster", github: "randomcoww/chef-mysql_cluster"
 cookbook "nsd", github: "randomcoww/chef-nsd"
 cookbook "nsd_resource", github: "randomcoww/chef-nsd_resource"
 cookbook "dbag", github: "randomcoww/chef-dbag"

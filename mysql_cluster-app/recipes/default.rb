@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: mysql-cluster-app
+# Cookbook Name:: mysql_cluster-app
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

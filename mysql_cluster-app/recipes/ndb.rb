@@ -1,7 +1,7 @@
 ## service starts automatically with default configs on install
 ## this conflicts with unbound running on default port
 ## stop until configs are written to run on another port
-apt_package node['mysql-cluster']['mgm']['pkg_names'] do
+apt_package node['mysql_cluster']['ndb']['pkg_names'] do
   action :install
   # notifies :stop, "service[mysql]", :immediately
   options [
@@ -15,16 +15,7 @@ directory "/var/lib/mysql-cluster" do
   action :create
 end
 
-mysql_cluster_config 'mgm' do
-  path '/var/lib/mysql-cluster/config.ini'
-  config node['mysql-cluster']['mgm']['config']
-  action :create
-end
-
-mysql_cluster_mgm 'mgm_service' do
-  options ({
-    'config-file' => '/var/lib/mysql-cluster/config.ini',
-    'no-nodeid-checks' => true
-  })
+mysql_cluster_ndb 'ndb_service' do
+  options node['mysql_cluster']['ndb']['options']
   action [:enable, :start]
 end

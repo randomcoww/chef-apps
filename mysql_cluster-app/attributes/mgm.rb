@@ -1,9 +1,9 @@
-node.default['mysql-cluster']['mgm']['pkg_names'] = [
+node.default['mysql_cluster']['mgm']['pkg_names'] = [
   'mysql-cluster-community-management-server',
   'mysql-cluster-community-client'
 ]
 
-node.default['mysql-cluster']['mgm']['config'] = {
+node.default['mysql_cluster']['mgm']['config'] = {
   'ndb_mgmd default' => {
     'datadir' => '/var/lib/mysql-cluster'
   },

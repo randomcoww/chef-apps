@@ -1,8 +1,8 @@
-node.default['mysql-cluster']['api']['pkg_names'] = [
+node.default['mysql_cluster']['api']['pkg_names'] = [
   'mysql-cluster-community-server'
 ]
 
-node.default['mysql-cluster']['api']['config'] = {
+node.default['mysql_cluster']['api']['config'] = {
   'mysqld' => {
     'ndbcluster' => nil,
     'default_storage_engine' => 'ndbcluster',

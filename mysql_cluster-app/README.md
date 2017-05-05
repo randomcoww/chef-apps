@@ -1,4 +1,4 @@
-# mysql-cluster-app-cookbook
+# mysql_cluster-app-cookbook
 
 TODO: Enter the cookbook description here.
 
@@ -16,7 +16,7 @@ TODO: List your supported platforms.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['mysql-cluster-app']['bacon']</tt></td>
+    <td><tt>['mysql_cluster-app']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -25,14 +25,14 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### mysql-cluster-app::default
+### mysql_cluster-app::default
 
-Include `mysql-cluster-app` in your node's `run_list`:
+Include `mysql_cluster-app` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[mysql-cluster-app::default]"
+    "recipe[mysql_cluster-app::default]"
   ]
 }
 ```
