@@ -8,7 +8,6 @@ node.default['environment_v2']['vip']['gateway_lan'] = "192.168.62.240"
 node.default['environment_v2']['vip']['dns_lan'] = "192.168.62.230"
 node.default['environment_v2']['vip']['gluster_lan'] = "192.168.62.250"
 node.default['environment_v2']['vip']['gluster_store'] = "169.254.127.250"
-node.default['environment_v2']['vip']['mysql_lan'] = "192.168.62.210"
 node.default['environment_v2']['vip']['haproxy_lan'] = "192.168.62.220"
 
 

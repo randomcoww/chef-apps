@@ -5,8 +5,7 @@ node.default['qemu']['mysql-ndb2']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[mysql_cluster-app::ndb]",
   "recipe[mysql_cluster-app::api]",
-  "recipe[kea-app::mysql]",
-  "recipe[keepalived-app::mysql]",
+  "recipe[kea-app::mysql]"
 ]
 
 node.default['qemu']['mysql-ndb2']['systemd_config'] = {

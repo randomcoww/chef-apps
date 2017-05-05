@@ -52,9 +52,10 @@ nsd_kea_zonefile 'dy.lan' do
   email_addr 'root.dy.lan'
   username node['mysql_credentials']['kea']['username']
   database node['mysql_credentials']['kea']['database']
-  host node['environment_v2']['vip']['mysql_lan']
+  host node['environment_v2']['vip']['haproxy_lan']
   password node['mysql_credentials']['kea']['password']
   notifies :reload, "service[nsd]", :delayed
+  ignore_failure true
 end
 
 ## main config
