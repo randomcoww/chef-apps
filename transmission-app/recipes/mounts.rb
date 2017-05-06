@@ -9,7 +9,7 @@ systemd_unit "data-transmission.mount" do
       "Description" => "Mount transmission share"
     },
     'Mount' => {
-      "What" => "#{node['environment_v2']['vip']['gluster_store']}:/ctorrent",
+      "What" => "#{node['environment_v2']['set']['gluster']['vip_store']}:/ctorrent",
       "Where" => node['transmission']['main']['home'],
       "Type" => "glusterfs"
     }

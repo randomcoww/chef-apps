@@ -15,7 +15,7 @@ node.default['qemu']['mysql-mgm']['systemd_config'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['vip']['dns_lan'],
+        node['environment_v2']['set']['dns']['vip_lan'],
         "8.8.8.8"
       ]
     },
@@ -23,7 +23,7 @@ node.default['qemu']['mysql-mgm']['systemd_config'] = {
       "Address" => "#{node['environment_v2']['host']['mysql-mgm']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['vip']['gateway_lan']
+      "Gateway" => node['environment_v2']['set']['gateway']['vip_lan']
     }
   },
   '/etc/systemd/system/chef-client.service' => {

@@ -13,25 +13,19 @@ node.default['mysql_cluster']['mgm']['config'] = {
     'IndexMemory' => '128M',
     'DataDir' => '/var/lib/mysql-cluster'
   },
-  'ndb_mgmd' => [
+  'ndb_mgmd' => node['environment_v2']['set']['mysql-mgm']['hosts'].map { |e|
     {
-      'hostname' => node['environment_v2']['host']['mysql-mgm']['ip_lan']
+      'hostname' => node['environment_v2']['host'][e]['ip_lan']
     }
-  ],
-  'ndbd' => [
+  },
+  'ndbd' => node['environment_v2']['set']['mysql-ndb']['hosts'].map { |e|
     {
-      'hostname' => node['environment_v2']['host']['mysql-ndb1']['ip_lan']
-    },
-    {
-      'hostname' => node['environment_v2']['host']['mysql-ndb2']['ip_lan']
+      'hostname' => node['environment_v2']['host'][e]['ip_lan']
     }
-  ],
-  'mysqld' => [
+  },
+  'mysqld' => node['environment_v2']['set']['mysql-ndb']['hosts'].map { |e|
     {
-      'hostname' => node['environment_v2']['host']['mysql-ndb1']['ip_lan']
-    },
-    {
-      'hostname' => node['environment_v2']['host']['mysql-ndb2']['ip_lan']
+      'hostname' => node['environment_v2']['host'][e]['ip_lan']
     }
-  ]
+  }
 }

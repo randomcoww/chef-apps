@@ -21,7 +21,7 @@ node.default['qemu']['gateway1']['systemd_config'] = {
       "Address" => "#{node['environment_v2']['host']['gateway1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['vip']['gateway_lan'],
+      "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
       "Metric" => 2048
     }
   },
@@ -42,7 +42,7 @@ node.default['qemu']['gateway1']['systemd_config'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "yes",
       "DNS" => [
-        node['environment_v2']['vip']['dns_lan'],
+        node['environment_v2']['set']['dns']['vip_lan'],
         "8.8.8.8"
       ]
     },

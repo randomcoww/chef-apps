@@ -26,7 +26,7 @@ node.default['qemu']['dns1']['systemd_config'] = {
       "Address" => "#{node['environment_v2']['host']['dns1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['vip']['gateway_lan'],
+      "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
       "Metric" => 2048
     }
   },

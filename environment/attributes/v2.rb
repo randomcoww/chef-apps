@@ -4,11 +4,52 @@ node.default['environment_v2']['subnet']['vpn'] = "192.168.30.0/23"
 node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
 node.default['environment_v2']['subnet']['vpn_dhcp_pool'] = "192.168.30.32/27"
 
-node.default['environment_v2']['vip']['gateway_lan'] = "192.168.62.240"
-node.default['environment_v2']['vip']['dns_lan'] = "192.168.62.230"
-node.default['environment_v2']['vip']['gluster_lan'] = "192.168.62.250"
-node.default['environment_v2']['vip']['gluster_store'] = "169.254.127.250"
-node.default['environment_v2']['vip']['haproxy_lan'] = "192.168.62.220"
+
+node.default['environment_v2']['set']['gateway'] = {
+  'hosts' => [
+    'gateway1',
+    'gateway2'
+  ],
+  'vip_lan' => "192.168.62.240"
+}
+
+node.default['environment_v2']['set']['gluster'] = {
+  'hosts' => [
+    'gluster1',
+    'gluster2'
+  ],
+  'vip_lan' => "192.168.62.250",
+  'vip_store' => "169.254.127.250"
+}
+
+node.default['environment_v2']['set']['dns'] = {
+  'hosts' => [
+    'dns1',
+    'dns2'
+  ],
+  'vip_lan' => "192.168.62.230"
+}
+
+node.default['environment_v2']['set']['mysql-mgm'] = {
+  'hosts' => [
+    'mysql-mgm'
+  ]
+}
+
+node.default['environment_v2']['set']['mysql-ndb'] = {
+  'hosts' => [
+    'mysql-ndb1',
+    'mysql-ndb2'
+  ]
+}
+
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'haproxy1',
+    'haproxy2'
+  ],
+  'vip_lan' => "192.168.62.220"
+}
 
 
 ## hardware override

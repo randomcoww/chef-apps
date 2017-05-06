@@ -20,12 +20,12 @@ node.default['kea']['mysql']['config'] = {
         "option-data" => [
           {
             "name" => "routers",
-            "data" => node['environment_v2']['vip']['gateway_lan']
+            "data" => node['environment_v2']['set']['gateway']['vip_lan']
           },
           {
             "name" => "domain-name-servers",
             "data" => [
-              node['environment_v2']['vip']['dns_lan'],
+              node['environment_v2']['set']['dns']['vip_lan'],
               '8.8.8.8'
             ].join(','),
             "csv-format" => true

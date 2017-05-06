@@ -3,6 +3,7 @@ node.default['qemu']['gluster2']['cloud_config_path'] = "/img/cloud-init/#{node[
 
 node.default['qemu']['gluster2']['chef_recipes'] = [
   "recipe[system_update::debian]",
+  "recipe[glusterfs-app::peer]",
   "recipe[keepalived-app::gluster]"
 ]
 
@@ -15,7 +16,7 @@ node.default['qemu']['gluster2']['systemd_config'] = {
       "LinkLocalAddressing" => "no",
       "DHCP" => "no",
       "DNS" => [
-        node['environment_v2']['vip']['dns_lan'],
+        node['environment_v2']['set']['dns']['vip_lan'],
         "8.8.8.8"
       ]
     },
@@ -23,7 +24,7 @@ node.default['qemu']['gluster2']['systemd_config'] = {
       "Address" => "#{node['environment_v2']['host']['gluster2']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
-      "Gateway" => node['environment_v2']['vip']['gateway_lan']
+      "Gateway" => node['environment_v2']['set']['gateway']['vip_lan']
     }
   },
   '/etc/systemd/network/eth1.network' => {
@@ -64,9 +65,7 @@ node.default['qemu']['gluster2']['systemd_config'] = {
   }
 }
 
-node.default['qemu']['gluster2']['chef_recipes'] = [
-  "recipe[keepalived-app::gluster]"
-]
+
 node.default['qemu']['gluster2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
