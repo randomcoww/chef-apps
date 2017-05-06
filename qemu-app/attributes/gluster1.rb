@@ -77,7 +77,6 @@ node.default['qemu']['gluster1']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['gluster1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install glusterfs-server",
     [
       "chef-client", "-o",
       node['qemu']['gluster1']['chef_recipes'].join(',')
