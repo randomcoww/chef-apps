@@ -30,9 +30,9 @@ node['environment_v2']['host'].each do |hostname, d|
   end
 end
 
-node['environment_v2']['vip'].each do |hostname, ip|
-  if !ip.nil?
-    static_hosts[hostname] = ip
+node['environment_v2']['set'].each do |set, d|
+  if !d['vip_lan'].nil?
+    static_hosts[set] = d['vip_lan']
   end
 end
 
