@@ -51,6 +51,15 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.220"
 }
 
+node.default['environment_v2']['set']['etcd'] = {
+  'hosts' => [
+    'etcd1',
+    'etcd2'
+  ],
+  'vip_lan' => "192.168.62.200"
+}
+
+
 
 ## hardware override
 node.default['environment_v2']['host']['vm1'] = {
@@ -129,6 +138,14 @@ node.default['environment_v2']['host']['haproxy1'] = {
 
 node.default['environment_v2']['host']['haproxy2'] = {
   'ip_lan' => "192.168.62.222"
+}
+
+node.default['environment_v2']['host']['etcd1'] = {
+  'ip_lan' => "192.168.62.201"
+}
+
+node.default['environment_v2']['host']['etcd2'] = {
+  'ip_lan' => "192.168.62.202"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
