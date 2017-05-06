@@ -29,7 +29,7 @@ haproxy_frontend 'mysql' do
 end
 
 haproxy_backend 'mysql' do
-  server (node['environment_v2']['set']['mysql-ndb']['hosts'].map.with_index { |e, i|
-    "mysql#{i} #{node['environment_v2']['host'][e]['ip_lan']}:3306 check"
+  server (node['environment_v2']['set']['mysql-ndb']['hosts'].map { |e|
+    "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:3306 check"
   })
 end
