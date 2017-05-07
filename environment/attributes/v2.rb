@@ -148,6 +148,14 @@ node.default['environment_v2']['host']['etcd2'] = {
   'ip_lan' => "192.168.62.202"
 }
 
+node.default['environment_v2']['host']['docker1'] = {
+  'ip_lan' => "192.168.62.203"
+}
+
+node.default['environment_v2']['host']['docker2'] = {
+  'ip_lan' => "192.168.62.204"
+}
+
 node.default['environment_v2']['host']['vm1-ipmi'] = {
   'ip_lan' => '192.168.63.64'
 }
