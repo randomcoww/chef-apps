@@ -2,6 +2,6 @@ source "https://supermarket.chef.io"
 
 metadata
 
-cookbook "dbag", github: "randomcoww/chef-dbag"
+cookbook "node_data", github: "randomcoww/chef-node_data"
 cookbook "etcd"
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
