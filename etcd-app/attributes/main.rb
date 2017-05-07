@@ -16,7 +16,11 @@ node.default['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER'] = node['envi
     "#{e}=http://#{node['environment_v2']['host'][e]['ip_lan']}:2380"
   }.join(',')
 
+## for now this needs to be manually set to either new or existing depending on cluster state
+## i don't have a good solution to this
+# node.default['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
 node.default['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
+
 node.default['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_TOKEN'] = "etcd-cluster-1"
 node.default['etcd']['main']['environment']['ETCD_ADVERTISE_CLIENT_URLS'] = "http://#{node_ip}:2379"
 
@@ -34,7 +38,7 @@ node.default['etcd']['main']['systemd_unit'] = {
     "Type" => "notify",
     "ExecStart" => "/usr/bin/etcd",
     "Restart" => "always",
-    "RestartSec" => "10s",
+    "RestartSec" => "5s",
     "LimitNOFILE" => 40000
   },
   "Install" => {

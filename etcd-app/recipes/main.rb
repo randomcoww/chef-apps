@@ -31,5 +31,6 @@ end
 
 systemd_unit "etcd.service" do
   content node['etcd']['main']['systemd_unit']
+  ignore_failure true
   action [:create, :enable, :start]
 end
