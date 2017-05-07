@@ -1,6 +1,3 @@
-node_ips = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan'])
-node_ip = node_ips.first
-
 etcd_installation 'main' do
   version node['etcd']['main']['version']
   action :create
@@ -10,18 +7,15 @@ end
 #   data_dir '/var/lib/etcd'
 #   service_manager 'systemd'
 #
-#   initial_cluster_token 'etcd-cluster-1'
+#   initial_cluster_token node['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_TOKEN']
+#   initial_advertise_peer_urls node['etcd']['main']['environment']['ETCD_INITIAL_ADVERTISE_PEER_URLS']
+#   listen_peer_urls node['etcd']['main']['environment']['ETCD_LISTEN_PEER_URLS']
+#   listen_client_urls node['etcd']['main']['environment']['ETCD_LISTEN_CLIENT_URLS']
+#   advertise_client_urls node['etcd']['main']['environment']['ETCD_ADVERTISE_CLIENT_URLS']
+#   initial_cluster node['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER']
+#   initial_cluster_state node['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_STATE']
 #
-#   initial_advertise_peer_urls "http://#{node_ip}:2380"
-#   listen_peer_urls "http://#{node_ip}:2380"
-#   listen_client_urls ["http://#{node_ip}:2379", "http://127.0.0.1:2379"].join(',')
-#   advertise_client_urls "http://#{node_ip}:2379"
-#   initial_cluster node['environment_v2']['set']['etcd']['hosts'].map { |e|
-#       "#{e}=http://#{node['environment_v2']['host'][e]['ip_lan']}:2380"
-#     }.join(',')
-#   initial_cluster_state 'new'
-#
-#   action :create
+#   action :start
 # end
 
 user node['etcd']['main']['user'] do
@@ -36,6 +30,6 @@ directory node['etcd']['main']['environment']['ETCD_DATA_DIR'] do
 end
 
 systemd_unit "etcd.service" do
-  content node['etcd']['main']['bootstrap_systemd']
+  content node['etcd']['main']['systemd_unit']
   action [:create, :enable, :start]
 end

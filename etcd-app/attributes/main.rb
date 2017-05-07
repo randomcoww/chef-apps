@@ -21,7 +21,7 @@ node.default['etcd']['main']['environment']['ETCD_INITIAL_CLUSTER_TOKEN'] = "etc
 node.default['etcd']['main']['environment']['ETCD_ADVERTISE_CLIENT_URLS'] = "http://#{node_ip}:2379"
 
 
-node.default['etcd']['main']['bootstrap_systemd'] = {
+node.default['etcd']['main']['systemd_unit'] = {
   'Unit' => {
     'Description' => 'etcd key-value store',
     "After" => "network.target"
