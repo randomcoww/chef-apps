@@ -64,7 +64,6 @@ node.default['qemu']['etcd2']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['etcd2']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "apt-get -y install default-libmysqlclient-dev",
     [
       "chef-client", "-o",
       node['qemu']['etcd2']['chef_recipes'].join(',')
