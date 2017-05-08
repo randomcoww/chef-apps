@@ -109,8 +109,6 @@ node.default['qemu']['docker2']['cloud_config'] = {
       "chef-client", "-o",
       node['qemu']['docker2']['chef_recipes'].join(',')
     ],
-    "systemctl enable flanneld",
-    "systemctl start flanneld",
     "systemctl enable chef-client.timer",
     "systemctl start chef-client.timer",
   ]
