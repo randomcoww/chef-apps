@@ -12,7 +12,8 @@ keepalived_vrrp_sync_group 'VG_gateway' do
 end
 
 keepalived_vrrp_instance 'VI_gateway' do
-  nopreempt true
+  # nopreempt true
+  # state 'MASTER'
   interface node['keepalived']['gateway']['lan_if']
   virtual_router_id 20
   # use_vmac 'vrrp20'
@@ -23,4 +24,4 @@ keepalived_vrrp_instance 'VI_gateway' do
   notify_fault %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
 end
 
-include_recipe 'keepalived::service'
+include_recipe 'keepalived-app::systemd_service'

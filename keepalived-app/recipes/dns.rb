@@ -12,7 +12,8 @@ keepalived_vrrp_sync_group 'VG_dns' do
 end
 
 keepalived_vrrp_instance 'VI_dns' do
-  nopreempt true
+  # nopreempt true
+  # state 'MASTER'
   interface node['keepalived']['dns']['lan_if']
   virtual_router_id 22
   # use_vmac 'vrrp22'
@@ -20,4 +21,4 @@ keepalived_vrrp_instance 'VI_dns' do
   virtual_ipaddress [ "#{node['environment_v2']['set']['dns']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]
 end
 
-include_recipe 'keepalived::service'
+include_recipe 'keepalived-app::systemd_service'

@@ -12,11 +12,12 @@ keepalived_vrrp_sync_group 'VG_haproxy' do
 end
 
 keepalived_vrrp_instance 'VI_haproxy' do
-  nopreempt true
+  # nopreempt true
+  priority node['environment_v2']['current_host']['priority']
   interface node['keepalived']['haproxy']['lan_if']
   virtual_router_id 31
   authentication auth_type: 'AH', auth_pass: password
   virtual_ipaddress [ "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]
 end
 
-include_recipe 'keepalived::service'
+include_recipe 'keepalived-app::systemd_service'
