@@ -1,5 +1,3 @@
-## override systemd - no support for drop-ins as far as i can tell..
-
 systemd_resource_dropin "10-network_bind" do
   service "keepalived.service"
   config ({
