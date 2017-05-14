@@ -3,6 +3,7 @@ node.default['qemu']['docker1']['cloud_config_path'] = "/img/cloud-init/#{node['
 
 node.default['qemu']['docker1']['chef_recipes'] = [
   "recipe[system_update::debian]",
+  "recipe[docker_overlay::install]",
 ]
 
 node.default['qemu']['docker1']['systemd_config'] = {
@@ -48,33 +49,6 @@ node.default['qemu']['docker1']['systemd_config'] = {
       "OnStartupSec" => "1min",
       "OnUnitActiveSec" => "30min"
     }
-  },
-  '/etc/systemd/system/flanneld.service' => {
-    'Unit' => {
-      'Description' => 'Network fabric for containers',
-      'After' => 'etcd.service',
-    },
-    'Service' => {
-      'Type' => 'notify',
-      'Restart' => 'always',
-      'RestartSec' => '5s',
-      'ExecStart' => "/usr/bin/flanneld -etcd-endpoints=#{node['environment_v2']['set']['etcd']['hosts'].map { |e| "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379" }.join(',')} -logtostderr=true -subnet-dir=/run/flannel/networks -subnet-file=/run/flannel/subnet.env"
-    },
-    'Install' => {
-      'WantedBy' => 'multi-user.target'
-    }
-  },
-  '/etc/systemd/system/docker.service.d/flannel.conf' => {
-    'Unit' => {
-      'After' => 'flanneld.service'
-    },
-    'Service' => {
-      "EnvironmentFile" => "/run/flannel/subnet.env",
-      "ExecStart" => [
-        '',
-        "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald"
-      ]
-    }
   }
 }
 
@@ -90,21 +64,11 @@ node.default['qemu']['docker1']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['docker1']['cloud_config_hostname']}.lan",
   "runcmd" => [
-    "cd /usr/local/src",
-    "wget https://github.com/coreos/flannel/releases/download/v0.7.1/flannel-v0.7.1-linux-amd64.tar.gz",
-    "tar -zxf flannel-v0.7.1-linux-amd64.tar.gz",
-    "mv flanneld /usr/bin/",
-    "systemctl enable flanneld",
-    "systemctl start flanneld",
-
     "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
     "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
+    "echo deb http://deb.debian.org/debian sid main contrib non-free > /etc/apt/sources.list.d/sid.list",
     "apt-get -y update",
-    "apt-get -y --allow-unauthenticated install docker-engine",
-    "mkdir -p /etc/systemd/system/docker.service.d",
-    "systemctl daemon-reload",
-
     [
       "chef-client", "-o",
       node['qemu']['docker1']['chef_recipes'].join(',')

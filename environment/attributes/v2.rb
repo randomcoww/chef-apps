@@ -51,10 +51,10 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.220"
 }
 
-node.default['environment_v2']['set']['etcd'] = {
+node.default['environment_v2']['set']['docker'] = {
   'hosts' => [
-    'etcd1',
-    'etcd2'
+    'docker1',
+    'docker2'
   ],
   'vip_lan' => "192.168.62.200"
 }
@@ -140,20 +140,12 @@ node.default['environment_v2']['host']['haproxy2'] = {
   'ip_lan' => "192.168.62.222"
 }
 
-node.default['environment_v2']['host']['etcd1'] = {
+node.default['environment_v2']['host']['docker1'] = {
   'ip_lan' => "192.168.62.201"
 }
 
-node.default['environment_v2']['host']['etcd2'] = {
-  'ip_lan' => "192.168.62.202"
-}
-
-node.default['environment_v2']['host']['docker1'] = {
-  'ip_lan' => "192.168.62.203"
-}
-
 node.default['environment_v2']['host']['docker2'] = {
-  'ip_lan' => "192.168.62.204"
+  'ip_lan' => "192.168.62.202"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
