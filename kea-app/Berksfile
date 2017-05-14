@@ -7,3 +7,4 @@ cookbook "mysql_credentials", github: "randomcoww/chef-apps", rel: "mysql_creden
 cookbook "kea", github: "randomcoww/chef-kea", branch: "attr"
 cookbook "dbag", github: "randomcoww/chef-dbag"
 cookbook "mysql_cluster", github: "randomcoww/chef-mysql_cluster"
+cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"

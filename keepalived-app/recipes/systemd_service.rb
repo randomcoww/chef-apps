@@ -1,29 +1,16 @@
 ## override systemd - no support for drop-ins as far as i can tell..
-systemd_unit 'keepalived.service' do
-  content ({
+
+systemd_resource_dropin "10-network_bind" do
+  service "keepalived.service"
+  config ({
     'Unit' => {
-      'Description' => 'Keepalive Daemon (LVS and VRRP)',
-      'After' => 'network-online.target',
-      'Wants' => 'network-online.target',
       'BindsTo' => 'systemd-networkd.service',
-      'ConditionFileNotEmpty' => '/etc/keepalived/keepalived.conf'
     },
     'Service' => {
-      'Restart' => 'always',
-      'RestartSec' => 5,
-      'Type' => 'forking',
-      'KillMode' => 'process',
-      'EnvironmentFile' => '-/etc/default/keepalived',
-      'ExecStart' => '/usr/sbin/keepalived $DAEMON_ARGS',
-      'ExecReload' => '/bin/kill -HUP $MAINPID'
-    },
-    'Install' => {
-      'WantedBy' => 'multi-user.target'
+      'Restart' => 'always'
     }
   })
-  action [:create, :enable, :start]
-
-  subscribes :stop, "package[#{node['keepalived']['package']}]", :immediately
-  subscribes :reload, 'file[keepalived.conf]', :delayed
-  subscribes :reload, 'file[keepalived-options]', :delayed
+  action [:create]
 end
+
+include_recipe "keepalived::service"
