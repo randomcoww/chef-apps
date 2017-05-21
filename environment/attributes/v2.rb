@@ -51,14 +51,28 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.220"
 }
 
-node.default['environment_v2']['set']['docker'] = {
+node.default['environment_v2']['set']['etcd'] = {
+  'hosts' => [
+    'docker1',
+    'docker2',
+    'docker3',
+    'docker4',
+  ]
+}
+
+node.default['environment_v2']['set']['kube_master'] = {
   'hosts' => [
     'docker1',
     'docker2'
-  ],
-  'vip_lan' => "192.168.62.200"
+  ]
 }
 
+node.default['environment_v2']['set']['kube_worker'] = {
+  'hosts' => [
+    'docker3',
+    'docker4'
+  ]
+}
 
 
 ## hardware override
@@ -146,6 +160,14 @@ node.default['environment_v2']['host']['docker1'] = {
 
 node.default['environment_v2']['host']['docker2'] = {
   'ip_lan' => "192.168.62.202"
+}
+
+node.default['environment_v2']['host']['docker3'] = {
+  'ip_lan' => "192.168.62.203"
+}
+
+node.default['environment_v2']['host']['docker4'] = {
+  'ip_lan' => "192.168.62.204"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
