@@ -2,7 +2,7 @@ node.default['kubernetes']['etcd']['pkg_names'] = ['etcd']
 node.default['kubernetes']['etcd']['user'] = 'etcd'
 
 node.default['kubernetes']['etcd']['environment']['ETCD_NAME'] = node['hostname']
-node.default['kubernetes']['etcd']['environment']['ETCD_DATA_DIR'] = "/var/lib/etcd/docker_overlay"
+node.default['kubernetes']['etcd']['environment']['ETCD_DATA_DIR'] = "/var/lib/etcd/kubernetes"
 node.default['kubernetes']['etcd']['environment']['ETCD_LISTEN_PEER_URLS'] = "http://#{node['kubernetes']['node_ip']}:2380"
 node.default['kubernetes']['etcd']['environment']['ETCD_LISTEN_CLIENT_URLS'] = [node['kubernetes']['node_ip'], '127.0.0.1'].map { |e|
     "http://#{e}:2379"

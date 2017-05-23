@@ -1,6 +1,6 @@
-include_recipe "docker_overlay::etcd"
-include_recipe "docker_overlay::flannel"
-include_recipe "docker_overlay::docker"
+include_recipe "kubernetes::etcd"
+include_recipe "kubernetes::flannel"
+include_recipe "kubernetes::docker"
 
 directory node['kubernetes']['kube_master']['base_path'] do
   recursive true
@@ -31,7 +31,7 @@ kubernetes_node_cert 'apiserver' do
   action :create_if_missing
 end
 
-include_recipe "docker_overlay::kube_apiserver"
-include_recipe "docker_overlay::kube_controller_manager"
-include_recipe "docker_overlay::kube_proxy"
-include_recipe "docker_overlay::kube_scheduler"
+include_recipe "kubernetes::kube_apiserver"
+include_recipe "kubernetes::kube_controller_manager"
+include_recipe "kubernetes::kube_proxy"
+include_recipe "kubernetes::kube_scheduler"
