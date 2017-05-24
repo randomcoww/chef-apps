@@ -66,9 +66,10 @@ node.default['qemu']['kube-worker1']['cloud_config'] = {
   "runcmd" => [
     "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
+    "wget -O- https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -",
+
     "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
     "echo deb http://deb.debian.org/debian sid main contrib non-free > /etc/apt/sources.list.d/sid.list",
-    "wget -O- https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -",
     "echo deb http://apt.kubernetes.io/ kubernetes-stretch main > /etc/apt/sources.list.d/kubernetes.list",
     "apt-get -y update",
     [
