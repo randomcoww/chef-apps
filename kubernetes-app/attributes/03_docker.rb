@@ -2,8 +2,9 @@ node.default['kubernetes']['docker']['pkg_names'] = ['docker-engine']
 
 node.default['kubernetes']['docker']['systemd_dropin'] = {
   'Unit' => {
-    'After' => 'flanneld.service',
-    'Requires' => 'flanneld.service'
+    'After' => 'flannel.service',
+    'Requires' => 'flannel.service',
+    'ConditionFileNotEmpty' => node['kubernetes']['flannel']['environment']['FLANNELD_SUBNET_FILE']
   },
   'Service' => {
     "Restart" => 'always',
@@ -12,7 +13,6 @@ node.default['kubernetes']['docker']['systemd_dropin'] = {
     "ExecStart" => [
       '',
       "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald"
-    ],
-    'ConditionFileNotEmpty' => node['kubernetes']['flannel']['environment']['FLANNELD_SUBNET_FILE']
+    ]
   }
 }

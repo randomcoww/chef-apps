@@ -55,8 +55,6 @@ node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'kube-master1',
     'kube-master2',
-    'kube-worker1',
-    'kube-worker2',
   ]
 }
 

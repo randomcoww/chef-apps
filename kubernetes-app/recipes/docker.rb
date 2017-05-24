@@ -1,5 +1,9 @@
-package node['kubernetes']['docker']['pkg_names'] do
-  action :upgrade
+apt_package node['kubernetes']['docker']['pkg_names'] do
+  action :install
+  options [
+    '--no-install-recommends',
+    '--allow-unauthenticated'
+  ]
   notifies :stop, "service[docker]", :immediately
 end
 
