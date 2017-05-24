@@ -1,12 +1,12 @@
-node.default['qemu']['docker1']['cloud_config_hostname'] = 'docker1'
-node.default['qemu']['docker1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['docker1']['cloud_config_hostname']}"
+node.default['qemu']['kube-master2']['cloud_config_hostname'] = 'kube-master2'
+node.default['qemu']['kube-master2']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['kube-master2']['cloud_config_hostname']}"
 
-node.default['qemu']['docker1']['chef_recipes'] = [
+node.default['qemu']['kube-master2']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[docker_overlay::install]",
+  "recipe[kubernetes-app::kube_master]",
 ]
 
-node.default['qemu']['docker1']['systemd_config'] = {
+node.default['qemu']['kube-master2']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -20,7 +20,7 @@ node.default['qemu']['docker1']['systemd_config'] = {
       ]
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['host']['docker1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host']['kube-master2']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
@@ -33,7 +33,7 @@ node.default['qemu']['docker1']['systemd_config'] = {
     },
     "Service" => {
       "Type" => "oneshot",
-      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['docker1']['chef_recipes'].join(',')}",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['kube-master2']['chef_recipes'].join(',')}",
       "ExecReload" => "/bin/kill -HUP $MAINPID",
       "SuccessExitStatus" => 3
     }
@@ -52,7 +52,7 @@ node.default['qemu']['docker1']['systemd_config'] = {
   }
 }
 
-node.default['qemu']['docker1']['cloud_config'] = {
+node.default['qemu']['kube-master2']['cloud_config'] = {
   "write_files" => [],
   "password" => "password",
   "chpasswd" => {
@@ -62,7 +62,7 @@ node.default['qemu']['docker1']['cloud_config'] = {
   "package_upgrade" => true,
   "apt_upgrade" => true,
   "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['docker1']['cloud_config_hostname']}.lan",
+  "fqdn" => "#{node['qemu']['kube-master2']['cloud_config_hostname']}.lan",
   "runcmd" => [
     "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
     "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
@@ -71,7 +71,7 @@ node.default['qemu']['docker1']['cloud_config'] = {
     "apt-get -y update",
     [
       "chef-client", "-o",
-      node['qemu']['docker1']['chef_recipes'].join(',')
+      node['qemu']['kube-master2']['chef_recipes'].join(',')
     ],
     "systemctl enable chef-client.timer",
     "systemctl start chef-client.timer",
@@ -79,12 +79,12 @@ node.default['qemu']['docker1']['cloud_config'] = {
 }
 
 
-node.default['qemu']['docker1']['libvirt_config'] = {
+node.default['qemu']['kube-master2']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['docker1']['cloud_config_hostname'],
+    "name"=>node['qemu']['kube-master2']['cloud_config_hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
@@ -166,7 +166,7 @@ node.default['qemu']['docker1']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['docker1']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['kube-master2']['cloud_config_hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -217,7 +217,7 @@ node.default['qemu']['docker1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['docker1']['cloud_config_path']
+              "dir"=>node['qemu']['kube-master2']['cloud_config_path']
             }
           },
           "target"=>{

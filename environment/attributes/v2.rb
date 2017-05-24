@@ -53,24 +53,24 @@ node.default['environment_v2']['set']['haproxy'] = {
 
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
-    'docker1',
-    'docker2',
-    'docker3',
-    'docker4',
+    'kube-master1',
+    'kube-master2',
+    'kube-worker1',
+    'kube-worker2',
   ]
 }
 
-node.default['environment_v2']['set']['kube_master'] = {
+node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
-    'docker1',
-    'docker2'
+    'kube-master1',
+    'kube-master2'
   ]
 }
 
-node.default['environment_v2']['set']['kube_worker'] = {
+node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'docker3',
-    'docker4'
+    'kube-worker1',
+    'kube-worker2'
   ]
 }
 
@@ -154,19 +154,19 @@ node.default['environment_v2']['host']['haproxy2'] = {
   'ip_lan' => "192.168.62.222"
 }
 
-node.default['environment_v2']['host']['docker1'] = {
+node.default['environment_v2']['host']['kube-master1'] = {
   'ip_lan' => "192.168.62.201"
 }
 
-node.default['environment_v2']['host']['docker2'] = {
+node.default['environment_v2']['host']['kube-master2'] = {
   'ip_lan' => "192.168.62.202"
 }
 
-node.default['environment_v2']['host']['docker3'] = {
+node.default['environment_v2']['host']['kube-worker1'] = {
   'ip_lan' => "192.168.62.203"
 }
 
-node.default['environment_v2']['host']['docker4'] = {
+node.default['environment_v2']['host']['kube-worker2'] = {
   'ip_lan' => "192.168.62.204"
 }
 
