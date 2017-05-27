@@ -51,6 +51,10 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.220"
 }
 
+## etcd of cluster size 2 seems to allow for node replacement
+## without manually neeing to remove dead members
+## setting cluster state to existing vs new reestablishes cluster relationship
+## good enough for a homelab
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'kube-master1',
