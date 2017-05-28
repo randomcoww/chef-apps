@@ -1,5 +1,5 @@
 node.default['kube_master']['kube_proxy']['args'] = [
-  "--cluster-cidr=#{node['kube_master']['service_ip_range']}",
+  "--cluster-cidr=#{node['kube_master']['cluster_cidr']}",
   "--master=http://127.0.0.1:8080"
 ]
 

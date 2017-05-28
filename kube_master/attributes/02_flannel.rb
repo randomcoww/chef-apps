@@ -9,11 +9,9 @@ node.default['kube_master']['flannel']['environment']['FLANNELD_SUBNET_DIR'] = '
 node.default['kube_master']['flannel']['environment']['FLANNELD_SUBNET_FILE'] = '/run/flannel/subnet.env'
 
 node.default['kube_master']['flannel']['etcd_network'] = {
-  "Network" => "10.254.0.0/16",
-  "SubnetLen" => 24,
+  "Network" => node['kube_master']['cluster_cidr'],
   "Backend" => {
-    "Type" => "vxlan",
-    "VNI" => 1
+    "Type" => "vxlan"
   }
 }
 

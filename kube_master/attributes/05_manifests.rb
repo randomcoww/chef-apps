@@ -16,7 +16,6 @@ node.default['kube_master']['manifests'] = {
             "/hyperkube",
             "apiserver",
             "--bind-address=0.0.0.0",
-            ## this is supposed to work with a kube-proxy - can't figure out
             # "--bind-address=127.0.0.1",
             # "--address=127.0.0.1",
             "--secure-port=443",
@@ -99,7 +98,7 @@ node.default['kube_master']['manifests'] = {
             "/hyperkube",
             "controller-manager",
             "--cluster-name=#{node['kube_master']['cluster_name']}",
-            "--cluster-cidr=#{node['kube_master']['service_ip_range']}",
+            "--cluster-cidr=#{node['kube_master']['cluster_cidr']}",
             "--service-account-private-key-file=#{node['kube_master']['key_path']}",
             "--master=http://127.0.0.1:8080",
           ],
