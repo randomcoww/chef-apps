@@ -12,7 +12,7 @@ node.default['kube_master']['docker']['systemd_dropin'] = {
     "EnvironmentFile" => node['kube_master']['flannel']['environment']['FLANNELD_SUBNET_FILE'],
     "ExecStart" => [
       '',
-      "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald"
+      "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald --iptables=false"
     ]
   }
 }

@@ -49,4 +49,4 @@ end
 include_recipe "kube_master::kubelet"
 include_recipe "kube_master::kube_proxy"
 
-include_recipe "kube_master::pods"
+include_recipe "kube_master::manifests"

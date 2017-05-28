@@ -1,4 +1,4 @@
-node.default['kube_master']['pods'] = {
+node.default['kube_master']['manifests'] = {
   'kube-apiserver.yaml' => {
     "kind" => "Pod",
     "apiVersion" => "v1",
@@ -7,6 +7,7 @@ node.default['kube_master']['pods'] = {
     },
     "spec" => {
       "hostNetwork" => true,
+      "restartPolicy" => 'Always',
       "containers" => [
         {
           "name" => "kube-apiserver",
@@ -14,13 +15,16 @@ node.default['kube_master']['pods'] = {
           "command" => [
             "/hyperkube",
             "apiserver",
-            "--bind-address=127.0.0.1",
-            "--address=127.0.0.1",
+            "--bind-address=0.0.0.0",
+            # "--bind-address=127.0.0.1",
+            # "--address=127.0.0.1",
+            "--secure-port=443",
             "--service-cluster-ip-range=#{node['kube_master']['service_ip_range']}",
             "--etcd-servers=#{node['kube_master']['etcd']['nodes']}",
             "--tls-cert-file=#{node['kube_master']['cert_path']}",
             "--tls-private-key-file=#{node['kube_master']['key_path']}",
-            "--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota",
+            # "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
+            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
             "--client-ca-file=#{node['kube_master']['ca_path']}",
             "--token-auth-file=#{node['kube_master']['token_file_path']}",
             # "--allow-privileged=true"
@@ -85,6 +89,7 @@ node.default['kube_master']['pods'] = {
       "name" => "kube-controller-manager"
     },
     "spec" => {
+      "restartPolicy" => 'Always',
       "hostNetwork" => true,
       "containers" => [
         {
@@ -146,6 +151,7 @@ node.default['kube_master']['pods'] = {
       "name" => "kube-scheduler"
     },
     "spec" => {
+      "restartPolicy" => 'Always',
       "hostNetwork" => true,
       "containers" => [
         {
