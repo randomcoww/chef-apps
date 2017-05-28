@@ -22,7 +22,8 @@ node.default['kube_master']['pods'] = {
             "--tls-private-key-file=#{node['kube_master']['key_path']}",
             "--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota",
             "--client-ca-file=#{node['kube_master']['ca_path']}",
-            "--token-auth-file=#{node['kube_master']['token_file_path']}"
+            "--token-auth-file=#{node['kube_master']['token_file_path']}",
+            # "--allow-privileged=true"
           ],
           "ports" => [
             {

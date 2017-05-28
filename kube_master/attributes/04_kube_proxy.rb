@@ -36,7 +36,8 @@ node.default['kube_master']['kube_proxy']['kubeconfig'] = {
 
 
 node.default['kube_master']['kube_proxy']['args'] = [
-  "--master=https://#{node['kube_master']['node_ip']}",
+  "--cluster-cidr=#{node['kube_master']['service_ip_range']}",
+  "--master=http://127.0.0.1:8080",
   "--kubeconfig=#{node['kube_master']['kube_proxy']['kubeconfig_path']}",
 ]
 
