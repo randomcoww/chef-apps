@@ -27,7 +27,7 @@ node.default['kube_master']['manifests'] = {
             "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
             "--client-ca-file=#{node['kube_master']['ca_path']}",
             "--token-auth-file=#{node['kube_master']['token_file_path']}",
-            # "--allow-privileged=true"
+            "--allow-privileged=true"
           ],
           "ports" => [
             {

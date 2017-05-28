@@ -1,6 +1,6 @@
-node['kube_master']['manifests'].each do |f, content|
-  file ::File.join(node['kube_master']['manifests_path'], f) do
-    content content.to_hash.to_yaml
+node['kube_master']['manifests'].each do |f, config|
+  kubernetes_pod ::File.join(node['kube_master']['manifests_path'], f) do
+    config config
     action :create
   end
 end
