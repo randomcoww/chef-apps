@@ -8,8 +8,8 @@ node.default['kube_master']['cluster_cidr'] = '10.2.0.0/16'
 
 ## service network
 node.default['kube_master']['service_ip_range'] = '10.3.0.0/24'
-node.default['kube_master']['cluster_service_ip'] = '10.3.0.1/24'
-node.default['kube_master']['cluster_dns_ip'] = '10.3.0.10/24'
+node.default['kube_master']['cluster_service_ip'] = '10.3.0.1'
+node.default['kube_master']['cluster_dns_ip'] = '10.3.0.10'
 
 
 ## cert and auth

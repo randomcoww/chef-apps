@@ -17,6 +17,9 @@ kubernetes_ca 'ca' do
   data_bag_item 'kubernetes_ssl'
   cert_path node['kube_worker']['ca_path']
   action :create
+  notifies :create, "kubernetes_node_cert[worker]", :immediately
+  notifies :restart, "systemd_unit[kubelet.service]", :delayed
+  notifies :restart, "systemd_unit[kube-proxy.service]", :delayed
 end
 
 kubernetes_node_cert 'worker' do

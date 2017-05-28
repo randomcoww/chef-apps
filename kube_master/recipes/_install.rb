@@ -18,6 +18,9 @@ kubernetes_ca 'ca' do
   data_bag_item 'kubernetes_ssl'
   cert_path node['kube_master']['ca_path']
   action :create
+  notifies :create, "kubernetes_node_cert[master]", :immediately
+  notifies :restart, "systemd_unit[kubelet.service]", :delayed
+  notifies :restart, "systemd_unit[kube-proxy.service]", :delayed
 end
 
 kubernetes_node_cert 'master' do
@@ -31,8 +34,9 @@ kubernetes_node_cert 'master' do
     'DNS.2' => 'kubernetes.default',
     'DNS.3' => 'kubernetes.default.svc',
     'DNS.4' => 'kubernetes.default.svc.cluster.local',
-    'IP.1' => node['kube_master']['node_ip'],
-    'IP.2' => node['kube_master']['master_ip'],
+    'IP.1' => node['kube_master']['cluster_service_ip'],
+    'IP.2' => node['kube_master']['node_ip'],
+    'IP.3' => node['kube_master']['master_ip'],
   })
   action :create_if_missing
 end
