@@ -3,7 +3,7 @@ node.default['qemu']['kube-master2']['cloud_config_path'] = "/img/cloud-init/#{n
 
 node.default['qemu']['kube-master2']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[kubernetes-app::kube_master]",
+  "recipe[kube_master::_install]",
 ]
 
 node.default['qemu']['kube-master2']['systemd_config'] = {
