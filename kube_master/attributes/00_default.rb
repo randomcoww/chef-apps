@@ -10,15 +10,15 @@ node.default['kube_master']['ca_path'] = ::File.join(node['kube_master']['srv_pa
 node.default['kube_master']['cert_path'] = ::File.join(node['kube_master']['srv_path'], 'server.crt')
 node.default['kube_master']['key_path'] = ::File.join(node['kube_master']['srv_path'], 'server.key')
 
-node.default['kube_master']['token_file_path'] = ::File.join(node['kube_master']['srv_path'], 'known_tokens.csv')
-tokens_dbag = Dbag::Keystore.new(
-    'deploy_config', 'kubernetes_auth'
-  )
-
-node.default['kube_master']['tokens'] = {
-  'kubelet' => tokens_dbag.get_or_create('kubelet', SecureRandom.hex),
-  'kube_proxy' => tokens_dbag.get_or_create('kube_proxy', SecureRandom.hex),
-}
+# node.default['kube_master']['token_file_path'] = ::File.join(node['kube_master']['srv_path'], 'known_tokens.csv')
+# tokens_dbag = Dbag::Keystore.new(
+#     'deploy_config', 'kubernetes_auth'
+#   )
+#
+# node.default['kube_master']['tokens'] = {
+#   'kubelet' => tokens_dbag.get_or_create('kubelet', SecureRandom.hex),
+#   'kube_proxy' => tokens_dbag.get_or_create('kube_proxy', SecureRandom.hex),
+# }
 
 
 ## pods

@@ -32,12 +32,12 @@ kubernetes_node_cert 'worker' do
 end
 
 
-file node['kube_worker']['token_file_path'] do
-  content (node['kube_worker']['tokens'].map.with_index { |kv, i|
-      [kv[1], kv[0], i].join(',')
-    }.join($/))
-  action :create
-end
+# file node['kube_worker']['token_file_path'] do
+#   content (node['kube_worker']['tokens'].map.with_index { |kv, i|
+#       [kv[1], kv[0], i].join(',')
+#     }.join($/))
+#   action :create
+# end
 
 
 include_recipe "kube_worker::kubelet"

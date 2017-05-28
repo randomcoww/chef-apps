@@ -38,12 +38,12 @@ kubernetes_node_cert 'master' do
 end
 
 
-file node['kube_master']['token_file_path'] do
-  content (node['kube_master']['tokens'].map.with_index { |kv, i|
-      [kv[1], kv[0], i].join(',')
-    }.join($/))
-  action :create
-end
+# file node['kube_master']['token_file_path'] do
+#   content (node['kube_master']['tokens'].map.with_index { |kv, i|
+#       [kv[1], kv[0], i].join(',')
+#     }.join($/))
+#   action :create
+# end
 
 
 include_recipe "kube_master::kubelet"

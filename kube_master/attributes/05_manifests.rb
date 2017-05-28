@@ -16,6 +16,7 @@ node.default['kube_master']['manifests'] = {
             "/hyperkube",
             "apiserver",
             "--bind-address=0.0.0.0",
+            ## this is supposed to work with a kube-proxy - can't figure out
             # "--bind-address=127.0.0.1",
             # "--address=127.0.0.1",
             "--secure-port=443",
@@ -23,11 +24,10 @@ node.default['kube_master']['manifests'] = {
             "--etcd-servers=#{node['kube_master']['etcd']['nodes']}",
             "--tls-cert-file=#{node['kube_master']['cert_path']}",
             "--tls-private-key-file=#{node['kube_master']['key_path']}",
-            # "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
+            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
             "--client-ca-file=#{node['kube_master']['ca_path']}",
-            "--token-auth-file=#{node['kube_master']['token_file_path']}",
-            "--allow-privileged=true"
+            # "--token-auth-file=#{node['kube_master']['token_file_path']}",
+            # "--allow-privileged=true"
           ],
           "ports" => [
             {

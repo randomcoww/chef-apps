@@ -3,7 +3,6 @@ node.default['kube_master']['kubelet']['args'] = [
   "--pod-manifest-path=#{node['kube_master']['manifests_path']}",
   "--cluster_dns=#{node['kube_master']['cluster_dns_ip']}",
   "--cluster_domain=cluster.local"
-  # "--register-node=true",
 ]
 
 node.default['kube_master']['kubelet']['systemd'] = {

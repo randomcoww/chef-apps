@@ -18,7 +18,7 @@ node.default['kube_worker']['kube_proxy']['kubeconfig'] = {
       "user" => {
         "client-certificate" => node['kube_worker']['cert_path'],
         "client-key" => node['kube_worker']['key_path'],
-        "token" => node['kube_worker']['tokens']['kube_proxy']
+        # "token" => node['kube_worker']['tokens']['kube_proxy']
       }
     }
   ],
