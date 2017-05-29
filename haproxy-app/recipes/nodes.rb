@@ -34,24 +34,12 @@ haproxy_backend 'mysql' do
   })
 end
 
-
-haproxy_frontend 'kube_master_8080' do
-  bind "*:8080"
-  default_backend "kube_master_8080"
-end
-
-haproxy_backend 'kube_master_8080' do
-  server (node['environment_v2']['set']['kube_master']['hosts'].map { |e|
-    "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:8080 check"
-  })
-end
-
-haproxy_frontend 'kube_master_443' do
+haproxy_frontend 'kube_master' do
   bind "*:443"
-  default_backend "kube_master_443"
+  default_backend "kube_master"
 end
 
-haproxy_backend 'kube_master_443' do
+haproxy_backend 'kube_master' do
   server (node['environment_v2']['set']['kube_master']['hosts'].map { |e|
     "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:443 check"
   })
