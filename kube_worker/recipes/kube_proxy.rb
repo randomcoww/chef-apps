@@ -11,4 +11,5 @@ end
 systemd_unit 'kube-proxy.service' do
   content node['kube_worker']['kube_proxy']['systemd']
   action [:create, :enable, :start]
+  subscribes :restart, "kubernetes_ca[ca]", :delayed
 end

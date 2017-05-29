@@ -1,5 +1,6 @@
 node.default['kube_master']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kube_master']['cluster_name'] = 'kube_cluster'
+node.default['kube_master']['cluster_domain'] = 'cluster.local'
 node.default['kube_master']['master_ip'] = node['environment_v2']['set']['haproxy']['vip_lan']
 
 

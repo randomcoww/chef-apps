@@ -1,8 +1,11 @@
 node.default['kube_master']['kubelet']['args'] = [
   "--api-servers=http://127.0.0.1:8080",
   "--pod-manifest-path=#{node['kube_master']['manifests_path']}",
-  "--cluster_dns=#{node['kube_master']['cluster_dns_ip']}",
-  "--cluster_domain=cluster.local"
+  "--cluster-dns=#{node['kube_master']['cluster_dns_ip']}",
+  "--cluster-domain=#{node['kube_master']['cluster_domain']}",
+  "--register-schedulable=false",
+  "--hostname-override=#{node['kube_master']['node_ip']}",
+  # "--resolv-conf=''"
 ]
 
 node.default['kube_master']['kubelet']['systemd'] = {

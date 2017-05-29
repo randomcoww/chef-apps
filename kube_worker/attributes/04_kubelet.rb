@@ -40,8 +40,10 @@ node.default['kube_worker']['kubelet']['args'] = [
   "--container-runtime=docker",
   "--kubeconfig=#{node['kube_worker']['kubelet']['kubeconfig_path']}",
   "--pod-manifest-path=#{node['kube_worker']['manifests_path']}",
-  "--cluster_dns=#{node['kube_worker']['cluster_dns_ip']}",
-  "--cluster_domain=cluster.local"
+  "--cluster-dns=#{node['kube_worker']['cluster_dns_ip']}",
+  "--cluster-domain=#{node['kube_worker']['cluster_domain']}",
+  "--hostname-override=#{node['kube_worker']['node_ip']}",
+  # "--resolv-conf=''"
   # "--register-node=true",
 ]
 
