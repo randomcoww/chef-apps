@@ -1,5 +1,5 @@
 package node['kube_master']['etcd']['pkg_names'] do
-  action :upgrade
+  action :install
   notifies :stop, "service[etcd]", :immediately
 end
 

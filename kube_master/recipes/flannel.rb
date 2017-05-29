@@ -1,5 +1,5 @@
 package node['kube_master']['flannel']['pkg_names'] do
-  action :upgrade
+  action :install
   notifies :stop, "service[flannel]", :immediately
 end
 

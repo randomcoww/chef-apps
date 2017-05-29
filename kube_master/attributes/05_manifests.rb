@@ -25,6 +25,7 @@ node.default['kube_master']['manifests'] = {
             "--tls-private-key-file=#{node['kube_master']['key_path']}",
             "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
             "--client-ca-file=#{node['kube_master']['ca_path']}",
+            "--service-account-key-file=#{node['kube_master']['key_path']}",
             # "--token-auth-file=#{node['kube_master']['token_file_path']}",
             # "--allow-privileged=true"
           ],
@@ -99,7 +100,10 @@ node.default['kube_master']['manifests'] = {
             "controller-manager",
             "--cluster-name=#{node['kube_master']['cluster_name']}",
             "--cluster-cidr=#{node['kube_master']['cluster_cidr']}",
+            "--service-cluster-ip-range=#{node['kube_master']['service_ip_range']}",
             "--service-account-private-key-file=#{node['kube_master']['key_path']}",
+            "--root-ca-file=#{node['kube_master']['ca_path']}",
+            "--leader-elect=true",
             "--master=http://127.0.0.1:8080",
           ],
           "volumeMounts" => [
@@ -160,6 +164,7 @@ node.default['kube_master']['manifests'] = {
             "/hyperkube",
             "scheduler",
             "--master=http://127.0.0.1:8080",
+            "--leader-elect=true"
           ],
           "livenessProbe" => {
             "httpGet" => {

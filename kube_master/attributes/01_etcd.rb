@@ -1,4 +1,4 @@
-node.default['kube_master']['etcd']['pkg_names'] = ['etcd']
+node.default['kube_master']['etcd']['pkg_names'] = ['etcd-server']
 node.default['kube_master']['etcd']['user'] = 'etcd'
 
 node.default['kube_master']['etcd']['environment']['ETCD_NAME'] = node['hostname']
