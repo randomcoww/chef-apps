@@ -69,11 +69,6 @@ node.default['qemu']['kube-master1']['cloud_config'] = {
 
     "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
     "echo deb http://deb.debian.org/debian sid main contrib non-free > /etc/apt/sources.list.d/sid.list",
-
-    "wget https://storage.googleapis.com/kubernetes-release/release/v1.6.4/kubernetes-server-linux-amd64.tar.gz",
-    "tar xzf kubernetes-server-linux-amd64.tar.gz --wildcards -C /usr/local/bin kubernetes/server/bin/* --strip-components=3",
-    "rm kubernetes-server-linux-amd64.tar.gz",
-
     "apt-get -y update",
     [
       "chef-client", "-o",
