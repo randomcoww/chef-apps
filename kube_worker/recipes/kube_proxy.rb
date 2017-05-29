@@ -1,3 +1,9 @@
+remote_file node['kube_worker']['kube_proxy']['binary_path'] do
+  source node['kube_worker']['kube_proxy']['remote_file']
+  mode '0750'
+  action :create_if_missing
+end
+
 directory ::File.dirname(node['kube_worker']['kube_proxy']['kubeconfig_path']) do
   recursive true
   action [:create]

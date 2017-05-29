@@ -1,3 +1,7 @@
+node.default['kube_worker']['kubelet']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubelet'
+node.default['kube_worker']['kubelet']['binary_path'] = "/usr/local/bin/kubelet"
+
+
 ## kubeconfig
 node.default['kube_worker']['kubelet']['kubeconfig_path'] = '/var/lib/kubelet/kubeconfig'
 node.default['kube_worker']['kubelet']['kubeconfig'] = {
@@ -35,7 +39,8 @@ node.default['kube_worker']['kubelet']['kubeconfig'] = {
 }
 
 
-node.default['kube_worker']['kubelet']['args'] = [
+node.default['kube_worker']['kubelet']['command'] = [
+  node['kube_worker']['kubelet']['binary_path'],
   "--api-servers=https://#{node['kube_worker']['master_ip']}",
   "--container-runtime=docker",
   "--kubeconfig=#{node['kube_worker']['kubelet']['kubeconfig_path']}",
@@ -54,7 +59,7 @@ node.default['kube_worker']['kubelet']['systemd'] = {
   'Service' => {
     "Restart" => 'always',
     "RestartSec" => 5,
-    "ExecStart" => "/usr/local/bin/kubelet #{node['kube_worker']['kubelet']['args'].join(' ')}"
+    "ExecStart" => node['kube_worker']['kubelet']['command'].join(' ')
   },
   'Install' => {
     'WantedBy' => 'multi-user.target'

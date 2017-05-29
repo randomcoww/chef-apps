@@ -1,4 +1,4 @@
-node.default['kube_master']['etcd']['pkg_names'] = ['etcd-server']
+node.default['kube_master']['etcd']['pkg_names'] = ['etcd']
 node.default['kube_master']['etcd']['user'] = 'etcd'
 
 node.default['kube_master']['etcd']['environment']['ETCD_NAME'] = node['hostname']
@@ -15,8 +15,8 @@ node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER'] = nod
 
 ## for now this needs to be manually set to either new or existing depending on cluster state
 ## i don't have a good solution to this
-# node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
-node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
+node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
+# node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
 
 node.default['kube_master']['etcd']['environment']['ETCD_INITIAL_CLUSTER_TOKEN'] = "etcd-cluster-1"
 node.default['kube_master']['etcd']['environment']['ETCD_ADVERTISE_CLIENT_URLS'] = "http://#{node['kube_master']['node_ip']}:2379"

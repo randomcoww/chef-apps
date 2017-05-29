@@ -43,4 +43,5 @@ end
 # include_recipe "kube_master::kube_apiserver"
 include_recipe "kube_master::kubelet"
 include_recipe "kube_master::kube_proxy"
+include_recipe "kube_master::kubectl"
 include_recipe "kube_master::manifests"

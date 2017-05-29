@@ -1,4 +1,8 @@
-node.default['kube_master']['kubelet']['args'] = [
+node.default['kube_master']['kubelet']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubelet'
+node.default['kube_master']['kubelet']['binary_path'] = "/usr/local/bin/kubelet"
+
+node.default['kube_master']['kubelet']['command'] = [
+  node['kube_master']['kubelet']['binary_path'],
   "--api-servers=http://127.0.0.1:8080",
   "--pod-manifest-path=#{node['kube_master']['manifests_path']}",
   "--cluster-dns=#{node['kube_master']['cluster_dns_ip']}",
@@ -15,7 +19,7 @@ node.default['kube_master']['kubelet']['systemd'] = {
   'Service' => {
     "Restart" => 'always',
     "RestartSec" => 5,
-    "ExecStart" => "/usr/local/bin/kubelet #{node['kube_master']['kubelet']['args'].join(' ')}"
+    "ExecStart" => node['kube_master']['kubelet']['command'].join(' ')
   },
   'Install' => {
     'WantedBy' => 'multi-user.target'
