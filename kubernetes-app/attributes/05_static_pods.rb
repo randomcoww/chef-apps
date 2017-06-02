@@ -3,6 +3,7 @@ node.default['kubernetes']['static_pods'] = {
     "kind" => "Pod",
     "apiVersion" => "v1",
     "metadata" => {
+      "namespace" => "kube-system",
       "name" => "kube-apiserver"
     },
     "spec" => {
@@ -86,6 +87,7 @@ node.default['kubernetes']['static_pods'] = {
     "kind" => "Pod",
     "apiVersion" => "v1",
     "metadata" => {
+      "namespace" => "kube-system",
       "name" => "kube-controller-manager"
     },
     "spec" => {
@@ -151,6 +153,7 @@ node.default['kubernetes']['static_pods'] = {
     "kind" => "Pod",
     "apiVersion" => "v1",
     "metadata" => {
+      "namespace" => "kube-system",
       "name" => "kube-scheduler"
     },
     "spec" => {
