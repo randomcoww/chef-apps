@@ -51,16 +51,14 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.220"
 }
 
-## etcd of cluster size 2 seems to allow for node replacement
-## without manually neeing to remove dead members
-## setting cluster state to existing vs new reestablishes cluster relationship
-## good enough for a homelab
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'kube-master1',
     'kube-master2',
     'kube-worker1',
-    'kube-worker2'
+    'kube-worker2',
+    'kube-worker3',
+    'kube-worker4'
   ]
 }
 
@@ -74,7 +72,9 @@ node.default['environment_v2']['set']['kube-master'] = {
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
     'kube-worker1',
-    'kube-worker2'
+    'kube-worker2',
+    'kube-worker3',
+    'kube-worker4',
   ]
 }
 
@@ -172,6 +172,14 @@ node.default['environment_v2']['host']['kube-worker1'] = {
 
 node.default['environment_v2']['host']['kube-worker2'] = {
   'ip_lan' => "192.168.62.204"
+}
+
+node.default['environment_v2']['host']['kube-worker3'] = {
+  'ip_lan' => "192.168.62.205"
+}
+
+node.default['environment_v2']['host']['kube-worker4'] = {
+  'ip_lan' => "192.168.62.206"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
