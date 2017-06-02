@@ -39,7 +39,7 @@ node.default['kube_worker']['kube_proxy']['command'] = [
   node['kubernetes']['kube_proxy']['binary_path'],
   "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
   "--master=https://#{node['kubernetes']['master_ip']}",
-  "--kubeconfig=#{node['kubernetes']['kube_proxy']['kubeconfig_path']}",
+  "--kubeconfig=#{node['kube_worker']['kube_proxy']['kubeconfig_path']}",
 ]
 
 node.default['kube_worker']['kube_proxy']['systemd'] = {
