@@ -40,7 +40,7 @@ haproxy_frontend 'kube_master' do
 end
 
 haproxy_backend 'kube_master' do
-  server (node['environment_v2']['set']['kube_master']['hosts'].map { |e|
+  server (node['environment_v2']['set']['kube-master']['hosts'].map { |e|
     "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:443 check"
   })
 end
