@@ -1,11 +1,12 @@
 include_recipe "kubernetes-app::etcd"
+include_recipe "kubernetes-app::flannel"
+include_recipe "kubernetes-app::docker"
 
 
 [
-  'kube_apiserver',
-  'kube_controller_manager',
-  'kube_scheduler',
-  'kubectl'
+  'kubelet',
+  'kube_proxy',
+  'kubectl',
 ].each do |e|
   remote_file node['kubernetes'][e]['binary_path'] do
     source node['kubernetes'][e]['remote_file']
@@ -52,23 +53,20 @@ kubernetes_node_cert 'master' do
 end
 
 
-## kube-apiserver
-systemd_unit 'kube-apiserver.service' do
-  content node['kube_master']['kube_apiserver']['systemd']
+## kubelet
+systemd_unit 'kubelet.service' do
+  content node['kube_master']['kubelet']['systemd']
   action [:create, :enable, :start]
   subscribes :restart, "kubernetes_ca[ca]", :delayed
 end
 
-## kube-controller-manager
-systemd_unit 'kube-controller-manager.service' do
-  content node['kube_master']['kube_controller_manager']['systemd']
+
+## kube-proxy
+systemd_unit 'kube-proxy.service' do
+  content node['kube_master']['kube_proxy']['systemd']
   action [:create, :enable, :start]
   subscribes :restart, "kubernetes_ca[ca]", :delayed
 end
 
-## kube-scheduler
-systemd_unit 'kube-scheduler.service' do
-  content node['kube_master']['kube_scheduler']['systemd']
-  action [:create, :enable, :start]
-  subscribes :restart, "kubernetes_ca[ca]", :delayed
-end
+
+include_recipe "kubernetes-app::static_pods"

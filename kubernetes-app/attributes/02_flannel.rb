@@ -20,7 +20,7 @@ node.default['kubernetes']['flannel']['systemd_unit'] = {
     'Description' => 'Network fabric for containers',
     "After" => [
       "network.target",
-      # 'etcd.service'
+      'etcd.service'
     ]
   },
   "Service" => {
