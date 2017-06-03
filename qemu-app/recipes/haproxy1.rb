@@ -1,18 +1,2 @@
-package node['qemu']['pkg_names'] do
-  action :upgrade
-end
-
-include_recipe "qemu::install"
-
-qemu_cloud_config 'haproxy1' do
-  path node['qemu']['haproxy1']['cloud_config_path']
-  hostname node['qemu']['haproxy1']['cloud_config_hostname']
-  config node['qemu']['haproxy1']['cloud_config']
-  systemd_hash node.default['qemu']['haproxy1']['systemd_config']
-  action :create
-end
-
-qemu_domain 'haproxy1' do
-  config node['qemu']['haproxy1']['libvirt_config']
-  action :start
-end
+node.default['qemu']['current_config']['hostname'] = 'haproxy1'
+include_recipe "qemu-app::template_haproxy"

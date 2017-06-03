@@ -1,14 +1,23 @@
-node.default['qemu']['gateway1']['cloud_config_hostname'] = 'gateway1'
-node.default['qemu']['gateway1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['gateway1']['cloud_config_hostname']}"
+# node.default['qemu']['current_config']['hostname'] = 'host'
+node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['gateway1']['chef_recipes'] = [
+node.default['qemu']['current_config']['chef_interval'] = '60min'
+node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
   "recipe[keepalived-app::gateway]",
   "recipe[ddclient-app::freedns]"
 ]
 
-node.default['qemu']['gateway1']['systemd_config'] = {
+node.default['qemu']['current_config']['memory'] = 1
+node.default['qemu']['current_config']['vcpu'] = 1
+
+node.default['qemu']['current_config']['runcmd'] = [
+]
+
+include_recipe "qemu-app::_cloud_config_common"
+
+node.default['qemu']['current_config']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -18,7 +27,7 @@ node.default['qemu']['gateway1']['systemd_config'] = {
       "DHCP" => "no"
     },
     "Address" => {
-      "Address" => "#{node['environment_v2']['host']['gateway1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+      "Address" => "#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
     },
     "Route" => {
       "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
@@ -63,7 +72,7 @@ node.default['qemu']['gateway1']['systemd_config'] = {
     },
     "Service" => {
       "Type" => "oneshot",
-      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['gateway1']['chef_recipes'].join(',')}",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['current_config']['chef_recipes'].join(',')}",
       "ExecReload" => "/bin/kill -HUP $MAINPID",
       "SuccessExitStatus" => 3
     }
@@ -77,56 +86,34 @@ node.default['qemu']['gateway1']['systemd_config'] = {
     },
     "Timer" => {
       "OnStartupSec" => "1min",
-      "OnUnitActiveSec" => "30min"
+      "OnUnitActiveSec" => node['qemu']['current_config']['chef_interval']
     }
   }
 }
 
-node.default['qemu']['gateway1']['cloud_config'] = {
-  "write_files" => [],
-  "password" => "password",
-  "chpasswd" => {
-    "expire" => false
-  },
-  "ssh_pwauth" => false,
-  "package_upgrade" => true,
-  "apt_upgrade" => true,
-  "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['gateway1']['cloud_config_hostname']}.lan",
-  "runcmd" => [
-    [
-      "chef-client", "-o",
-      node['qemu']['gateway1']['chef_recipes'].join(',')
-    ],
-    "systemctl enable chef-client.timer",
-    "systemctl start chef-client.timer"
-  ]
-}
-
-
-node.default['qemu']['gateway1']['libvirt_config'] = {
+node.default['qemu']['current_config']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['gateway1']['cloud_config_hostname'],
+    "name"=>node['qemu']['current_config']['hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['vcpu']
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -162,7 +149,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"1",
+          "cores"=>node['qemu']['current_config']['vcpu'],
           "threads"=>"1"
         }
       }
@@ -191,7 +178,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['gateway1']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -242,7 +229,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['gateway1']['cloud_config_path']
+              "dir"=>node['qemu']['current_config']['cloud_config_path']
             }
           },
           "target"=>{
@@ -293,7 +280,7 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
           },
           "mac"=>{
             "#attributes"=>{
-              "address"=>node['environment_v2']['host']['gateway1']['mac_wan']
+              "address"=>node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['mac_wan']
             }
           },
           "source"=>{
@@ -352,3 +339,5 @@ node.default['qemu']['gateway1']['libvirt_config'] = {
     }
   }
 }
+
+include_recipe "qemu-app::_deploy_common"

@@ -1,14 +1,22 @@
-node.default['qemu']['mysql-ndb1']['cloud_config_hostname'] = 'mysql-ndb1'
-node.default['qemu']['mysql-ndb1']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['mysql-ndb1']['cloud_config_hostname']}"
+# node.default['qemu']['current_config']['hostname'] = 'host'
+node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['mysql-ndb1']['chef_recipes'] = [
+node.default['qemu']['current_config']['chef_interval'] = '60min'
+node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[mysql_cluster-app::ndb]",
-  "recipe[mysql_cluster-app::api]",
-  "recipe[kea-app::mysql]"
+  "recipe[glusterfs-app::peer]",
+  "recipe[keepalived-app::gluster]"
 ]
 
-node.default['qemu']['mysql-ndb1']['systemd_config'] = {
+node.default['qemu']['current_config']['memory'] = 32
+node.default['qemu']['current_config']['vcpu'] = 3
+
+node.default['qemu']['current_config']['runcmd'] = [
+]
+
+include_recipe "qemu-app::_cloud_config_common"
+
+node.default['qemu']['current_config']['systemd_config'] = {
   '/etc/systemd/network/eth0.network' => {
     "Match" => {
       "Name" => "eth0"
@@ -21,13 +29,23 @@ node.default['qemu']['mysql-ndb1']['systemd_config'] = {
         "8.8.8.8"
       ]
     },
-    "Address" => [
-      {
-        "Address" => "#{node['environment_v2']['host']['mysql-ndb1']['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-      }
-    ],
+    "Address" => {
+      "Address" => "#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+    },
     "Route" => {
       "Gateway" => node['environment_v2']['set']['gateway']['vip_lan']
+    }
+  },
+  '/etc/systemd/network/eth1.network' => {
+    "Match" => {
+      "Name" => "eth1"
+    },
+    "Network" => {
+      "LinkLocalAddressing" => "no",
+      "DHCP" => "no",
+    },
+    "Address" => {
+      "Address" => "#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_store']}/#{node['environment_v2']['subnet']['store'].split('/').last}"
     }
   },
   '/etc/systemd/system/chef-client.service' => {
@@ -37,7 +55,7 @@ node.default['qemu']['mysql-ndb1']['systemd_config'] = {
     },
     "Service" => {
       "Type" => "oneshot",
-      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['mysql-ndb1']['chef_recipes'].join(',')}",
+      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['current_config']['chef_recipes'].join(',')}",
       "ExecReload" => "/bin/kill -HUP $MAINPID",
       "SuccessExitStatus" => 3
     }
@@ -51,59 +69,34 @@ node.default['qemu']['mysql-ndb1']['systemd_config'] = {
     },
     "Timer" => {
       "OnStartupSec" => "1min",
-      "OnUnitActiveSec" => "30min"
+      "OnUnitActiveSec" => node['qemu']['current_config']['chef_interval']
     }
   }
 }
 
-node.default['qemu']['mysql-ndb1']['cloud_config'] = {
-  "write_files" => [],
-  "password" => "password",
-  "chpasswd" => {
-    "expire" => false
-  },
-  "ssh_pwauth" => false,
-  "package_upgrade" => true,
-  "apt_upgrade" => true,
-  "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['mysql-ndb1']['cloud_config_hostname']}.lan",
-  "runcmd" =>  [
-    "echo deb http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
-    "echo deb-src http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
-    "apt-get -y update",
-    [
-      "chef-client", "-o",
-      node['qemu']['mysql-ndb1']['chef_recipes'].join(',')
-    ],
-    "systemctl enable chef-client.timer",
-    "systemctl start chef-client.timer"
-  ]
-}
-
-
-node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
+node.default['qemu']['current_config']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['mysql-ndb1']['cloud_config_hostname'],
+    "name"=>node['qemu']['current_config']['hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"1"
+      "#text"=>node['qemu']['current_config']['vcpu']
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -139,7 +132,7 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"1",
+          "cores"=>node['qemu']['current_config']['vcpu'],
           "threads"=>"1"
         }
       }
@@ -168,7 +161,7 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['mysql-ndb1']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -219,7 +212,7 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['mysql-ndb1']['cloud_config_path']
+              "dir"=>node['qemu']['current_config']['cloud_config_path']
             }
           },
           "target"=>{
@@ -239,6 +232,23 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment_v2']['current_host']['if_lan'],
+              "mode"=>"bridge"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dev"=>node['environment_v2']['current_host']['if_store'],
               "mode"=>"bridge"
             }
           },
@@ -284,6 +294,35 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
           }
         }
       ],
+      "hostdev" => [
+        {
+          "#attributes"=>{
+            "mode"=>"subsystem",
+            "type"=>"pci",
+            "managed"=>"yes"
+          },
+          "driver"=>{
+            "#attributes"=>{
+              "name"=>"vfio"
+            }
+          },
+          "source"=>{
+            "address"=>{
+              "#attributes"=>{
+                "domain"=>node['environment_v2']['current_host']['passthrough_hba']['domain'],
+                "bus"=>node['environment_v2']['current_host']['passthrough_hba']['bus'],
+                "slot"=>node['environment_v2']['current_host']['passthrough_hba']['slot'],
+                "function"=>node['environment_v2']['current_host']['passthrough_hba']['function'],
+              }
+            }
+          },
+          "rom"=>{
+            "#attributes"=>{
+              "file"=>node['environment_v2']['current_host']['passthrough_hba']['file']
+            }
+          }
+        }
+      ],
       "memballoon"=>{
         "#attributes"=>{
           "model"=>"virtio"
@@ -292,3 +331,5 @@ node.default['qemu']['mysql-ndb1']['libvirt_config'] = {
     }
   }
 }
+
+include_recipe "qemu-app::_deploy_common"

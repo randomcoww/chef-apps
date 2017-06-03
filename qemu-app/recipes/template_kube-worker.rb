@@ -1,4 +1,4 @@
-# node.default['qemu']['current_config']['hostname'] = 'kube-worker1'
+# node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
 node.default['qemu']['current_config']['chef_interval'] = '30min'
