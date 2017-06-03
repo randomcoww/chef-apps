@@ -44,3 +44,14 @@ haproxy_backend 'kube_master' do
     "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:443 check"
   })
 end
+
+haproxy_frontend 'kube_node_ports' do
+  bind "*:30000-32767"
+  default_backend "kube_node_ports"
+end
+
+haproxy_backend 'kube_node_ports' do
+  server (node['environment_v2']['set']['kube-worker']['hosts'].map { |e|
+    "#{e} #{node['environment_v2']['host'][e]['ip_lan']}"
+  })
+end
