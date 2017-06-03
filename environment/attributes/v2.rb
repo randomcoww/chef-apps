@@ -55,26 +55,22 @@ node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'kube-master1',
     'kube-master2',
-    'kube-worker1',
-    'kube-worker2',
-    'kube-worker3',
-    'kube-worker4'
+    'kube-master3'
   ]
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'kube-master1',
-    'kube-master2'
+    'kube-master2',
+    'kube-master3'
   ]
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
     'kube-worker1',
-    'kube-worker2',
-    'kube-worker3',
-    'kube-worker4',
+    'kube-worker2'
   ]
 }
 
@@ -166,20 +162,16 @@ node.default['environment_v2']['host']['kube-master2'] = {
   'ip_lan' => "192.168.62.202"
 }
 
+node.default['environment_v2']['host']['kube-master3'] = {
+  'ip_lan' => "192.168.62.205"
+}
+
 node.default['environment_v2']['host']['kube-worker1'] = {
   'ip_lan' => "192.168.62.203"
 }
 
 node.default['environment_v2']['host']['kube-worker2'] = {
   'ip_lan' => "192.168.62.204"
-}
-
-node.default['environment_v2']['host']['kube-worker3'] = {
-  'ip_lan' => "192.168.62.205"
-}
-
-node.default['environment_v2']['host']['kube-worker4'] = {
-  'ip_lan' => "192.168.62.206"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
