@@ -20,7 +20,7 @@ node.default['kubernetes']['flannel']['systemd_unit'] = {
     'Description' => 'Network fabric for containers',
     "After" => [
       "network.target",
-      'etcd.service'
+      # 'etcd.service'
     ]
   },
   "Service" => {
@@ -30,7 +30,7 @@ node.default['kubernetes']['flannel']['systemd_unit'] = {
     "Type" => "notify",
     "Restart" => "always",
     "RestartSec" => "5s",
-    'ExecStartPre' => "-/usr/bin/etcdctl set #{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flannel']['etcd_network'].to_json}'",
+    'ExecStartPre' => "/usr/bin/etcdctl --endpoints=#{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS']} set #{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flannel']['etcd_network'].to_json}'",
     'ExecStart' => "/usr/bin/flannel"
   },
   "Install" => {

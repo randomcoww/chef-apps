@@ -1,8 +1,28 @@
-# include_recipe "kubernetes-app::etcd_client"
-include_recipe "kubernetes-app::etcd"
+include_recipe "kubernetes-app::etcd_client"
 include_recipe "kubernetes-app::flannel"
 include_recipe "kubernetes-app::docker"
-include_recipe 'kubernetes-app::kubernetes_packages'
+
+
+[
+  'kubelet',
+  'kube_proxy',
+].each do |e|
+  remote_file node['kubernetes'][e]['binary_path'] do
+    source node['kubernetes'][e]['remote_file']
+    mode '0750'
+    action :create_if_missing
+  end
+end
+
+[
+  node['kubernetes']['srv_path'],
+  node['kubernetes']['manifests_path']
+].each do |d|
+  directory d do
+    recursive true
+    action [:create]
+  end
+end
 
 
 kubernetes_ca 'ca' do
@@ -24,6 +44,7 @@ kubernetes_node_cert 'worker' do
   action :create_if_missing
   subscribes :create, "kubernetes_ca[ca]", :immediately
 end
+
 
 ## kubelet
 directory ::File.dirname(node['kube_worker']['kubelet']['kubeconfig_path']) do
