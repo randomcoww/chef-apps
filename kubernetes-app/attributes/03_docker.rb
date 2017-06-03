@@ -12,7 +12,7 @@ node.default['kubernetes']['docker']['systemd_dropin'] = {
     "EnvironmentFile" => node['kubernetes']['flannel']['environment']['FLANNELD_SUBNET_FILE'],
     "ExecStart" => [
       '',
-      "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald --iptables=false"
+      "/usr/bin/dockerd -H fd:// --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} --log-driver=journald --ip-masq=false --iptables=false"
     ]
   }
 }

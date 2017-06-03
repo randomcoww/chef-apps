@@ -7,6 +7,7 @@ node.default['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS'] 
 node.default['kubernetes']['flannel']['environment']['FLANNELD_ETCD_PREFIX'] = '/docker_overlay/network'
 node.default['kubernetes']['flannel']['environment']['FLANNELD_SUBNET_DIR'] = '/run/flannel/networks'
 node.default['kubernetes']['flannel']['environment']['FLANNELD_SUBNET_FILE'] = '/run/flannel/subnet.env'
+node.default['kubernetes']['flannel']['environment']['FLANNELD_IP_MASQ'] = true
 
 node.default['kubernetes']['flannel']['etcd_network'] = {
   "Network" => node['kubernetes']['cluster_cidr'],
