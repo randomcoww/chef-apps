@@ -4,6 +4,7 @@ metadata
 
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
 cookbook "dbag", github: "randomcoww/chef-dbag"
+cookbook "openssl_cert", github: "randomcoww/chef-openssl_cert"
 cookbook "node_data", github: "randomcoww/chef-node_data"
 cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
 cookbook "kubernetes", github: "randomcoww/chef-kubernetes"
