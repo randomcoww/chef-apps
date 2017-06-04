@@ -1,7 +1,7 @@
 ## master
 node.default['kube_master']['kube_scheduler']['command'] = [
   node['kubernetes']['kube_scheduler']['binary_path'],
-  "--master=http://127.0.0.1:8080",
+  "--master=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
   "--leader-elect=true"
 ]
 

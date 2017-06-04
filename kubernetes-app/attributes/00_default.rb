@@ -3,6 +3,8 @@ node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
 node.default['kubernetes']['master_ip'] = node['environment_v2']['set']['haproxy']['vip_lan']
 
+node.default['kubernetes']['insecure_port'] = 8080
+node.default['kubernetes']['secure_port'] = 443
 
 ## pod network
 node.default['kubernetes']['cluster_cidr'] = '10.2.0.0/16'
@@ -13,8 +15,8 @@ node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 
 
-## cert and auth
 node.default['kubernetes']['srv_path'] = '/srv/kubernetes'
+## cert and auth
 node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['srv_path'], 'ca.crt')
 node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['srv_path'], 'server.crt')
 node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['srv_path'], 'server.key')
@@ -22,6 +24,7 @@ node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['srv_pat
 
 ## pods
 node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
+node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
 node.default['kubernetes']['hyperkube_image'] = 'gcr.io/google_containers/hyperkube:v1.6.4'
 
 

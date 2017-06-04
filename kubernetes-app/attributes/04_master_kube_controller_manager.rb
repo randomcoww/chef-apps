@@ -7,7 +7,7 @@ node.default['kube_master']['kube_controller_manager']['command'] = [
   "--service-account-private-key-file=#{node['kubernetes']['key_path']}",
   "--root-ca-file=#{node['kubernetes']['ca_path']}",
   "--leader-elect=true",
-  "--master=http://127.0.0.1:8080",
+  "--master=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
 ]
 
 node.default['kube_master']['kube_controller_manager']['systemd'] = {

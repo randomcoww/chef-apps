@@ -15,8 +15,7 @@ include_recipe "kubernetes-app::docker"
 end
 
 [
-  node['kubernetes']['srv_path'],
-  node['kubernetes']['manifests_path']
+  node['kubernetes']['srv_path']
 ].each do |d|
   directory d do
     recursive true

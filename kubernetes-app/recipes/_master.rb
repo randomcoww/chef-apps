@@ -6,7 +6,6 @@ include_recipe "kubernetes-app::docker"
 [
   'kubelet',
   'kube_proxy',
-  'kubectl',
 ].each do |e|
   remote_file node['kubernetes'][e]['binary_path'] do
     source node['kubernetes'][e]['remote_file']
@@ -17,7 +16,8 @@ end
 
 [
   node['kubernetes']['srv_path'],
-  node['kubernetes']['manifests_path']
+  node['kubernetes']['manifests_path'],
+  node['kubernetes']['addons_path'],
 ].each do |d|
   directory d do
     recursive true
@@ -26,6 +26,7 @@ end
 end
 
 
+## ssl
 kubernetes_ca 'ca' do
   data_bag 'deploy_config'
   data_bag_item 'kubernetes_ssl'
@@ -70,3 +71,4 @@ end
 
 
 include_recipe "kubernetes-app::static_pods"
+include_recipe "kubernetes-app::addons"
