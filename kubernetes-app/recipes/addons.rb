@@ -7,7 +7,6 @@ node['kubernetes']['addons'].each do |f, config|
 end
 
 if ::File.directory?(node['kubernetes']['addons_path'])
-
   Dir.entries(node['kubernetes']['addons_path']).each do |f|
     next if node['kubernetes']['addons'].has_key?(f)
 

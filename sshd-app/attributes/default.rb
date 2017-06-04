@@ -5,7 +5,7 @@ node.default['sshd']['docker']['config'] = {
   "Subsystem" => ["sftp", "internal-sftp"],
   "PermitRootLogin" => false,
   "PasswordAuthentication" => false,
-  "ChallengeResponseAuthentication" => false
+  "ChallengeResponseAuthentication" => true
 }
 
 node.default['sshd']['docker']['user'] = {
