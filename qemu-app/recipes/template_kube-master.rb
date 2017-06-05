@@ -1,7 +1,7 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['current_config']['chef_interval'] = '5min'
+node.default['qemu']['current_config']['chef_interval'] = '30min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[kubernetes-app::_master]",
