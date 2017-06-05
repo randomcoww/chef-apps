@@ -3,13 +3,13 @@ package node['openvpn']['pia_client']['pkg_names'] do
   notifies :stop, "service[openvpn@client]", :immediately
 end
 
-openvpn_config_client 'pia_client' do
+openvpn_client_config 'pia_client' do
   config node['openvpn']['pia_client']['config']
   action :create
   notifies :restart, "service[openvpn@client]", :delayed
 end
 
-openvpn_credentials 'client_auth' do
+openvpn_credentials_config 'client_auth' do
   data_bag node['openvpn']['pia_client']['auth-user-pass']['data_bag']
   data_bag_item node['openvpn']['pia_client']['auth-user-pass']['data_bag_item']
   key node['openvpn']['pia_client']['auth-user-pass']['key']
@@ -17,7 +17,7 @@ openvpn_credentials 'client_auth' do
   notifies :restart, "service[openvpn@client]", :delayed
 end
 
-openvpn_credentials 'ca.crt' do
+openvpn_credentials_config 'ca.crt' do
   data_bag node['openvpn']['pia_client']['ca']['data_bag']
   data_bag_item node['openvpn']['pia_client']['ca']['data_bag_item']
   key node['openvpn']['pia_client']['ca']['key']
