@@ -276,44 +276,44 @@ node.default['kubernetes']['addons']['kubedns-svc.yaml'] = {
 
 ## dashboard
 
-node.default['kubernetes']['addons']['kube-dashboard-serviceaccount.yaml'] = {
-  "apiVersion" => "v1",
-  "kind" => "ServiceAccount",
-  "metadata" => {
-    "labels" => {
-      "k8s-app" => "kubernetes-dashboard",
-      "kubernetes.io/cluster-service" => "true",
-      "addonmanager.kubernetes.io/mode" => "Reconcile"
-    },
-    "name" => "kubernetes-dashboard",
-    "namespace" => "kube-system"
-  }
-}
-
-node.default['kubernetes']['addons']['kube-dashboard-rbac.yaml'] = {
-  "apiVersion" => "rbac.authorization.k8s.io/v1beta1",
-  "kind" => "ClusterRoleBinding",
-  "metadata" => {
-    "name" => "kubernetes-dashboard",
-    "labels" => {
-      "k8s-app" => "kubernetes-dashboard",
-      "kubernetes.io/cluster-service" => "true",
-      "addonmanager.kubernetes.io/mode" => "Reconcile"
-    }
-  },
-  "roleRef" => {
-    "apiGroup" => "rbac.authorization.k8s.io",
-    "kind" => "ClusterRole",
-    "name" => "cluster-admin"
-  },
-  "subjects" => [
-    {
-      "kind" => "ServiceAccount",
-      "name" => "kubernetes-dashboard",
-      "namespace" => "kube-system"
-    }
-  ]
-}
+# node.default['kubernetes']['addons']['kube-dashboard-serviceaccount.yaml'] = {
+#   "apiVersion" => "v1",
+#   "kind" => "ServiceAccount",
+#   "metadata" => {
+#     "labels" => {
+#       "k8s-app" => "kubernetes-dashboard",
+#       "kubernetes.io/cluster-service" => "true",
+#       "addonmanager.kubernetes.io/mode" => "Reconcile"
+#     },
+#     "name" => "kubernetes-dashboard",
+#     "namespace" => "kube-system"
+#   }
+# }
+#
+# node.default['kubernetes']['addons']['kube-dashboard-rbac.yaml'] = {
+#   "apiVersion" => "rbac.authorization.k8s.io/v1beta1",
+#   "kind" => "ClusterRoleBinding",
+#   "metadata" => {
+#     "name" => "kubernetes-dashboard",
+#     "labels" => {
+#       "k8s-app" => "kubernetes-dashboard",
+#       "kubernetes.io/cluster-service" => "true",
+#       "addonmanager.kubernetes.io/mode" => "Reconcile"
+#     }
+#   },
+#   "roleRef" => {
+#     "apiGroup" => "rbac.authorization.k8s.io",
+#     "kind" => "ClusterRole",
+#     "name" => "cluster-admin"
+#   },
+#   "subjects" => [
+#     {
+#       "kind" => "ServiceAccount",
+#       "name" => "kubernetes-dashboard",
+#       "namespace" => "kube-system"
+#     }
+#   ]
+# }
 
 node.default['kubernetes']['addons']['kube-dashboard.yaml'] = {
   "kind" => "Deployment",
@@ -362,7 +362,7 @@ node.default['kubernetes']['addons']['kube-dashboard.yaml'] = {
             }
           }
         ],
-        "serviceAccountName" => "kubernetes-dashboard",
+        # "serviceAccountName" => "kubernetes-dashboard",
         "tolerations" => [
           {
             "key" => "node-role.kubernetes.io/master",

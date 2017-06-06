@@ -230,3 +230,67 @@ node.default['kubernetes']['static_pods']['kube-addon-manager.yaml'] = {
     ]
   }
 }
+
+# node.default['kubernetes']['static_pods']['kubernetes-dashboard.yaml'] = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     "name" => "kubernetes-dashboard",
+#     "namespace" => "kube-system",
+#     "labels" => {
+#       "k8s-app" => "kubernetes-dashboard"
+#     }
+#   },
+#   "spec" => {
+#     "hostNetwork" => true,
+#     "containers" => [
+#       {
+#         "name" => "kubernetes-dashboard",
+#         "image" => "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.1",
+#         "command" => [
+#           "/dashboard",
+#           "--bind-address=0.0.0.0",
+#           "--insecure-bind-address=0.0.0.0",
+#           "--port=8443",
+#           "--apiserver-host=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
+#           "--tls-cert-file=#{node['kubernetes']['cert_path']}",
+#           "--tls-key-file=#{node['kubernetes']['key_path']}"
+#         ],
+#         "volumeMounts" => [
+#           {
+#             "name" => "srv-kubernetes",
+#             "mountPath" => node['kubernetes']['srv_path'],
+#             "readOnly" => true
+#           },
+#           {
+#             "name" => "ssl-certs-host",
+#             "mountPath" => "/etc/ssl",
+#             "readOnly" => true
+#           }
+#         ],
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "path" => "/",
+#             "port" => 9090
+#           },
+#           "initialDelaySeconds" => 30,
+#           "timeoutSeconds" => 30
+#         }
+#       }
+#     ],
+#     "volumes" => [
+#       {
+#         "name" => "srv-kubernetes",
+#         "hostPath" => {
+#           "path" => node['kubernetes']['srv_path'],
+#         }
+#       },
+#       {
+#         "name" => "ssl-certs-host",
+#         "hostPath" => {
+#           "path" => "/etc/ssl"
+#         }
+#       }
+#     ]
+#   }
+# }
