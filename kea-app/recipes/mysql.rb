@@ -1,6 +1,10 @@
-package node['kea']['pkg_names'] do
-  action :upgrade
+package 'kea-dhcp4-server' do
+  action :install
   notifies :stop, "service[kea-dhcp4-server]", :immediately
+end
+
+package 'default-libmysqlclient-dev' do
+  action :install
 end
 
 chef_gem 'mysql2' do

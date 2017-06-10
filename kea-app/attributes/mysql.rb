@@ -51,6 +51,10 @@ node.default['kea']['mysql']['config'] = {
           }
         ]
       }
-    ]
+    ],
+    "dhcp-ddns" => {
+      "enable-updates" => true,
+      "qualifying-suffix" => "dy.lan"
+    }
   }
 }
