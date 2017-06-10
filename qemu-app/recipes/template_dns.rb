@@ -5,7 +5,7 @@ node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[keepalived-app::dns]",
-  "recipe[nsd-app::main]",
+  "recipe[knot-app::main]",
   "recipe[unbound-app::main]",
   "recipe[openvpn-app::pia_client]"
 ]

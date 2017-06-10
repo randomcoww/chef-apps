@@ -186,9 +186,9 @@ node.default['environment_v2']['host']['vm2-ipmi'] = {
   'ip_lan' => '192.168.63.63'
 }
 
-# node.default['environment_v2']['host']['sw'] = {
-#   'ip_lan' => '192.168.63.95'
-# }
+node.default['environment_v2']['host']['sw'] = {
+  'ip_lan' => '192.168.63.95'
+}
 
 node.default['environment_v2']['host']['gamestream'] = {
   'ip_lan' => '192.168.63.99',

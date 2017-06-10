@@ -20,12 +20,12 @@ node.default['kea']['ddns']['config'] = {
         {
           "name" => "dy.lan.",
           "key-name" => "update_key",
-          "dns-servers" => node['environment_v2']['set']['dns'].map { |e|
+          "dns-servers" => [
             {
-              "ip-address" => node['environment_v2']['host'][e]['ip_lan'],
+              "ip-address" => node['environment_v2']['set']['dns']['vip_lan'],
               "port" => 53530
             }
-          }
+          ]
         }
       ]
     },
