@@ -1,0 +1,8 @@
+source "https://supermarket.chef.io"
+
+metadata
+
+cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
+cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
+cookbook "knot", github: "randomcoww/chef-knot"
+cookbook "dbag", github: "randomcoww/chef-dbag"
