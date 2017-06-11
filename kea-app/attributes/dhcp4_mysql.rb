@@ -1,4 +1,4 @@
-node.default['kea']['mysql']['config'] = {
+node.default['kea']['dhcp4_mysql']['config'] = {
   "Dhcp4" => {
     "valid-lifetime" => 300,
     # "renew-timer" => 300,

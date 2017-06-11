@@ -1,8 +1,3 @@
-package 'kea-dhcp4-server' do
-  action :install
-  notifies :stop, "service[kea-dhcp4-server]", :immediately
-end
-
 package 'default-libmysqlclient-dev' do
   action :install
 end
@@ -47,13 +42,3 @@ bash "provision_kea_tables" do
   ignore_failure true
   action :nothing
 end
-
-## start kea
-
-kea_dhcp4_config 'kea-mysql' do
-  config node['kea']['mysql']['config']
-  action :create
-  notifies :restart, "service[kea-dhcp4-server]", :delayed
-end
-
-include_recipe "kea::dhcp4_service_mysql"

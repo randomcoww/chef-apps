@@ -6,8 +6,8 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[mysql_cluster-app::ndb]",
   "recipe[mysql_cluster-app::api]",
-  "recipe[kea-app::mysql]",
-  "recipe[kea-app::ddns]",
+  "recipe[kea-app::dhcp4]",
+  "recipe[kea-app::ddns]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 1
