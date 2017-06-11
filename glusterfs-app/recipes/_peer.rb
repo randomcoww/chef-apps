@@ -4,7 +4,7 @@ package node['glusterfs']['pkg_names'] do
 end
 
 
-gluster_nodes = node['environment_v2']['set']['gluster']['hosts'].map do |e|
+gluster_nodes = node['environment_v2']['set'][node['glusterfs']['host_set']]['hosts'].map do |e|
   node['environment_v2']['host'][e]['ip_store']
 end
 
