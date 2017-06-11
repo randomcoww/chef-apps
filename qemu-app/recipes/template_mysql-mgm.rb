@@ -18,5 +18,8 @@ node.default['qemu']['current_config']['runcmd'] = [
 
 include_recipe "qemu-app::_cloud_config_common"
 include_recipe "qemu-app::_libvirt_common"
-include_recipe "qemu-app::_systemd_common"
+
+include_recipe "qemu-app::_systemd_eth0_static"
+include_recipe "qemu-app::_systemd_chef-client"
+
 include_recipe "qemu-app::_deploy_common"

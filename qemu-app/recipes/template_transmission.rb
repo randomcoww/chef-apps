@@ -1,80 +1,34 @@
-node.default['qemu']['transmission']['cloud_config_hostname'] = 'transmission'
-node.default['qemu']['transmission']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['transmission']['cloud_config_hostname']}"
+# node.default['qemu']['current_config']['hostname'] = 'host'
+node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['transmission']['chef_recipes'] = [
+node.default['qemu']['current_config']['chef_interval'] = '60min'
+node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::filter]",
   "recipe[transmission-app::main]",
   "recipe[openvpn-app::pia_client]"
 ]
 
-node.default['qemu']['transmission']['systemd_config'] = {
-  '/etc/systemd/network/eth0.network' => {
-    "Match" => {
-      "Name" => "eth0"
-    },
-    "Network" => {
-      "LinkLocalAddressing" => "no",
-      "DHCP" => "yes"
-    }
+node.default['qemu']['current_config']['memory'] = 2
+node.default['qemu']['current_config']['vcpu'] = 2
+
+node.default['qemu']['current_config']['runcmd'] = [
+  "apt-get -y install glusterfs-client"
+]
+
+include_recipe "qemu-app::_cloud_config_common"
+
+include_recipe "qemu-app::_systemd_eth0_dhcp"
+node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/eth1.network'] = {
+  "Match" => {
+    "Name" => "eth1"
   },
-  '/etc/systemd/network/eth1.network' => {
-    "Match" => {
-      "Name" => "eth1"
-    },
-    "Network" => {
-      "LinkLocalAddressing" => "yes",
-      "DHCP" => "no"
-    }
-  },
-  '/etc/systemd/system/chef-client.service' => {
-    "Unit" => {
-      "Description" => "Chef Client daemon",
-      "After" => "network.target auditd.service"
-    },
-    "Service" => {
-      "Type" => "oneshot",
-      "ExecStart" => "/usr/bin/chef-client -o #{node['qemu']['transmission']['chef_recipes'].join(',')}",
-      "ExecReload" => "/bin/kill -HUP $MAINPID",
-      "SuccessExitStatus" => 3
-    }
-  },
-  '/etc/systemd/system/chef-client.timer' => {
-    "Unit" => {
-      "Description" => "chef-client periodic run"
-    },
-    "Install" => {
-      "WantedBy" => "timers.target"
-    },
-    "Timer" => {
-      "OnStartupSec" => "1min",
-      "OnUnitActiveSec" => "30min"
-    }
+  "Network" => {
+    "LinkLocalAddressing" => "yes",
+    "DHCP" => "no"
   }
 }
-
-
-node.default['qemu']['transmission']['cloud_config'] = {
-  "write_files" => [],
-  "password" => "password",
-  "chpasswd" => {
-    "expire" => false
-  },
-  "ssh_pwauth" => false,
-  "package_upgrade" => true,
-  "apt_upgrade" => true,
-  "manage_etc_hosts" => true,
-  "fqdn" => "#{node['qemu']['transmission']['cloud_config_hostname']}.lan",
-  "runcmd" => [
-    "apt-get -y install glusterfs-client",
-    [
-      "chef-client", "-o",
-      node['qemu']['transmission']['chef_recipes'].join(',')
-    ],
-    "systemctl enable chef-client.timer",
-    "systemctl start chef-client.timer"
-  ]
-}
+include_recipe "qemu-app::_systemd_chef-client"
 
 
 node.default['qemu']['transmission']['libvirt_config'] = {
@@ -82,24 +36,24 @@ node.default['qemu']['transmission']['libvirt_config'] = {
     "#attributes"=>{
       "type"=>"kvm"
     },
-    "name"=>node['qemu']['transmission']['cloud_config_hostname'],
+    "name"=>node['qemu']['current_config']['hostname'],
     "memory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"2"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "currentMemory"=>{
       "#attributes"=>{
         "unit"=>"GiB"
       },
-      "#text"=>"2"
+      "#text"=>node['qemu']['current_config']['memory']
     },
     "vcpu"=>{
       "#attributes"=>{
         "placement"=>"static"
       },
-      "#text"=>"2"
+      "#text"=>node['qemu']['current_config']['vcpu']
     },
     "iothreads"=>"1",
     "iothreadids"=>{
@@ -135,7 +89,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
       "topology"=>{
         "#attributes"=>{
           "sockets"=>"1",
-          "cores"=>"2",
+          "cores"=>node['qemu']['current_config']['vcpu'],
           "threads"=>"1"
         }
       }
@@ -164,7 +118,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['transmission']['cloud_config_hostname']}.qcow2"
+            "file"=>"/img/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -215,7 +169,7 @@ node.default['qemu']['transmission']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>node['qemu']['transmission']['cloud_config_path']
+              "dir"=>node['qemu']['current_config']['cloud_config_path']
             }
           },
           "target"=>{
@@ -303,3 +257,5 @@ node.default['qemu']['transmission']['libvirt_config'] = {
     }
   }
 }
+
+include_recipe "qemu-app::_deploy_common"
