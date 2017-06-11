@@ -398,3 +398,52 @@ node.default['kubernetes']['addons']['kube-dashboard-svc.yaml'] = {
     }
   }
 }
+
+node.default['kubernetes']['addons']['glusterfs-endpoints.yaml'] = {
+  "kind" => "Endpoints",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "labels" => {
+      "k8s-app" => "glusterfs-service",
+      "kubernetes.io/cluster-service" => "true",
+      "addonmanager.kubernetes.io/mode" => "Reconcile"
+    },
+    "name" => "glusterfs-cluster",
+    # "namespace" => "default"
+  },
+  "subsets" => node['environment_v2']['set']['gluster']['hosts'].map { |e|
+    {
+      "addresses" => [
+        {
+          "ip" => node['environment_v2']['host'][e]['ip_lan']
+        }
+      ],
+      "ports" => [
+        {
+          "port" => 1
+        }
+      ]
+    }
+  }
+}
+
+node.default['kubernetes']['addons']['glusterfs-service.yaml'] = {
+  "kind" => "Service",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "labels" => {
+      "k8s-app" => "glusterfs-service",
+      "kubernetes.io/cluster-service" => "true",
+      "addonmanager.kubernetes.io/mode" => "Reconcile"
+    },
+    "name" => "glusterfs-cluster",
+    # "namespace" => "default"
+  },
+  "spec" => {
+    "ports" => [
+      {
+        "port" => 1
+      }
+    ]
+  }
+}
