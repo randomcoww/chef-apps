@@ -167,11 +167,13 @@ node.default['environment_v2']['host']['kube-master3'] = {
 }
 
 node.default['environment_v2']['host']['kube-worker1'] = {
-  'ip_lan' => "192.168.62.203"
+  'ip_lan' => "192.168.62.203",
+  'ip_store' => "169.254.127.203"
 }
 
 node.default['environment_v2']['host']['kube-worker2'] = {
-  'ip_lan' => "192.168.62.204"
+  'ip_lan' => "192.168.62.204",
+  'ip_store' => "169.254.127.204"
 }
 
 node.default['environment_v2']['host']['test1'] = {
