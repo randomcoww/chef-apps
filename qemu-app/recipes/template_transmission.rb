@@ -31,7 +31,7 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/e
 include_recipe "qemu-app::_systemd_chef-client"
 
 
-node.default['qemu']['transmission']['libvirt_config'] = {
+node.default['qemu']['current_config']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
       "type"=>"kvm"
