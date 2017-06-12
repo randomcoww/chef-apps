@@ -1,3 +1,6 @@
+node.default['kea']['dhcp4_mysql']['create_tables_sql_source'] = 'https://raw.githubusercontent.com/isc-projects/kea/master/src/share/database/scripts/mysql/dhcpdb_create.mysql'
+node.default['kea']['dhcp4_mysql']['create_tables_sql_file'] = ::File.join(Chef::Config[:file_cache_path], 'kea', 'create_tables.sql')
+
 node.default['kea']['dhcp4_mysql']['config'] = {
   "Dhcp4" => {
     "valid-lifetime" => 300,

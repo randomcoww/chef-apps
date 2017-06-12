@@ -1,3 +1,8 @@
+def create_tables_sql
+  create_tables_sql ||= open(node['kea']['dhcp4_mysql']['create_tables_sql'])
+end
+
+
 package 'default-libmysqlclient-dev' do
   action :install
 end
@@ -7,11 +12,12 @@ chef_gem 'mysql2' do
   compile_time false
 end
 
+
 ## provision mysql
 
-mysql_cluster_sql 'query' do
+mysql_cluster_sql 'create_db' do
   queries ([
-    %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']}},
+    %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
     %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'%' IDENTIFIED BY '#{node['mysql_credentials']['kea']['password']}';},
     %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
   ])
@@ -23,22 +29,43 @@ mysql_cluster_sql 'query' do
   action :query
 end
 
-kea_tables_path = ::File.join(Chef::Config[:file_cache_path], 'kea_database.sql')
 
-cookbook_file kea_tables_path do
-  source 'kea_tables.sql'
-  notifies :run, "bash[provision_kea_tables]", :immediately
-  action :create_if_missing
+## provision tables
+
+mysql_cluster_sql 'create_tables' do
+  queries lazy {
+    lines = []
+      ::File.read(node['kea']['dhcp4_mysql']['create_tables_sql_file']).each_line do |e|
+        ## remove comments
+        e.gsub!(/\s*#.*?$/, '')
+        e.gsub!(/\s*--.*?$/, '')
+
+        e.chomp!
+        e.strip!
+        next if e.empty?
+
+        e.gsub!('INNODB', 'NDBCLUSTER')
+        lines << e
+      end
+
+      lines.join(' ').split(';')
+    }
+  timeout 120
+  ignore_errors true
+  options ({
+    username: node['mysql_credentials']['kea']['username'],
+    password: node['mysql_credentials']['kea']['password'],
+    database: node['mysql_credentials']['kea']['database']
+  })
+  action :nothing
 end
 
-## this may be provisioned by another host and fail
+directory ::File.dirname(node['kea']['dhcp4_mysql']['create_tables_sql_file']) do
+  recursive true
+end
 
-bash "provision_kea_tables" do
-  code %Q{mysql \
-    --user="#{node['mysql_credentials']['kea']['username']}" \
-    --password="#{node['mysql_credentials']['kea']['password']}" \
-    --database="#{node['mysql_credentials']['kea']['database']}" \
-    < #{kea_tables_path}}
-  ignore_failure true
-  action :nothing
+remote_file node['kea']['dhcp4_mysql']['create_tables_sql_file'] do
+  source node['kea']['dhcp4_mysql']['create_tables_sql_source']
+  action :create_if_missing
+  notifies :query, "mysql_cluster_sql[create_tables]", :immediately
 end
