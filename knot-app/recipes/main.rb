@@ -1,7 +1,4 @@
-## service starts automatically with default configs on install
-## this conflicts with unbound running on default port
-## stop until configs are written to run on another port
-package node['knot']['pkg_names'] do
+package 'knot' do
   action :upgrade
   notifies :stop, "service[knot]", :immediately
 end
@@ -22,6 +19,15 @@ end
   end
 end
 
+## main config
+
+knot_config 'knot' do
+  config node['knot']['main']['config']
+  action :create
+  notifies :restart, "service[knot]", :delayed
+end
+
+## static zones
 
 static_hosts = {}
 node['environment_v2']['host'].each do |hostname, d|
@@ -44,22 +50,29 @@ knot_zonefile 'st.lan' do
   notifies :reload, "service[knot]", :delayed
 end
 
-knot_zonefile 'dy.lan' do
+## dynamic zones
+
+# knot_zonefile 'dy.lan' do
+#   domain 'dy.lan'
+#   name_server 'ns1.dy.lan'
+#   email_addr 'root.dy.lan'
+#   hosts ({})
+#   action :create_if_missing
+#   notifies :reload, "service[knot]", :delayed
+# end
+
+include_recipe "knot-app::_mysql_support"
+
+knot_kea_zonefile 'dy.lan' do
   domain 'dy.lan'
   name_server 'ns1.dy.lan'
   email_addr 'root.dy.lan'
-  hosts ({})
-  action :create_if_missing
+  username node['mysql_credentials']['kea']['username']
+  database node['mysql_credentials']['kea']['database']
+  host node['environment_v2']['set']['haproxy']['vip_lan']
+  password node['mysql_credentials']['kea']['password']
   notifies :reload, "service[knot]", :delayed
-end
-
-
-## main config
-
-knot_config 'knot' do
-  config node['knot']['main']['config']
-  action :create
-  notifies :restart, "service[knot]", :delayed
+  ignore_failure true
 end
 
 include_recipe "knot::service"
