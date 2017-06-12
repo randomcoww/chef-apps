@@ -59,7 +59,8 @@ node.default['kea']['dhcp4_mysql']['config'] = {
       "enable-updates" => true,
       "qualifying-suffix" => "dy.lan",
       "override-client-update" => true,
-      "override-no-update" => true
+      "override-no-update" => true,
+      "replace-client-name" => "when-not-present"
     }
   }
 }
