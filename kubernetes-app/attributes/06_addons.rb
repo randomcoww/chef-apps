@@ -447,3 +447,31 @@ node.default['kubernetes']['addons']['glusterfs-service.yaml'] = {
     ]
   }
 }
+
+
+node.default['kubernetes']['addons']['glusterfs-pv.yaml'] = {
+  "kind" => "PersistentVolume",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "labels" => {
+      "k8s-app" => "glusterfs-service",
+      "kubernetes.io/cluster-service" => "true",
+      "addonmanager.kubernetes.io/mode" => "Reconcile"
+    },
+    "name" => "gluster-default-volume"
+  },
+  "spec" => {
+    "capacity" => {
+      "storage" => "60Gi"
+    },
+    "accessModes" => [
+      "ReadWriteMany"
+    ],
+    "glusterfs" => {
+      "endpoints" => "glusterfs-cluster",
+      "path" => "kubepv",
+      "readOnly" => false
+    },
+    "persistentVolumeReclaimPolicy" => "Retain"
+  }
+}
