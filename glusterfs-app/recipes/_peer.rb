@@ -19,7 +19,7 @@ glusterfs_glusterd_info 'glusterd.info' do
   data_bag_item node['glusterfs']['data_bag_item']
   key node_ips.first
   action [:create, :save_if_missing]
-  notifies :restart, "service[glusterfs-server]", :delayed
+  # notifies :restart, "service[glusterfs-server]", :delayed
   notifies :send, "glusterfs_peer_probe[gluster]", :delayed
 end
 
@@ -27,6 +27,7 @@ glusterfs_peer_probe 'gluster' do
   peer_host gluster_nodes.first
   action :nothing
   notifies :start, "service[glusterfs-server]", :before
+  notifies :restart, "service[glusterfs-server]", :delayed
 end
 
 include_recipe "glusterfs::service"
