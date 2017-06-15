@@ -7,12 +7,10 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[kubernetes-app::_worker]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 4
+node.default['qemu']['current_config']['memory'] = 2048
 node.default['qemu']['current_config']['vcpu'] = 2
 
 node.default['qemu']['current_config']['runcmd'] = [
-  "apt-get -y install glusterfs-client git",
-
   "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
   "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
 

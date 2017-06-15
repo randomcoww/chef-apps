@@ -7,7 +7,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[mysql_cluster-app::mgm]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 1
+node.default['qemu']['current_config']['memory'] = 256
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [

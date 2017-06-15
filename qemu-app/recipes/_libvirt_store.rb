@@ -6,13 +6,13 @@ node.default['qemu']['current_config']['libvirt_config'] = {
     "name"=>node['qemu']['current_config']['hostname'],
     "memory"=>{
       "#attributes"=>{
-        "unit"=>"GiB"
+        "unit"=>"MiB"
       },
       "#text"=>node['qemu']['current_config']['memory']
     },
     "currentMemory"=>{
       "#attributes"=>{
-        "unit"=>"GiB"
+        "unit"=>"MiB"
       },
       "#text"=>node['qemu']['current_config']['memory']
     },

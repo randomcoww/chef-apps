@@ -7,7 +7,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[kubernetes-app::_master]",
 ]
 
-node.default['qemu']['current_config']['memory'] = 1
+node.default['qemu']['current_config']['memory'] = 1024
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
