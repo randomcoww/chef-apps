@@ -1,3 +1,9 @@
+node.default['kubernetes']['packages'] = [
+  'glusterfs-client',
+  'git',
+  'socat'
+]
+
 node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'

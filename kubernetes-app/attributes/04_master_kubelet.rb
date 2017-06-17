@@ -7,6 +7,7 @@ node.default['kube_master']['kubelet']['command'] = [
   "--cluster-domain=#{node['kubernetes']['cluster_domain']}",
   "--register-schedulable=false",
   "--hostname-override=#{node['kubernetes']['node_ip']}",
+  "--allow-privileged=true"
   # "--resolv-conf=''"
 ]
 

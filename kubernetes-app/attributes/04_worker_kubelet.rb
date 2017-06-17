@@ -44,8 +44,7 @@ node.default['kube_worker']['kubelet']['command'] = [
   "--cluster-dns=#{node['kubernetes']['cluster_dns_ip']}",
   "--cluster-domain=#{node['kubernetes']['cluster_domain']}",
   "--hostname-override=#{node['kubernetes']['node_ip']}",
-  # "--resolv-conf=''"
-  # "--register-node=true",
+  "--allow-privileged=true"
 ]
 
 node.default['kube_worker']['kubelet']['systemd'] = {

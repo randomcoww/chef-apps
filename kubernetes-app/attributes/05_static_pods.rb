@@ -28,7 +28,7 @@ node.default['kubernetes']['static_pods']['kube-apiserver.yaml'] = {
           "--service-account-key-file=#{node['kubernetes']['key_path']}",
           # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
           # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
-          # "--allow-privileged=true"
+          "--allow-privileged=true"
         ],
         "ports" => [
           {
