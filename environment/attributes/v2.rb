@@ -176,8 +176,16 @@ node.default['environment_v2']['host']['kube-worker2'] = {
   'ip_store' => "169.254.127.204"
 }
 
-node.default['environment_v2']['host']['test1'] = {
+node.default['environment_v2']['host']['test3'] = {
   'ip_lan' => "192.168.62.239"
+}
+
+node.default['environment_v2']['host']['test2'] = {
+  'ip_lan' => "192.168.62.238"
+}
+
+node.default['environment_v2']['host']['test1'] = {
+  'ip_lan' => "192.168.62.237"
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
