@@ -7,7 +7,7 @@ apt_package node['kubernetes']['docker']['pkg_names'] do
   notifies :stop, "service[docker]", :immediately
 end
 
-systemd_resource_dropin "10-flannel" do
+systemd_resource_dropin "10-dropin" do
   service "docker.service"
   config node['kubernetes']['docker']['systemd_dropin']
   action [:create]

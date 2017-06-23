@@ -1,8 +1,3 @@
-def create_tables_sql
-  create_tables_sql ||= open(node['kea']['dhcp4_mysql']['create_tables_sql'])
-end
-
-
 package 'default-libmysqlclient-dev' do
   action :install
 end
@@ -32,6 +27,16 @@ end
 
 ## provision tables
 
+directory ::File.dirname(node['kea']['dhcp4_mysql']['create_tables_sql_file']) do
+  recursive true
+end
+
+remote_file node['kea']['dhcp4_mysql']['create_tables_sql_file'] do
+  source node['kea']['dhcp4_mysql']['create_tables_sql_source']
+  action :create_if_missing
+  notifies :query, "mysql_cluster_sql[create_tables]", :immediately
+end
+
 mysql_cluster_sql 'create_tables' do
   queries lazy {
     lines = []
@@ -58,14 +63,4 @@ mysql_cluster_sql 'create_tables' do
     database: node['mysql_credentials']['kea']['database']
   })
   action :nothing
-end
-
-directory ::File.dirname(node['kea']['dhcp4_mysql']['create_tables_sql_file']) do
-  recursive true
-end
-
-remote_file node['kea']['dhcp4_mysql']['create_tables_sql_file'] do
-  source node['kea']['dhcp4_mysql']['create_tables_sql_source']
-  action :create_if_missing
-  notifies :query, "mysql_cluster_sql[create_tables]", :immediately
 end

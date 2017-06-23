@@ -6,3 +6,5 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+
+include_recipe "kea-app::_mysql_backend"

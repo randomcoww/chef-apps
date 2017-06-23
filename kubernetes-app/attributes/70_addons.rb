@@ -448,30 +448,151 @@ node.default['kubernetes']['addons']['glusterfs-service.yaml'] = {
   }
 }
 
-
-# node.default['kubernetes']['addons']['glusterfs-pv.yaml'] = {
-#   "kind" => "PersistentVolume",
-#   "apiVersion" => "v1",
+# node.default['kubernetes']['addons']['heketi-daemonset.yaml'] = {
+#   "kind" => "DaemonSet",
+#   "apiVersion" => "extensions/v1beta1",
 #   "metadata" => {
+#     "name" => "glusterfs",
 #     "labels" => {
+#       "glusterfs" => "deployment",
 #       "k8s-app" => "glusterfs-service",
 #       "kubernetes.io/cluster-service" => "true",
 #       "addonmanager.kubernetes.io/mode" => "Reconcile"
 #     },
-#     "name" => "gluster-default-volume"
+#     "annotations" => {
+#       "description" => "GlusterFS Daemon Set",
+#       "tags" => "glusterfs"
+#     }
 #   },
 #   "spec" => {
-#     "capacity" => {
-#       "storage" => "60Gi"
-#     },
-#     "accessModes" => [
-#       "ReadWriteMany"
-#     ],
-#     "glusterfs" => {
-#       "endpoints" => "glusterfs-cluster",
-#       "path" => "kubepv",
-#       "readOnly" => false
-#     },
-#     "persistentVolumeReclaimPolicy" => "Retain"
+#     "template" => {
+#       "metadata" => {
+#         "name" => "glusterfs",
+#         "labels" => {
+#           "glusterfs-node" => "daemonset"
+#         }
+#       },
+#       "spec" => {
+#         "nodeSelector" => {
+#           "storagenode" => "glusterfs"
+#         },
+#         "hostNetwork" => true,
+#         "containers" => [
+#           {
+#             "image" => "heketi/gluster:latest",
+#             "imagePullPolicy" => "Always",
+#             "name" => "glusterfs",
+#             "volumeMounts" => [
+#               {
+#                 "name" => "glusterfs-heketi",
+#                 "mountPath" => "/var/lib/heketi"
+#               },
+#               {
+#                 "name" => "glusterfs-run",
+#                 "mountPath" => "/run"
+#               },
+#               {
+#                 "name" => "glusterfs-lvm",
+#                 "mountPath" => "/run/lvm"
+#               },
+#               {
+#                 "name" => "glusterfs-etc",
+#                 "mountPath" => "/etc/glusterfs"
+#               },
+#               {
+#                 "name" => "glusterfs-logs",
+#                 "mountPath" => "/var/log/glusterfs"
+#               },
+#               {
+#                 "name" => "glusterfs-config",
+#                 "mountPath" => "/var/lib/glusterd"
+#               },
+#               {
+#                 "name" => "glusterfs-dev",
+#                 "mountPath" => "/dev"
+#               },
+#               {
+#                 "name" => "glusterfs-cgroup",
+#                 "mountPath" => "/sys/fs/cgroup"
+#               }
+#             ],
+#             "securityContext" => {
+#               "capabilities" => {
+#               },
+#               "privileged" => true
+#             },
+#             "readinessProbe" => {
+#               "timeoutSeconds" => 3,
+#               "initialDelaySeconds" => 60,
+#               "exec" => {
+#                 "command" => [
+#                   "/bin/bash",
+#                   "-c",
+#                   "systemctl status glusterd.service"
+#                 ]
+#               }
+#             },
+#             "livenessProbe" => {
+#               "timeoutSeconds" => 3,
+#               "initialDelaySeconds" => 60,
+#               "exec" => {
+#                 "command" => [
+#                   "/bin/bash",
+#                   "-c",
+#                   "systemctl status glusterd.service"
+#                 ]
+#               }
+#             }
+#           }
+#         ],
+#         "volumes" => [
+#           {
+#             "name" => "glusterfs-heketi",
+#             "hostPath" => {
+#               "path" => "/var/lib/heketi"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-run"
+#           },
+#           {
+#             "name" => "glusterfs-lvm",
+#             "hostPath" => {
+#               "path" => "/run/lvm"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-etc",
+#             "hostPath" => {
+#               "path" => "/etc/glusterfs"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-logs",
+#             "hostPath" => {
+#               "path" => "/var/log/glusterfs"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-config",
+#             "hostPath" => {
+#               "path" => "/var/lib/glusterd"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-dev",
+#             "hostPath" => {
+#               "path" => "/dev"
+#             }
+#           },
+#           {
+#             "name" => "glusterfs-cgroup",
+#             "hostPath" => {
+#               "path" => "/sys/fs/cgroup"
+#             }
+#           }
+#         ]
+#       }
+#     }
 #   }
 # }
