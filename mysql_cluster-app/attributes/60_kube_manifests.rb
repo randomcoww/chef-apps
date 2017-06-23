@@ -1,4 +1,4 @@
-node.default['kube_static_pods'][node['hostname']]['mysql-cluster-ndb.yaml'] = {
+node.default['kubernetes']['static_pods']['mysql-cluster-ndb.yaml'] = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {

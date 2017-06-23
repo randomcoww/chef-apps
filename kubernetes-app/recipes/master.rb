@@ -1,6 +1,6 @@
-include_recipe "kubernetes-app::etcd"
-include_recipe "kubernetes-app::flannel"
-include_recipe "kubernetes-app::docker"
+include_recipe "kubernetes-app::_etcd"
+include_recipe "kubernetes-app::_flannel"
+include_recipe "kubernetes-app::_docker"
 
 package node['kubernetes']['packages'] do
   action :install
@@ -74,5 +74,5 @@ systemd_unit 'kube-proxy.service' do
 end
 
 
-include_recipe "kubernetes-app::static_pods"
-include_recipe "kubernetes-app::addons"
+include_recipe "kubernetes-app::_static_pods"
+include_recipe "kubernetes-app::_addons"

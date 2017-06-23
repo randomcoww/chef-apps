@@ -1,4 +1,4 @@
-node.default['kube_static_pods'][node['hostname']]['kea.yaml'] = {
+node.default['kubernetes']['static_pods']['kea.yaml'] = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {

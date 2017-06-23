@@ -1,6 +1,6 @@
-include_recipe "kubernetes-app::etcd_client"
-include_recipe "kubernetes-app::flannel"
-include_recipe "kubernetes-app::docker"
+include_recipe "kubernetes-app::_etcd_client"
+include_recipe "kubernetes-app::_flannel"
+include_recipe "kubernetes-app::_docker"
 
 
 [
