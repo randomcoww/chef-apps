@@ -1,32 +1,3 @@
-package 'default-libmysqlclient-dev' do
-  action :install
-end
-
-chef_gem 'mysql2' do
-  action :install
-  compile_time false
-end
-
-
-## provision mysql
-
-mysql_cluster_sql 'create_db' do
-  queries ([
-    %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
-    %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'%' IDENTIFIED BY '#{node['mysql_credentials']['kea']['password']}';},
-    %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
-  ])
-  timeout 120
-  options ({
-    username: 'root',
-    password: node['mysql_credentials']['root']['password']
-  })
-  action :query
-end
-
-
-## provision tables
-
 directory ::File.dirname(node['kea']['dhcp4_mysql']['create_tables_sql_file']) do
   recursive true
 end
@@ -60,7 +31,9 @@ mysql_cluster_sql 'create_tables' do
   options ({
     username: node['mysql_credentials']['kea']['username'],
     password: node['mysql_credentials']['kea']['password'],
-    database: node['mysql_credentials']['kea']['database']
+    database: node['mysql_credentials']['kea']['database'],
+    host: '127.0.0.1',
+    port: 3306
   })
   action :nothing
 end

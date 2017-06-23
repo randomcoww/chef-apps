@@ -1,10 +1,5 @@
 include_recipe "kubernetes-app::_docker"
 
-package node['kubernetes']['packages'] do
-  action :install
-end
-
-
 [
   'kubelet',
 ].each do |e|
@@ -32,4 +27,4 @@ systemd_unit 'kubelet.service' do
   subscribes :restart, "kubernetes_ca[ca]", :delayed
 end
 
-include_recipe "kubernetes-app::_static_pods"
+include_recipe "kubelet-app::_static_pods"

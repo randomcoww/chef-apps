@@ -1,4 +1,6 @@
-include_recipe "kea-app::_mysql_backend"
+include_recipe "kea-app::_mysql_packages"
+include_recipe "kea-app::_mysql_db"
+include_recipe "kea-app::_mysql_seed"
 
 package 'kea-dhcp4-server' do
   action :install
