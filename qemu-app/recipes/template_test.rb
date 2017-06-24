@@ -3,7 +3,8 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#
 
 node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
-  "recipe[system_update::debian]"
+  "recipe[system_update::debian]",
+  "recipe[kubelet-app::master]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 2048
