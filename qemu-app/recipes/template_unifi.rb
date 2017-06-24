@@ -6,7 +6,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 1024
+node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [

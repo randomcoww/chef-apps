@@ -30,6 +30,19 @@ node.default['qemu']['current_config']['libvirt_config'] = {
         }
       }
     },
+    "sysinfo"=>{
+      "#attributes"=>{
+        "type"=>"smbios"
+      },
+      "baseBoard"=>{
+        "entry"=>{
+          "#attributes"=>{
+            "name"=>"serial"
+          },
+          "#text"=>"ds=nocloud"
+        }
+      }
+    },
     "os"=>{
       "type"=>{
         "#attributes"=>{
@@ -41,6 +54,11 @@ node.default['qemu']['current_config']['libvirt_config'] = {
       "boot"=>{
         "#attributes"=>{
           "dev"=>"hd"
+        }
+      },
+      "smbios"=>{
+        "#attributes"=>{
+          "mode"=>"sysinfo"
         }
       }
     },
