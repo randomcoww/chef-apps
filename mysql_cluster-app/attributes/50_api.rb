@@ -7,7 +7,7 @@ node.default['mysql_cluster']['api']['config'] = {
     'ndbcluster' => nil,
     'default_storage_engine' => 'ndbcluster',
     'ndb-connectstring' => [
-      node['environment_v2']['host']['mysql-mgm']['ip_lan']
+      node['environment_v2']['host']['kea-mysql-mgmd']['ip_lan']
     ].join(','),
     'bind-address' => '0.0.0.0'
   }

@@ -4,18 +4,18 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#
 node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[mysql_cluster-app::ndb]",
-  "recipe[mysql_cluster-app::api]",
-  "recipe[kea-app::dhcp4]",
-  "recipe[kea-app::ddns]"
+  "recipe[kubelet-app::master]",
+  "recipe[kea-pod]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 2048
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
-  "echo deb http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
-  "echo deb-src http://repo.mysql.com/apt/debian/ jessie mysql-cluster-7.5 >> /etc/apt/sources.list.d/mysql.list",
+  "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
+  "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
+
+  "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
   "apt-get -y update"
 ]
 

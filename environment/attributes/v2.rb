@@ -30,16 +30,16 @@ node.default['environment_v2']['set']['dns'] = {
   'vip_lan' => "192.168.62.230"
 }
 
-node.default['environment_v2']['set']['mysql-mgm'] = {
+node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
-    'mysql-mgm'
+    'kea-mysql-mgmd'
   ]
 }
 
-node.default['environment_v2']['set']['mysql-ndb'] = {
+node.default['environment_v2']['set']['kea-mysql'] = {
   'hosts' => [
-    'mysql-ndb1',
-    'mysql-ndb2'
+    'kea-mysql1',
+    'kea-mysql2'
   ]
 }
 
@@ -134,15 +134,15 @@ node.default['environment_v2']['host']['dns2'] = {
   'ip_lan' => "192.168.62.232"
 }
 
-node.default['environment_v2']['host']['mysql-mgm'] = {
+node.default['environment_v2']['host']['kea-mysql-mgmd'] = {
   'ip_lan' => "192.168.62.211"
 }
 
-node.default['environment_v2']['host']['mysql-ndb1'] = {
+node.default['environment_v2']['host']['kea-mysql1'] = {
   'ip_lan' => "192.168.62.213"
 }
 
-node.default['environment_v2']['host']['mysql-ndb2'] = {
+node.default['environment_v2']['host']['kea-mysql2'] = {
   'ip_lan' => "192.168.62.214"
 }
 
