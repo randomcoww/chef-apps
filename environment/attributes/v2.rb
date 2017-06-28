@@ -81,13 +81,13 @@ node.default['environment_v2']['host']['vm1'] = {
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
-  'if_store' => 'enp5s0',
+  'if_store' => 'ens1',
   'passthrough_hba' => {
     'domain' => "0x0000",
-    'bus' => "0x03",
+    'bus' => "0x01",
     'slot' => "0x00",
     'function' => "0x0",
-    'file' => "/img/kvm/firmware/mptsas2.rom"
+    'file' => "/img/kvm/firmware/mptsas3.rom"
   }
 }
 
@@ -96,10 +96,10 @@ node.default['environment_v2']['host']['vm2'] = {
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
-  'if_store' => 'enp6s0',
+  'if_store' => 'ens1',
   'passthrough_hba' => {
     'domain' => "0x0000",
-    'bus' => "0x03",
+    'bus' => "0x01",
     'slot' => "0x00",
     'function' => "0x0",
     'file' => "/img/kvm/firmware/mptsas3.rom"

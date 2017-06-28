@@ -9,7 +9,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[openvpn-app::pia_client]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 2048
+node.default['qemu']['current_config']['memory'] = 1024
 node.default['qemu']['current_config']['vcpu'] = 2
 
 node.default['qemu']['current_config']['runcmd'] = [

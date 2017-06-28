@@ -8,7 +8,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[keepalived-app::gluster]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 20480
+node.default['qemu']['current_config']['memory'] = 16384
 node.default['qemu']['current_config']['vcpu'] = 3
 
 node.default['qemu']['current_config']['runcmd'] = [
@@ -207,7 +207,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment_v2']['current_host']['if_store'],
-              "mode"=>"bridge"
+              "mode"=>"passthrough"
             }
           },
           "model"=>{
