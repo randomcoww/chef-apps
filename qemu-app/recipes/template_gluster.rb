@@ -9,7 +9,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
 ]
 
 node.default['qemu']['current_config']['memory'] = 16384
-node.default['qemu']['current_config']['vcpu'] = 3
+node.default['qemu']['current_config']['vcpu'] = 2
 
 node.default['qemu']['current_config']['runcmd'] = [
 ]

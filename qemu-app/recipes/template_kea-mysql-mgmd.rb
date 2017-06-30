@@ -8,7 +8,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[mysql_cluster_ndb_mgmd-pod]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 256
+node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
