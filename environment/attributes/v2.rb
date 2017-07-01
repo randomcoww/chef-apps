@@ -144,11 +144,13 @@ node.default['environment_v2']['host']['kea-mysql-mgmd2'] = {
 }
 
 node.default['environment_v2']['host']['kea-mysql1'] = {
-  'ip_lan' => "192.168.62.213"
+  'ip_lan' => "192.168.62.213",
+  'nodeid' => 1
 }
 
 node.default['environment_v2']['host']['kea-mysql2'] = {
-  'ip_lan' => "192.168.62.214"
+  'ip_lan' => "192.168.62.214",
+  'nodeid' => 2
 }
 
 node.default['environment_v2']['host']['haproxy1'] = {
