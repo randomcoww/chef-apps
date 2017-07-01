@@ -32,8 +32,8 @@ node.default['environment_v2']['set']['dns'] = {
 
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
-    'kea-mysql-mgmd1',
-    'kea-mysql-mgmd2'
+    'kea-mysql1',
+    'kea-mysql2'
   ]
 }
 
@@ -133,14 +133,6 @@ node.default['environment_v2']['host']['dns1'] = {
 
 node.default['environment_v2']['host']['dns2'] = {
   'ip_lan' => "192.168.62.232"
-}
-
-node.default['environment_v2']['host']['kea-mysql-mgmd1'] = {
-  'ip_lan' => "192.168.62.213"
-}
-
-node.default['environment_v2']['host']['kea-mysql-mgmd2'] = {
-  'ip_lan' => "192.168.62.214"
 }
 
 node.default['environment_v2']['host']['kea-mysql1'] = {
