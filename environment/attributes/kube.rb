@@ -4,3 +4,5 @@ node.default['kube']['images']['mysql_cluster_ndb_mgmd'] = "randomcoww/k8s-mysql
 node.default['kube']['images']['kea_dhcp4'] = "randomcoww/k8s-kea:latest"
 node.default['kube']['images']['kea_dhcp_ddns'] = "randomcoww/k8s-kea:latest"
 node.default['kube']['images']['haproxy'] = "randomcoww/k8s-haproxy:latest"
+node.default['kube']['images']['keepalived'] = "randomcoww/k8s-keepalived:latest"
+node.default['kube']['images']['ddclient'] = "randomcoww/k8s-ddclient:latest"
