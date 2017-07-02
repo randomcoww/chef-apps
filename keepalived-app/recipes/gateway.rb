@@ -14,14 +14,14 @@ end
 keepalived_vrrp_instance 'VI_gateway' do
   # nopreempt true
   # state 'MASTER'
-  interface node['keepalived']['gateway']['lan_if']
+  interface node['environment_v2']['current_host']['if_lan']
   virtual_router_id 20
   # use_vmac 'vrrp20'
   authentication auth_type: 'AH', auth_pass: password
   virtual_ipaddress [ "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]
-  notify_master %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} up"}
-  notify_backup %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
-  notify_fault %Q{"/sbin/ip link set #{node['keepalived']['gateway']['wan_if']} down"}
+  notify_master %Q{"/sbin/ip link set #{node['environment_v2']['current_host']['if_wan']} up"}
+  notify_backup %Q{"/sbin/ip link set #{node['environment_v2']['current_host']['if_wan']} down"}
+  notify_fault %Q{"/sbin/ip link set #{node['environment_v2']['current_host']['if_wan']} down"}
 end
 
 include_recipe 'keepalived-app::systemd_service'

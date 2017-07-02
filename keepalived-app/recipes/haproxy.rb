@@ -13,8 +13,7 @@ end
 
 keepalived_vrrp_instance 'VI_haproxy' do
   # nopreempt true
-  priority node['environment_v2']['current_host']['priority']
-  interface node['keepalived']['haproxy']['lan_if']
+  interface node['environment_v2']['current_host']['if_lan']
   virtual_router_id 31
   authentication auth_type: 'AH', auth_pass: password
   virtual_ipaddress [ "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}" ]

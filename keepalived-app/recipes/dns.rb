@@ -14,7 +14,7 @@ end
 keepalived_vrrp_instance 'VI_dns' do
   # nopreempt true
   # state 'MASTER'
-  interface node['keepalived']['dns']['lan_if']
+  interface node['environment_v2']['current_host']['if_lan']
   virtual_router_id 22
   # use_vmac 'vrrp22'
   authentication auth_type: 'AH', auth_pass: password

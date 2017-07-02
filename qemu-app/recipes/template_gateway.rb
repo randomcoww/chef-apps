@@ -5,11 +5,10 @@ node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
-  "recipe[keepalived-app::gateway]",
-  "recipe[ddclient-app::freedns]"
+  "recipe[keepalived-app::gateway]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 256
+node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
