@@ -4,20 +4,18 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#
 node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[keepalived-app::dns]",
-  "recipe[knot-app::main]",
-  "recipe[unbound-app::main]",
-  "recipe[openvpn-app::pia_client]"
+  "recipe[kubelet-app::master]",
+  "recipe[dns-pod]"
 ]
 
-node.default['qemu']['current_config']['memory'] = 256
+node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
-  "apt-get -y install apt-transport-https ca-certificates",
-  "wget -O - https://deb.knot-dns.cz/knot/apt.gpg | apt-key add -",
+  "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
+  "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
 
-  "echo deb https://deb.knot-dns.cz/knot/ $(lsb_release -sc) main > /etc/apt/sources.list.d/knot.list",
+  "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
   "apt-get -y update"
 ]
 
