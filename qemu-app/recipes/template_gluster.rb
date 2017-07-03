@@ -4,7 +4,7 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#
 node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[glusterfs-app::gluster-peer]",
+  "recipe[glusterfs-app::gluster_peer]",
   "recipe[keepalived-app::gluster]"
 ]
 
