@@ -6,6 +6,8 @@ node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
   "recipe[keepalived-app::gateway]",
+  # "recipe[kubelet-app::master]",
+  # "recipe[gateway-pod]",
   # "recipe[ddclient-app::freedns]"
 ]
 
@@ -64,7 +66,9 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/e
     "UseHostname" => "false",
     "UseDomains" => "false",
     "UseTimezone" => "no",
-    "RouteMetric" => 1024
+    "RouteMetric" => 1024,
+    "IPMasquerade" => "yes",
+    "IPForward" => "ipv4"
   }
 }
 

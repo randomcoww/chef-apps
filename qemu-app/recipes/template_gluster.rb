@@ -207,7 +207,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           "source"=>{
             "#attributes"=>{
               "dev"=>node['environment_v2']['current_host']['if_store'],
-              "mode"=>"passthrough"
+              "mode"=>"bridge"
             }
           },
           "model"=>{

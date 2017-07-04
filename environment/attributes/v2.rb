@@ -22,10 +22,26 @@ node.default['environment_v2']['set']['gluster'] = {
   'vip_store' => "169.254.127.250"
 }
 
+node.default['environment_v2']['set']['kubelet'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ],
+  'vip_lan' => "192.168.62.230"
+}
+
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ],
+  'vip_lan' => "192.168.62.230"
+}
+
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'dns1',
-    'dns2'
+    'kubelet1',
+    'kubelet2'
   ],
   'vip_lan' => "192.168.62.230"
 }
@@ -42,14 +58,6 @@ node.default['environment_v2']['set']['kea-mysql'] = {
     'kea-mysql1',
     'kea-mysql2'
   ]
-}
-
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'haproxy1',
-    'haproxy2'
-  ],
-  'vip_lan' => "192.168.62.220"
 }
 
 node.default['environment_v2']['set']['etcd'] = {
@@ -137,12 +145,12 @@ node.default['environment_v2']['host']['gluster2'] = {
   'if_store' => 'eth1',
 }
 
-node.default['environment_v2']['host']['dns1'] = {
+node.default['environment_v2']['host']['kubelet1'] = {
   'ip_lan' => "192.168.62.231",
   'if_lan' => 'eth0',
 }
 
-node.default['environment_v2']['host']['dns2'] = {
+node.default['environment_v2']['host']['kubelet2'] = {
   'ip_lan' => "192.168.62.232",
   'if_lan' => 'eth0',
 }
@@ -155,15 +163,15 @@ node.default['environment_v2']['host']['kea-mysql2'] = {
   'ip_lan' => "192.168.62.214"
 }
 
-node.default['environment_v2']['host']['haproxy1'] = {
-  'ip_lan' => "192.168.62.221",
-  'if_lan' => 'eth0',
-}
-
-node.default['environment_v2']['host']['haproxy2'] = {
-  'ip_lan' => "192.168.62.222",
-  'if_lan' => 'eth0',
-}
+# node.default['environment_v2']['host']['haproxy1'] = {
+#   'ip_lan' => "192.168.62.221",
+#   'if_lan' => 'eth0',
+# }
+#
+# node.default['environment_v2']['host']['haproxy2'] = {
+#   'ip_lan' => "192.168.62.222",
+#   'if_lan' => 'eth0',
+# }
 
 node.default['environment_v2']['host']['kube-master1'] = {
   'ip_lan' => "192.168.62.201"
@@ -187,6 +195,19 @@ node.default['environment_v2']['host']['kube-worker2'] = {
   'ip_store' => "169.254.127.204"
 }
 
+
+##
+## one offs..
+##
+
+node.default['environment_v2']['host']['unifi1'] = {
+  'ip_lan' => "192.168.62.217",
+}
+
+node.default['environment_v2']['host']['transmission1'] = {
+  'ip_lan' => "192.168.62.218",
+}
+
 # node.default['environment_v2']['host']['test3'] = {
 #   'ip_lan' => "192.168.62.239"
 # }
@@ -198,6 +219,11 @@ node.default['environment_v2']['host']['kube-worker2'] = {
 # node.default['environment_v2']['host']['test1'] = {
 #   'ip_lan' => "192.168.62.237"
 # }
+
+
+##
+## hardware
+##
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
   'ip_lan' => '192.168.63.64'

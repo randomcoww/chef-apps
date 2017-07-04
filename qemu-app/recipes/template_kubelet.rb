@@ -1,23 +1,22 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['current_config']['chef_interval'] = '60min'
+node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
-  "recipe[system_update::debian]"
+  "recipe[system_update::debian]",
+  "recipe[kubelet-app::master]",
+  "recipe[kubelet-pod]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
 node.default['qemu']['current_config']['runcmd'] = [
-  'apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr',
-  'apt-key adv --keyserver keyserver.ubuntu.com --recv C0A52C50',
-  'echo "deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list',
-  "apt-get -y update",
-  "apt-get -y install --no-install-recommends unifi",
-  "systemctl disable mongodb",
-  "systemctl start unifi",
-  "systemctl enable unifi"
+  "apt-get -y install apt-transport-https ca-certificates gnupg2 dirmngr",
+  "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D",
+
+  "echo deb https://apt.dockerproject.org/repo debian-stretch main > /etc/apt/sources.list.d/docker.list",
+  "apt-get -y update"
 ]
 
 include_recipe "qemu-app::_cloud_config_common"
