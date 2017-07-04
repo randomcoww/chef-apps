@@ -22,26 +22,26 @@ node.default['environment_v2']['set']['gluster'] = {
   'vip_store' => "169.254.127.250"
 }
 
-node.default['environment_v2']['set']['kubelet'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ],
-  'vip_lan' => "192.168.62.230"
-}
+# node.default['environment_v2']['set']['kubelet'] = {
+#   'hosts' => [
+#     'kubelet1',
+#     'kubelet2'
+#   ],
+#   'vip_lan' => "192.168.62.230"
+# }
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'gateway1',
+    'gateway2'
   ],
   'vip_lan' => "192.168.62.230"
 }
 
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'dns1',
+    'dns2'
   ],
   'vip_lan' => "192.168.62.230"
 }
@@ -145,12 +145,12 @@ node.default['environment_v2']['host']['gluster2'] = {
   'if_store' => 'eth1',
 }
 
-node.default['environment_v2']['host']['kubelet1'] = {
+node.default['environment_v2']['host']['dns1'] = {
   'ip_lan' => "192.168.62.231",
   'if_lan' => 'eth0',
 }
 
-node.default['environment_v2']['host']['kubelet2'] = {
+node.default['environment_v2']['host']['dns2'] = {
   'ip_lan' => "192.168.62.232",
   'if_lan' => 'eth0',
 }

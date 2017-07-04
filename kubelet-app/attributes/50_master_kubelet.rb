@@ -19,3 +19,5 @@ node.override['kube_master']['kubelet']['systemd'] = {
     'WantedBy' => 'multi-user.target'
   }
 }
+
+node.default['kubelet']['static_pods'] ||= {}

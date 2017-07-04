@@ -9,5 +9,3 @@ node.default['kubernetes']['docker']['systemd_dropin'] = {
     ]
   }
 }
-
-node.default['kubelet']['static_pods'] ||= {}
