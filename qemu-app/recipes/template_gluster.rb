@@ -5,15 +5,14 @@ node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[glusterfs-app::gluster_peer]",
-  "recipe[keepalived-app::gluster]"
+  "recipe[kubelet-app::master]",
+  "recipe[gluster-pod]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 16384
 node.default['qemu']['current_config']['vcpu'] = 2
 
-node.default['qemu']['current_config']['runcmd'] = [
-]
-
+include_recipe "qemu-app::_docker_repo"
 include_recipe "qemu-app::_cloud_config_common"
 
 include_recipe "qemu-app::_systemd_eth0_static"
