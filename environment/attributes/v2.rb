@@ -86,7 +86,7 @@ node.default['environment_v2']['set']['kube-worker'] = {
 
 ## hardware override
 node.default['environment_v2']['host']['vm1'] = {
-  'ip_lan' => '192.168.63.30',
+  'ip_lan' => '192.168.63.31',
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
@@ -101,7 +101,7 @@ node.default['environment_v2']['host']['vm1'] = {
 }
 
 node.default['environment_v2']['host']['vm2'] = {
-  'ip_lan' => '192.168.63.31',
+  'ip_lan' => '192.168.63.32',
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
