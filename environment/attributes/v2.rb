@@ -15,20 +15,12 @@ node.default['environment_v2']['set']['gateway'] = {
 
 node.default['environment_v2']['set']['gluster'] = {
   'hosts' => [
-    'gluster1',
-    'gluster2'
+    'vm1',
+    'vm2'
   ],
   'vip_lan' => "192.168.62.250",
   'vip_store' => "169.254.127.250"
 }
-
-# node.default['environment_v2']['set']['kubelet'] = {
-#   'hosts' => [
-#     'kubelet1',
-#     'kubelet2'
-#   ],
-#   'vip_lan' => "192.168.62.230"
-# }
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
@@ -86,7 +78,10 @@ node.default['environment_v2']['set']['kube-worker'] = {
 
 ## hardware override
 node.default['environment_v2']['host']['vm1'] = {
-  'ip_lan' => '192.168.63.31',
+  'ip_lan' => '192.168.62.251',
+  'ip_store' => '169.254.127.251',
+  'if_host_lan' => 'host_lan',
+  'if_host_store' => 'host_store',
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
@@ -101,7 +96,10 @@ node.default['environment_v2']['host']['vm1'] = {
 }
 
 node.default['environment_v2']['host']['vm2'] = {
-  'ip_lan' => '192.168.63.32',
+  'ip_lan' => '192.168.62.252',
+  'ip_store' => '169.254.127.252',
+  'if_host_lan' => 'host_lan',
+  'if_host_store' => 'host_store',
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
@@ -131,19 +129,19 @@ node.default['environment_v2']['host']['gateway2'] = {
   'if_wan' => 'eth2',
 }
 
-node.default['environment_v2']['host']['gluster1'] = {
-  'ip_lan' => "192.168.62.251",
-  'ip_store' => "169.254.127.251",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-}
-
-node.default['environment_v2']['host']['gluster2'] = {
-  'ip_lan' => "192.168.62.252",
-  'ip_store' => "169.254.127.252",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-}
+# node.default['environment_v2']['host']['gluster1'] = {
+#   'ip_lan' => "192.168.62.251",
+#   'ip_store' => "169.254.127.251",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1',
+# }
+#
+# node.default['environment_v2']['host']['gluster2'] = {
+#   'ip_lan' => "192.168.62.252",
+#   'ip_store' => "169.254.127.252",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1',
+# }
 
 node.default['environment_v2']['host']['dns1'] = {
   'ip_lan' => "192.168.62.231",
