@@ -224,11 +224,11 @@ node.default['environment_v2']['host']['transmission1'] = {
 ##
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
-  'ip_lan' => '192.168.63.64'
+  'ip_lan' => '192.168.63.61'
 }
 
 node.default['environment_v2']['host']['vm2-ipmi'] = {
-  'ip_lan' => '192.168.63.63'
+  'ip_lan' => '192.168.63.62'
 }
 
 node.default['environment_v2']['host']['sw'] = {
