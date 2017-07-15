@@ -103,7 +103,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
+            "file"=>"/data/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -137,7 +137,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>"/img/secret/chef"
+              "dir"=>"/data/secret/chef"
             }
           },
           "target"=>{

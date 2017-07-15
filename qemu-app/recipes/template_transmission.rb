@@ -1,5 +1,5 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
-node.default['qemu']['current_config']['cloud_config_path'] = "/img/cloud-init/#{node['qemu']['current_config']['hostname']}"
+node.default['qemu']['current_config']['cloud_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
 node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
@@ -109,7 +109,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
         },
         "source"=>{
           "#attributes"=>{
-            "file"=>"/img/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
+            "file"=>"/data/kvm/#{node['qemu']['current_config']['hostname']}.qcow2"
           }
         },
         "target"=>{
@@ -143,7 +143,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dir"=>"/img/secret/chef"
+              "dir"=>"/data/secret/chef"
             }
           },
           "target"=>{
