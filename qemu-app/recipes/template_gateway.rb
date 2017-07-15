@@ -10,13 +10,12 @@ node.default['qemu']['current_config']['chef_recipes'] = [
 ]
 
 node.default['qemu']['current_config']['memory'] = 512
-node.default['qemu']['current_config']['vcpu'] = 1
+node.default['qemu']['current_config']['vcpu'] = 2
 
-include_recipe "qemu-app::_docker_repo"
 include_recipe "qemu-app::_cloud_config_common"
 
 
-node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/eth0.network'] = {
+node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/50-eth0.network'] = {
   "Match" => {
     "Name" => "eth0"
   },
@@ -33,7 +32,7 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/e
   }
 }
 
-node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/eth1.network'] = {
+node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/50-eth1.network'] = {
   "Match" => {
     "Name" => "eth1"
   },
@@ -43,7 +42,7 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/e
   }
 }
 
-node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/eth2.network'] = {
+node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/50-eth2.network'] = {
   "Match" => {
     "Name" => "eth2"
   },

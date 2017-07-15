@@ -11,7 +11,6 @@ node.default['qemu']['current_config']['chef_recipes'] = [
 node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
 
-include_recipe "qemu-app::_docker_repo"
 include_recipe "qemu-app::_cloud_config_common"
 include_recipe "qemu-app::_libvirt_common"
 

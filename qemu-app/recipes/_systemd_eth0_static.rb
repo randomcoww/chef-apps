@@ -1,4 +1,4 @@
-node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/eth0.network'] = {
+node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/50-eth0.network'] = {
   "Match" => {
     "Name" => "eth0"
   },
