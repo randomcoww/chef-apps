@@ -85,14 +85,14 @@ node.default['environment_v2']['host']['vm1'] = {
   'if_lan' => 'eno1',
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
-  'if_store' => 'enp2s0',
-  'passthrough_hba' => {
-    'domain' => "0x0000",
-    'bus' => "0x01",
-    'slot' => "0x00",
-    'function' => "0x0",
-    'file' => "/img/kvm/firmware/mptsas3.rom"
-  }
+  'if_store' => 'ens1',
+  # 'passthrough_hba' => {
+  #   'domain' => "0x0000",
+  #   'bus' => "0x01",
+  #   'slot' => "0x00",
+  #   'function' => "0x0",
+  #   'file' => "/data/kvm/firmware/mptsas3.rom"
+  # }
 }
 
 node.default['environment_v2']['host']['vm2'] = {
@@ -104,13 +104,13 @@ node.default['environment_v2']['host']['vm2'] = {
   'if_vpn' => 'vpn',
   'if_wan' => 'wan',
   'if_store' => 'ens1',
-  'passthrough_hba' => {
-    'domain' => "0x0000",
-    'bus' => "0x01",
-    'slot' => "0x00",
-    'function' => "0x0",
-    'file' => "/img/kvm/firmware/mptsas3.rom"
-  }
+  # 'passthrough_hba' => {
+  #   'domain' => "0x0000",
+  #   'bus' => "0x01",
+  #   'slot' => "0x00",
+  #   'function' => "0x0",
+  #   'file' => "/data/kvm/firmware/mptsas3.rom"
+  # }
 }
 
 node.default['environment_v2']['host']['gateway1'] = {
