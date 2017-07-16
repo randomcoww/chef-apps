@@ -10,6 +10,8 @@ node.default['qemu']['current_config']['chef_recipes'] = [
 node.default['qemu']['current_config']['memory'] = 1024
 node.default['qemu']['current_config']['vcpu'] = 1
 
+node.default['qemu']['current_config']['runcmd'] = []
+
 include_recipe "qemu-app::_cloud_config_common"
 include_recipe "qemu-app::_libvirt_common"
 

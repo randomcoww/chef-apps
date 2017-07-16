@@ -5,12 +5,14 @@ node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
-  "recipe[kubelet-app::_static_pods]",
+  "recipe[kubelet-app::master_disable_iptables]",
   "recipe[gateway-pod]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 2
+
+node.default['qemu']['current_config']['runcmd'] = []
 
 include_recipe "qemu-app::_cloud_config_common"
 

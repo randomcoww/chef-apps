@@ -4,12 +4,14 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/data/cloud-init/
 node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[kubelet-app::_static_pods]",
+  "recipe[kubelet-app::master]",
   "recipe[dns-pod]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 512
 node.default['qemu']['current_config']['vcpu'] = 1
+
+node.default['qemu']['current_config']['runcmd'] = []
 
 include_recipe "qemu-app::_cloud_config_common"
 include_recipe "qemu-app::_libvirt_common"
