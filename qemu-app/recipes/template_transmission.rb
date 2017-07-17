@@ -174,13 +174,11 @@ node.default['qemu']['current_config']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct",
-            "trustGuestRxFilters"=>"yes"
+            "type"=>"network"
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['current_host']['if_lan'],
-              "mode"=>"bridge"
+              "network"=>"passthrough_lan"
             }
           },
           "model"=>{
@@ -191,13 +189,11 @@ node.default['qemu']['current_config']['libvirt_config'] = {
         },
         {
           "#attributes"=>{
-            "type"=>"direct",
-            "trustGuestRxFilters"=>"yes"
+            "type"=>"network"
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['current_host']['if_store'],
-              "mode"=>"bridge"
+              "network"=>"passthrough_store"
             }
           },
           "model"=>{
@@ -205,7 +201,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
               "type"=>"virtio-net"
             }
           }
-        }
+        },
       ],
       "serial"=>{
         "#attributes"=>{

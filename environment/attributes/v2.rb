@@ -80,11 +80,8 @@ node.default['environment_v2']['set']['kube-worker'] = {
 node.default['environment_v2']['host']['vm1'] = {
   'ip_lan' => '192.168.62.251',
   'ip_store' => '169.254.127.251',
-  'if_host_lan' => 'host_lan',
-  'if_host_store' => 'host_store',
   'if_lan' => 'eno1',
-  'if_vpn' => 'vpn',
-  'if_wan' => 'wan',
+  'if_wan' => 'eno2',
   'if_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -98,11 +95,8 @@ node.default['environment_v2']['host']['vm1'] = {
 node.default['environment_v2']['host']['vm2'] = {
   'ip_lan' => '192.168.62.252',
   'ip_store' => '169.254.127.252',
-  'if_host_lan' => 'host_lan',
-  'if_host_store' => 'host_store',
   'if_lan' => 'eno1',
-  'if_vpn' => 'vpn',
-  'if_wan' => 'wan',
+  'if_wan' => 'eno2',
   'if_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -117,31 +111,15 @@ node.default['environment_v2']['host']['gateway1'] = {
   'ip_lan' => "192.168.62.241",
   'mac_wan' => "52:54:00:63:6e:b0",
   'if_lan' => 'eth0',
-  'if_vpn' => 'eth1',
-  'if_wan' => 'eth2',
+  'if_wan' => 'eth1',
 }
 
 node.default['environment_v2']['host']['gateway2'] = {
   'ip_lan' => "192.168.62.242",
   'mac_wan' => "52:54:00:63:6e:b1",
   'if_lan' => 'eth0',
-  'if_vpn' => 'eth1',
-  'if_wan' => 'eth2',
+  'if_wan' => 'eth1',
 }
-
-# node.default['environment_v2']['host']['gluster1'] = {
-#   'ip_lan' => "192.168.62.251",
-#   'ip_store' => "169.254.127.251",
-#   'if_lan' => 'eth0',
-#   'if_store' => 'eth1',
-# }
-#
-# node.default['environment_v2']['host']['gluster2'] = {
-#   'ip_lan' => "192.168.62.252",
-#   'ip_store' => "169.254.127.252",
-#   'if_lan' => 'eth0',
-#   'if_store' => 'eth1',
-# }
 
 node.default['environment_v2']['host']['dns1'] = {
   'ip_lan' => "192.168.62.231",
@@ -160,16 +138,6 @@ node.default['environment_v2']['host']['kea-mysql1'] = {
 node.default['environment_v2']['host']['kea-mysql2'] = {
   'ip_lan' => "192.168.62.214"
 }
-
-# node.default['environment_v2']['host']['haproxy1'] = {
-#   'ip_lan' => "192.168.62.221",
-#   'if_lan' => 'eth0',
-# }
-#
-# node.default['environment_v2']['host']['haproxy2'] = {
-#   'ip_lan' => "192.168.62.222",
-#   'if_lan' => 'eth0',
-# }
 
 node.default['environment_v2']['host']['kube-master1'] = {
   'ip_lan' => "192.168.62.201"

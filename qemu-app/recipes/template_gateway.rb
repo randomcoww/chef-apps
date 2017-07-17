@@ -40,16 +40,6 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/5
   },
   "Network" => {
     "LinkLocalAddressing" => "no",
-    "DHCP" => "no"
-  }
-}
-
-node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/50-eth2.network'] = {
-  "Match" => {
-    "Name" => "eth2"
-  },
-  "Network" => {
-    "LinkLocalAddressing" => "no",
     "DHCP" => "yes",
     "DNS" => [
       node['environment_v2']['set']['dns']['vip_lan'],
@@ -64,8 +54,8 @@ node.default['qemu']['current_config']['systemd_config']['/etc/systemd/network/5
     "UseDomains" => "false",
     "UseTimezone" => "no",
     "RouteMetric" => 1024,
-    "IPMasquerade" => "yes",
-    "IPForward" => "ipv4"
+    # "IPMasquerade" => "yes",
+    # "IPForward" => "ipv4"
   }
 }
 
@@ -224,13 +214,11 @@ node.default['qemu']['current_config']['libvirt_config'] = {
       "interface"=>[
         {
           "#attributes"=>{
-            "type"=>"direct",
-            "trustGuestRxFilters"=>"yes"
+            "type"=>"network"
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['current_host']['if_lan'],
-              "mode"=>"bridge"
+              "network"=>"passthrough_lan"
             }
           },
           "model"=>{
@@ -241,23 +229,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
         },
         {
           "#attributes"=>{
-            "type"=>"direct"
-          },
-          "source"=>{
-            "#attributes"=>{
-              "dev"=>node['environment_v2']['current_host']['if_vpn'],
-              "mode"=>"bridge"
-            }
-          },
-          "model"=>{
-            "#attributes"=>{
-              "type"=>"virtio-net"
-            }
-          }
-        },
-        {
-          "#attributes"=>{
-            "type"=>"direct"
+            "type"=>"network"
           },
           "mac"=>{
             "#attributes"=>{
@@ -266,8 +238,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "dev"=>node['environment_v2']['current_host']['if_wan'],
-              "mode"=>"bridge"
+              "network"=>"passthrough_wan"
             }
           },
           "model"=>{

@@ -13,7 +13,7 @@ node.default['kubelet']['keepalived']['config'] = KeepalivedHelper::ConfigGenera
     {
       'state' => 'BACKUP',
       'virtual_router_id' => 23,
-      'interface' => node['environment_v2']['current_host']['if_host_lan'],
+      'interface' => node['environment_v2']['current_host']['if_lan'],
       'priority' => 100,
       'authentication' => [
         {
@@ -30,7 +30,7 @@ node.default['kubelet']['keepalived']['config'] = KeepalivedHelper::ConfigGenera
     {
       'state' => 'BACKUP',
       'virtual_router_id' => 24,
-      'interface' => node['environment_v2']['current_host']['if_host_store'],
+      'interface' => node['environment_v2']['current_host']['if_store'],
       'priority' => 100,
       'authentication' => [
         {
