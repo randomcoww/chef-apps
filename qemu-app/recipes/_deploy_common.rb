@@ -1,6 +1,6 @@
 package node['qemu']['pkg_names'] do
-  action :upgrade
-end
+  action :nothing
+end.run_action(:install)
 
 include_recipe "qemu::install"
 
