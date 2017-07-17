@@ -178,7 +178,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "network"=>"passthrough_lan"
+              "network"=>node['qemu']['libvirt_network_lan']
             }
           },
           "model"=>{
@@ -193,7 +193,7 @@ node.default['qemu']['current_config']['libvirt_config'] = {
           },
           "source"=>{
             "#attributes"=>{
-              "network"=>"passthrough_store"
+              "network"=>node['qemu']['libvirt_network_store']
             }
           },
           "model"=>{
