@@ -4,9 +4,9 @@ node.default['kea']['lan_reservations'] = {}
 
 node.default['kea']['dhcp4_mysql']['config'] = {
   "Dhcp4" => {
-    "valid-lifetime" => 300,
-    # "renew-timer" => 300,
-    # "rebind-timer" => 300,
+    "valid-lifetime" => 3600,
+    "renew-timer" => 3600,
+    "rebind-timer" => 3600,
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },
