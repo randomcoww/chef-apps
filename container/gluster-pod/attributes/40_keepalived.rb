@@ -10,6 +10,8 @@ node.default['kubelet']['keepalived']['config'] = KeepalivedHelper::ConfigGenera
     }
   ],
   'vrrp_instance VI_lan_gluster' => [
+    'use_vmac',
+    'vmac_xmit_base',
     {
       'state' => 'BACKUP',
       'virtual_router_id' => 23,
@@ -27,6 +29,8 @@ node.default['kubelet']['keepalived']['config'] = KeepalivedHelper::ConfigGenera
     }
   ],
   'vrrp_instance VI_store_gluster' => [
+    'use_vmac',
+    'vmac_xmit_base',
     {
       'state' => 'BACKUP',
       'virtual_router_id' => 24,
