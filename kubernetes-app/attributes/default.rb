@@ -4,6 +4,8 @@
 #   'socat'
 # ]
 
+node.default['kubernetes']['version'] = '1.7.0'
+
 node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
@@ -31,12 +33,10 @@ node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['srv_pat
 ## pods
 node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
 node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
-node.default['kubernetes']['hyperkube_image'] = 'gcr.io/google_containers/hyperkube:v1.6.4'
+node.default['kubernetes']['hyperkube_image'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
 
 
 ## kubernetes download
-node.default['kubernetes']['version'] = '1.7.0'
-
 node.default['kubernetes']['kubelet']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kubelet"
 node.default['kubernetes']['kubelet']['binary_path'] = "/usr/local/bin/kubelet"
 
