@@ -33,7 +33,7 @@ node.default['kubernetes']['etcd']['systemd_unit'] = {
     },
     "User" => node['kubernetes']['etcd']['user'],
     "Type" => "notify",
-    "ExecStart" => "/usr/bin/etcd",
+    "ExecStart" => "/usr/local/bin/etcd",
     "Restart" => "always",
     "RestartSec" => "5s",
     "LimitNOFILE" => 40000

@@ -2,10 +2,6 @@ include_recipe "kubernetes-app::_etcd"
 include_recipe "kubernetes-app::_flannel"
 include_recipe "kubernetes-app::_docker"
 
-package node['kubernetes']['packages'] do
-  action :install
-end
-
 
 [
   'kubelet',

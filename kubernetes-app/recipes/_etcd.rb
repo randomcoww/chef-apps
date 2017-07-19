@@ -1,7 +1,7 @@
-package node['kubernetes']['etcd']['pkg_names'] do
-  action :install
-  notifies :stop, "service[etcd]", :immediately
-end
+# package node['kubernetes']['etcd']['pkg_names'] do
+#   action :install
+#   notifies :stop, "service[etcd]", :immediately
+# end
 
 user node['kubernetes']['etcd']['user'] do
   shell '/bin/false'

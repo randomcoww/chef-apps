@@ -31,8 +31,8 @@ node.default['kubernetes']['flannel']['systemd_unit'] = {
     "Type" => "notify",
     "Restart" => "always",
     "RestartSec" => "5s",
-    'ExecStartPre' => "/usr/bin/etcdctl --endpoints=#{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS']} set #{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flannel']['etcd_network'].to_json}'",
-    'ExecStart' => "/usr/bin/flannel"
+    'ExecStartPre' => "/usr/local/bin/etcdctl --endpoints=#{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS']} set #{node['kubernetes']['flannel']['environment']['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flannel']['etcd_network'].to_json}'",
+    'ExecStart' => "/usr/local/bin/flanneld"
   },
   "Install" => {
     "WantedBy" => "multi-user.target"

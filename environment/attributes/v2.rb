@@ -55,16 +55,16 @@ node.default['environment_v2']['set']['kea-mysql'] = {
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'kube-master1',
-    'kube-master2',
-    'kube-master3'
+    # 'kube-master2',
+    # 'kube-master3'
   ]
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'kube-master1',
-    'kube-master2',
-    'kube-master3'
+    # 'kube-master2',
+    # 'kube-master3'
   ]
 }
 

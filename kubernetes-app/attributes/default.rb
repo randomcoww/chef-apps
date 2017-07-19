@@ -1,8 +1,8 @@
-node.default['kubernetes']['packages'] = [
-  'glusterfs-client',
-  'git',
-  'socat'
-]
+# node.default['kubernetes']['packages'] = [
+#   'glusterfs-client',
+#   'git',
+#   'socat'
+# ]
 
 node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -35,20 +35,22 @@ node.default['kubernetes']['hyperkube_image'] = 'gcr.io/google_containers/hyperk
 
 
 ## kubernetes download
-node.default['kubernetes']['kubelet']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubelet'
+node.default['kubernetes']['version'] = '1.7.0'
+
+node.default['kubernetes']['kubelet']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kubelet"
 node.default['kubernetes']['kubelet']['binary_path'] = "/usr/local/bin/kubelet"
 
-node.default['kubernetes']['kube_proxy']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kube-proxy'
+node.default['kubernetes']['kube_proxy']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kube-proxy"
 node.default['kubernetes']['kube_proxy']['binary_path'] = "/usr/local/bin/kube-proxy"
 
-node.default['kubernetes']['kube_apiserver']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kube-apiserver'
+node.default['kubernetes']['kube_apiserver']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kube-apiserver"
 node.default['kubernetes']['kube_apiserver']['binary_path'] = "/usr/local/bin/kube-apiserver"
 
-node.default['kubernetes']['kube_controller_manager']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kube-controller-manager'
+node.default['kubernetes']['kube_controller_manager']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kube-controller-manager"
 node.default['kubernetes']['kube_controller_manager']['binary_path'] = "/usr/local/bin/kube-controller-manager"
 
-node.default['kubernetes']['kube_scheduler']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kube-scheduler'
+node.default['kubernetes']['kube_scheduler']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kube-scheduler"
 node.default['kubernetes']['kube_scheduler']['binary_path'] = "/usr/local/bin/kube-scheduler"
 
-node.default['kubernetes']['kubectl']['remote_file'] = 'https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl'
+node.default['kubernetes']['kubectl']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kubectl"
 node.default['kubernetes']['kubectl']['binary_path'] = "/usr/local/bin/kubectl"
