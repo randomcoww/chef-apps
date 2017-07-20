@@ -8,8 +8,3 @@ node.default['kubernetes']['docker']['systemd_dropin'] = {
     ]
   }
 }
-
-include_recipe "kubernetes-app::_docker"
-
-include_recipe "kubelet-app::_kubelet"
-include_recipe "kubelet-app::_static_pods"

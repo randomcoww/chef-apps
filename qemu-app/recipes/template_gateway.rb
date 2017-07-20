@@ -5,7 +5,7 @@ node.default['qemu']['current_config']['chef_interval'] = '60min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
-  "recipe[kubelet-app::master_disable_iptables]",
+  "recipe[kubelet-app::master]",
   "recipe[gateway-pod]"
 ]
 
