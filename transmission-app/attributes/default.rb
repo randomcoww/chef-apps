@@ -1,4 +1,5 @@
-node.default['transmission']['pkg_names'] = ['transmission-daemon']
+node.default['transmission']['transmission_package'] = 'transmission-daemon'
+node.default['transmission']['mount_package'] = 'glusterfs-client'
 
 node.default['transmission']['main']['incomplete-dir'] = "/data/transmission/incomplete"
 node.default['transmission']['main']['watch-dir'] = "/data/transmission/watch"
@@ -55,7 +56,7 @@ node.default['transmission']['main']['config'] = {
   "prefetch-enabled" => true,
   "queue-stalled-enabled" => true,
   "queue-stalled-minutes" => 30,
-  "ratio-limit" => 2,
+  "ratio-limit" => 0,
   "ratio-limit-enabled" => false,
   "rename-partial-files" => true,
   "rpc-authentication-required" => false,

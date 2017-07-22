@@ -41,6 +41,7 @@ node.default['kubelet']['static_pods']['kube-apiserver.yaml'] = {
         "name" => "kube-etcd",
         "image" => "quay.io/coreos/etcd:latest",
         "command" => [
+          "/usr/local/bin/etcd",
           "--name",
           "etcd0",
           "--advertise-client-urls",

@@ -1,3 +1,8 @@
+## finally install package and should use existing user
+package node['transmission']['mount_package'] do
+  action :install
+end
+
 directory '/data/transmission' do
   recursive true
   action :create

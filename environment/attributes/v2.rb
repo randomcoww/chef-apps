@@ -54,7 +54,7 @@ node.default['environment_v2']['set']['kea-mysql'] = {
 
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
-    'kube-master1',
+    # 'kube-master1',
     # 'kube-master2',
     # 'kube-master3'
   ]
@@ -62,7 +62,7 @@ node.default['environment_v2']['set']['etcd'] = {
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
-    'kube-master1',
+    # 'kube-master1',
     # 'kube-master2',
     # 'kube-master3'
   ]
@@ -70,8 +70,8 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'kube-worker1',
-    'kube-worker2'
+    # 'kube-worker1',
+    # 'kube-worker2'
   ]
 }
 
@@ -139,27 +139,36 @@ node.default['environment_v2']['host']['kea-mysql2'] = {
   'ip_lan' => "192.168.62.214"
 }
 
-node.default['environment_v2']['host']['kube-master1'] = {
+node.default['environment_v2']['host']['minikube1'] = {
   'ip_lan' => "192.168.62.201"
 }
 
-node.default['environment_v2']['host']['kube-master2'] = {
+node.default['environment_v2']['host']['minikube2'] = {
   'ip_lan' => "192.168.62.202"
 }
 
-node.default['environment_v2']['host']['kube-master3'] = {
-  'ip_lan' => "192.168.62.205"
-}
 
-node.default['environment_v2']['host']['kube-worker1'] = {
-  'ip_lan' => "192.168.62.203",
-  'ip_store' => "169.254.127.203"
-}
-
-node.default['environment_v2']['host']['kube-worker2'] = {
-  'ip_lan' => "192.168.62.204",
-  'ip_store' => "169.254.127.204"
-}
+# node.default['environment_v2']['host']['kube-master1'] = {
+#   'ip_lan' => "192.168.62.201"
+# }
+#
+# node.default['environment_v2']['host']['kube-master2'] = {
+#   'ip_lan' => "192.168.62.202"
+# }
+#
+# node.default['environment_v2']['host']['kube-master3'] = {
+#   'ip_lan' => "192.168.62.205"
+# }
+#
+# node.default['environment_v2']['host']['kube-worker1'] = {
+#   'ip_lan' => "192.168.62.203",
+#   'ip_store' => "169.254.127.203"
+# }
+#
+# node.default['environment_v2']['host']['kube-worker2'] = {
+#   'ip_lan' => "192.168.62.204",
+#   'ip_store' => "169.254.127.204"
+# }
 
 
 ##

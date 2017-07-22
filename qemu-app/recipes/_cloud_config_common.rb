@@ -5,8 +5,10 @@ node.default['qemu']['current_config']['cloud_config'] = {
     "expire" => false
   },
   "ssh_pwauth" => false,
-  "package_upgrade" => true,
-  "apt_upgrade" => true,
+  "package_update" => false,
+  "package_upgrade" => false,
+  "package_reboot_if_required" => false,
+  "cc_resolv_conf" => false,
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
   "runcmd" => node['qemu']['current_config']['runcmd'] + [

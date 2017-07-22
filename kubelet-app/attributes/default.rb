@@ -16,7 +16,6 @@ node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 
 ## pods
 node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
-node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
 node.default['kubernetes']['hyperkube_image'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
 
 ## kubernetes download

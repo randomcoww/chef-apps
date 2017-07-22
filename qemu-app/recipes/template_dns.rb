@@ -4,7 +4,7 @@ node.default['qemu']['current_config']['cloud_config_path'] = "/data/cloud-init/
 node.default['qemu']['current_config']['chef_interval'] = '10min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[kubelet-app::master]",
+  "recipe[kubelet-app::kubelet]",
   "recipe[dns-pod]"
 ]
 

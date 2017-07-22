@@ -15,7 +15,7 @@ user node['transmission']['main']['user'] do
 end
 
 ## finally install package and should use existing user
-package node['transmission']['pkg_names'] do
+package node['transmission']['transmission_package'] do
   action :upgrade
   notifies :stop, "service[transmission-daemon]", :immediately
 end
