@@ -24,56 +24,56 @@ node.default['environment_v2']['set']['gluster'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'kubelet1',
+    'kubelet2'
   ],
   'vip_lan' => "192.168.62.230"
 }
 
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'dns1',
-    'dns2'
+    'kubelet1',
+    'kubelet2'
   ],
   'vip_lan' => "192.168.62.230"
 }
 
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
-    'kea-mysql1',
-    'kea-mysql2'
+    'kubelet1',
+    'kubelet2'
   ]
 }
 
 node.default['environment_v2']['set']['kea-mysql'] = {
   'hosts' => [
-    'kea-mysql1',
-    'kea-mysql2'
+    'kubelet1',
+    'kubelet2'
   ]
 }
 
-node.default['environment_v2']['set']['etcd'] = {
-  'hosts' => [
-    # 'kube-master1',
-    # 'kube-master2',
-    # 'kube-master3'
-  ]
-}
-
-node.default['environment_v2']['set']['kube-master'] = {
-  'hosts' => [
-    # 'kube-master1',
-    # 'kube-master2',
-    # 'kube-master3'
-  ]
-}
-
-node.default['environment_v2']['set']['kube-worker'] = {
-  'hosts' => [
-    # 'kube-worker1',
-    # 'kube-worker2'
-  ]
-}
+# node.default['environment_v2']['set']['etcd'] = {
+#   'hosts' => [
+#     'kube-master1',
+#     'kube-master2',
+#     'kube-master3'
+#   ]
+# }
+#
+# node.default['environment_v2']['set']['kube-master'] = {
+#   'hosts' => [
+#     'kube-master1',
+#     'kube-master2',
+#     'kube-master3'
+#   ]
+# }
+#
+# node.default['environment_v2']['set']['kube-worker'] = {
+#   'hosts' => [
+#     'kube-worker1',
+#     'kube-worker2'
+#   ]
+# }
 
 
 ## hardware override
@@ -121,54 +121,39 @@ node.default['environment_v2']['host']['gateway2'] = {
   'if_wan' => 'eth1',
 }
 
-node.default['environment_v2']['host']['dns1'] = {
-  'ip_lan' => "192.168.62.231",
-  'if_lan' => 'eth0',
-}
-
-node.default['environment_v2']['host']['dns2'] = {
-  'ip_lan' => "192.168.62.232",
-  'if_lan' => 'eth0',
-}
-
-node.default['environment_v2']['host']['kea-mysql1'] = {
-  'ip_lan' => "192.168.62.213"
-}
-
-node.default['environment_v2']['host']['kea-mysql2'] = {
-  'ip_lan' => "192.168.62.214"
-}
-
-node.default['environment_v2']['host']['minikube1'] = {
-  'ip_lan' => "192.168.62.201"
-}
-
-node.default['environment_v2']['host']['minikube2'] = {
-  'ip_lan' => "192.168.62.202"
-}
-
-
-# node.default['environment_v2']['host']['kube-master1'] = {
+# node.default['environment_v2']['host']['dns1'] = {
+#   'ip_lan' => "192.168.62.231",
+#   'if_lan' => 'eth0',
+# }
+#
+# node.default['environment_v2']['host']['dns2'] = {
+#   'ip_lan' => "192.168.62.232",
+#   'if_lan' => 'eth0',
+# }
+#
+# node.default['environment_v2']['host']['kea-mysql1'] = {
+#   'ip_lan' => "192.168.62.213"
+# }
+#
+# node.default['environment_v2']['host']['kea-mysql2'] = {
+#   'ip_lan' => "192.168.62.214"
+# }
+#
+# node.default['environment_v2']['host']['minikube1'] = {
 #   'ip_lan' => "192.168.62.201"
 # }
 #
-# node.default['environment_v2']['host']['kube-master2'] = {
+# node.default['environment_v2']['host']['minikube2'] = {
 #   'ip_lan' => "192.168.62.202"
 # }
-#
-# node.default['environment_v2']['host']['kube-master3'] = {
-#   'ip_lan' => "192.168.62.205"
-# }
-#
-# node.default['environment_v2']['host']['kube-worker1'] = {
-#   'ip_lan' => "192.168.62.203",
-#   'ip_store' => "169.254.127.203"
-# }
-#
-# node.default['environment_v2']['host']['kube-worker2'] = {
-#   'ip_lan' => "192.168.62.204",
-#   'ip_store' => "169.254.127.204"
-# }
+
+node.default['environment_v2']['host']['kubelet1'] = {
+  'ip_lan' => "192.168.62.201"
+}
+
+node.default['environment_v2']['host']['kubelet2'] = {
+  'ip_lan' => "192.168.62.202"
+}
 
 
 ##
@@ -182,18 +167,6 @@ node.default['environment_v2']['host']['unifi1'] = {
 node.default['environment_v2']['host']['transmission1'] = {
   'ip_lan' => "192.168.62.218",
 }
-
-# node.default['environment_v2']['host']['test3'] = {
-#   'ip_lan' => "192.168.62.239"
-# }
-#
-# node.default['environment_v2']['host']['test2'] = {
-#   'ip_lan' => "192.168.62.238"
-# }
-#
-# node.default['environment_v2']['host']['test1'] = {
-#   'ip_lan' => "192.168.62.237"
-# }
 
 
 ##
