@@ -148,11 +148,15 @@ node.default['environment_v2']['host']['gateway2'] = {
 # }
 
 node.default['environment_v2']['host']['kubelet1'] = {
-  'ip_lan' => "192.168.62.201"
+  'ip_lan' => "192.168.62.231",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
 }
 
 node.default['environment_v2']['host']['kubelet2'] = {
-  'ip_lan' => "192.168.62.202"
+  'ip_lan' => "192.168.62.232",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
 }
 
 

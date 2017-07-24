@@ -1,5 +1,5 @@
 kea_mysql_seed 'seed' do
-  url 'https://raw.githubusercontent.com/isc-projects/kea/master/src/share/database/scripts/mysql/dhcpdb_create.mysql'
+  url 'https://raw.githubusercontent.com/randomcoww/chef-apps/master/container/kea-pod/files/default/mysql_cluster_seed.sql'
   options ({
     username: node['mysql_credentials']['kea']['username'],
     password: node['mysql_credentials']['kea']['password'],
