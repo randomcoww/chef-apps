@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: kea-pod
+# Cookbook Name:: haproxy-pod
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

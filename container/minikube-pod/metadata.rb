@@ -1,7 +1,0 @@
-name             'minikube-pod'
-maintainer       'YOUR_NAME'
-maintainer_email 'YOUR_EMAIL'
-license          'All rights reserved'
-description      'Installs/Configures minikube-pod'
-long_description 'Installs/Configures minikube-pod'
-version          '0.1.0'

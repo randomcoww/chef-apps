@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: kea-pod
+# Cookbook Name:: sshd-pod
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

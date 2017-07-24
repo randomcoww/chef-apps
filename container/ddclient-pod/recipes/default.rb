@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: kea-pod
+# Cookbook Name:: ddclient-pod
 # Recipe:: default
 #
 # Copyright (C) 2017 YOUR_NAME

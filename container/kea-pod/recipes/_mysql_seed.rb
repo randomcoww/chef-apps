@@ -1,6 +1,5 @@
 kea_mysql_seed 'seed' do
-  url node['kea']['dhcp4_mysql']['create_tables_sql_source']
-  timeout 300
+  url 'https://raw.githubusercontent.com/isc-projects/kea/master/src/share/database/scripts/mysql/dhcpdb_create.mysql'
   options ({
     username: node['mysql_credentials']['kea']['username'],
     password: node['mysql_credentials']['kea']['password'],

@@ -1,0 +1,7 @@
+name             'sshd-pod'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures sshd-pod'
+long_description 'Installs/Configures sshd-pod'
+version          '0.1.0'
