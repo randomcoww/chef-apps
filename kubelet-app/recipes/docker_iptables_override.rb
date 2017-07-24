@@ -4,8 +4,8 @@ node.default['kubernetes']['docker']['systemd_dropin'] = {
     "RestartSec" => 5,
     "ExecStart" => [
       '',
-      # "/usr/bin/dockerd -H fd:// --log-driver=journald --iptables=false"
-      "/usr/bin/dockerd -H fd:// --log-driver=journald"
+      "/usr/bin/dockerd -H fd:// --log-driver=journald --iptables=false"
+      # "/usr/bin/dockerd -H fd:// --log-driver=journald"
     ]
   }
 }

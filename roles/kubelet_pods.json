@@ -1,0 +1,22 @@
+{
+  "name": "kubelet_pods",
+  "description": "",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[dns-pod::pod_dns]",
+    "recipe[kea-pod::pod_kea]",
+    "recipe[keepalived-pod::pod_keepalived_dns]",
+    "recipe[ddclient-pod::pod_ddclient]",
+    "recipe[sshd-pod::pod_sshd]"
+  ],
+  "env_run_lists": {
+
+  }
+}

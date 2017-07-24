@@ -1,12 +1,11 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['cloud_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}"
 
-node.default['qemu']['current_config']['chef_interval'] = '10min'
+node.default['qemu']['current_config']['chef_interval'] = '5min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
-  "recipe[keepalived-pod::pod_keepalived_gateway]",
-  "recipe[sshd-pod::pod_sshd]",
+  "role[gateway_pods]",
   "recipe[kubelet-app::docker_iptables_override]",
   "recipe[kubelet-app::kubelet]",
 ]

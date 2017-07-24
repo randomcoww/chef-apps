@@ -8,7 +8,7 @@ node.default['kubelet']['static_pods']['sshd.yaml'] = {
   },
   "spec" => {
     "restartPolicy" => "Always",
-    "hostNetwork" => true,
+    # "hostNetwork" => true,
     "containers" => [
       {
         "name" => "sshd",
@@ -27,13 +27,13 @@ node.default['kubelet']['static_pods']['sshd.yaml'] = {
             "value" => node['kubelet']['sshd']['login']
           }
         ],
-        # "ports" => [
-        #   {
-        #     "protocol" => "TCP",
-        #     "containerPort" => 22,
-        #     "hostPort" => 2222,
-        #   }
-        # ]
+        "ports" => [
+          {
+            "protocol" => "TCP",
+            "containerPort" => 22,
+            "hostPort" => 2222,
+          }
+        ]
       }
     ]
   }

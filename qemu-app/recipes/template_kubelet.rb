@@ -5,11 +5,7 @@ node.default['qemu']['current_config']['chef_interval'] = '5min'
 
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[dns-pod::pod_dns]",
-  "recipe[haproxy-pod::pod_haproxy]",
-  "recipe[kea-pod::pod_kea]",
-  "recipe[keepalived-pod::pod_keepalived_haproxy]",
-  "recipe[ddclient-pod::pod_ddclient]",
+  "role[kubelet_pods]",
   "recipe[kubelet-app::kubelet]",
 ]
 
