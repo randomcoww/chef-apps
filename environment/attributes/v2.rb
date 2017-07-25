@@ -24,10 +24,10 @@ node.default['environment_v2']['set']['gluster'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'gateway1',
+    'gateway2'
   ],
-  'vip_lan' => "192.168.62.230"
+  'vip_lan' => "192.168.62.240"
 }
 
 node.default['environment_v2']['set']['dns'] = {
@@ -139,13 +139,13 @@ node.default['environment_v2']['host']['gateway2'] = {
 #   'ip_lan' => "192.168.62.214"
 # }
 #
-# node.default['environment_v2']['host']['minikube1'] = {
-#   'ip_lan' => "192.168.62.201"
-# }
-#
-# node.default['environment_v2']['host']['minikube2'] = {
-#   'ip_lan' => "192.168.62.202"
-# }
+node.default['environment_v2']['host']['minikube1'] = {
+  'ip_lan' => "192.168.62.201"
+}
+
+node.default['environment_v2']['host']['minikube2'] = {
+  'ip_lan' => "192.168.62.202"
+}
 
 node.default['environment_v2']['host']['kubelet1'] = {
   'ip_lan' => "192.168.62.231",
@@ -168,9 +168,9 @@ node.default['environment_v2']['host']['unifi1'] = {
   'ip_lan' => "192.168.62.217",
 }
 
-node.default['environment_v2']['host']['transmission1'] = {
-  'ip_lan' => "192.168.62.218",
-}
+# node.default['environment_v2']['host']['transmission1'] = {
+#   'ip_lan' => "192.168.62.218",
+# }
 
 
 ##
