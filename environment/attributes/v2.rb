@@ -79,7 +79,7 @@ node.default['environment_v2']['set']['kea-mysql'] = {
 ## hardware override
 node.default['environment_v2']['host']['vm1'] = {
   'ip_lan' => '192.168.62.251',
-  'ip_store' => '169.254.127.251',
+  'ip_store' => '192.168.126.251',
   'if_lan' => 'eno1',
   'if_wan' => 'eno2',
   'if_store' => 'ens1',
@@ -94,7 +94,7 @@ node.default['environment_v2']['host']['vm1'] = {
 
 node.default['environment_v2']['host']['vm2'] = {
   'ip_lan' => '192.168.62.252',
-  'ip_store' => '169.254.127.252',
+  'ip_store' => '192.168.126.252',
   'if_lan' => 'eno1',
   'if_wan' => 'eno2',
   'if_store' => 'ens1',
