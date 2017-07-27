@@ -1,5 +1,5 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
-node.default['environment_v2']['subnet']['store'] = "169.254.0.0/16"
+node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 node.default['environment_v2']['subnet']['vpn'] = "192.168.30.0/23"
 node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
 node.default['environment_v2']['subnet']['vpn_dhcp_pool'] = "192.168.30.32/27"
@@ -19,7 +19,7 @@ node.default['environment_v2']['set']['gluster'] = {
     'vm2'
   ],
   'vip_lan' => "192.168.62.250",
-  'vip_store' => "169.254.127.250"
+  'vip_store' => "192.168.126.250"
 }
 
 node.default['environment_v2']['set']['haproxy'] = {
@@ -31,6 +31,14 @@ node.default['environment_v2']['set']['haproxy'] = {
 }
 
 node.default['environment_v2']['set']['dns'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ],
+  'vip_lan' => "192.168.62.230"
+}
+
+node.default['environment_v2']['set']['kubelet'] = {
   'hosts' => [
     'kubelet1',
     'kubelet2'
@@ -80,9 +88,11 @@ node.default['environment_v2']['set']['kea-mysql'] = {
 node.default['environment_v2']['host']['vm1'] = {
   'ip_lan' => '192.168.62.251',
   'ip_store' => '192.168.126.251',
-  'if_lan' => 'eno1',
-  'if_wan' => 'eno2',
-  'if_store' => 'ens1',
+  'if_lan' => 'host_lan',
+  'if_store' => 'host_store',
+  'vf_lan' => 'eno1',
+  'vf_wan' => 'eno2',
+  'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -95,9 +105,11 @@ node.default['environment_v2']['host']['vm1'] = {
 node.default['environment_v2']['host']['vm2'] = {
   'ip_lan' => '192.168.62.252',
   'ip_store' => '192.168.126.252',
-  'if_lan' => 'eno1',
-  'if_wan' => 'eno2',
-  'if_store' => 'ens1',
+  'if_lan' => 'host_lan',
+  'if_store' => 'host_store',
+  'vf_lan' => 'eno1',
+  'vf_wan' => 'eno2',
+  'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -121,30 +133,14 @@ node.default['environment_v2']['host']['gateway2'] = {
   'if_wan' => 'eth1',
 }
 
-# node.default['environment_v2']['host']['dns1'] = {
-#   'ip_lan' => "192.168.62.231",
-#   'if_lan' => 'eth0',
-# }
-#
-# node.default['environment_v2']['host']['dns2'] = {
-#   'ip_lan' => "192.168.62.232",
-#   'if_lan' => 'eth0',
-# }
-#
-# node.default['environment_v2']['host']['kea-mysql1'] = {
-#   'ip_lan' => "192.168.62.213"
-# }
-#
-# node.default['environment_v2']['host']['kea-mysql2'] = {
-#   'ip_lan' => "192.168.62.214"
-# }
-#
 node.default['environment_v2']['host']['minikube1'] = {
-  'ip_lan' => "192.168.62.201"
+  'ip_lan' => "192.168.62.211",
+  'ip_store' => "192.168.126.211"
 }
 
 node.default['environment_v2']['host']['minikube2'] = {
-  'ip_lan' => "192.168.62.202"
+  'ip_lan' => "192.168.62.212",
+  'ip_store' => "192.168.126.212"
 }
 
 node.default['environment_v2']['host']['kubelet1'] = {
