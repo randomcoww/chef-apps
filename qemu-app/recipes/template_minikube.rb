@@ -1,3 +1,26 @@
+# node.default['qemu']['current_config']['hostname'] = 'host'
+node.default['qemu']['current_config']['cloud_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}"
+
+node.default['qemu']['current_config']['chef_interval'] = '10min'
+
+node.default['qemu']['current_config']['chef_recipes'] = [
+  "recipe[system_update::debian]",
+  "recipe[minikube-pod::pod_minikube]",
+  "recipe[kubelet-app::kubelet]",
+]
+
+node.default['qemu']['current_config']['memory'] = 2048
+node.default['qemu']['current_config']['vcpu'] = 2
+
+node.default['qemu']['current_config']['packages'] = [
+  'glusterfs-client'
+]
+
+node.default['qemu']['current_config']['runcmd'] = []
+
+include_recipe "qemu-app::_cloud_config_common"
+# include_recipe "qemu-app::_libvirt_common"
+
 node.default['qemu']['current_config']['libvirt_config'] = {
   "domain"=>{
     "#attributes"=>{
@@ -180,6 +203,21 @@ node.default['qemu']['current_config']['libvirt_config'] = {
               "type"=>"virtio-net"
             }
           }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"network"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "network"=>node['qemu']['libvirt_network_store']
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
         }
       ],
       "serial"=>{
@@ -225,3 +263,9 @@ node.default['qemu']['current_config']['libvirt_config'] = {
     }
   }
 }
+
+include_recipe "qemu-app::_systemd_eth0_static"
+include_recipe "qemu-app::_systemd_eth1_static"
+include_recipe "qemu-app::_systemd_chef-client"
+
+include_recipe "qemu-app::_deploy_common"

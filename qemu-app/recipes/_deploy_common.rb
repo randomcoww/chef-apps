@@ -7,9 +7,9 @@ include_recipe "qemu::install"
 
 ## libvirt networks
 {
-  node['qemu']['libvirt_network_lan'] => node['environment_v2']['current_host']['if_lan'],
-  node['qemu']['libvirt_network_wan'] => node['environment_v2']['current_host']['if_wan'],
-  node['qemu']['libvirt_network_store'] => node['environment_v2']['current_host']['if_store']
+  node['qemu']['libvirt_network_lan'] => node['environment_v2']['current_host']['vf_lan'],
+  node['qemu']['libvirt_network_wan'] => node['environment_v2']['current_host']['vf_wan'],
+  node['qemu']['libvirt_network_store'] => node['environment_v2']['current_host']['vf_store']
 }.each do |name, dev|
 
   qemu_network name do

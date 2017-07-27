@@ -11,6 +11,7 @@ node.default['qemu']['current_config']['cloud_config'] = {
   "cc_resolv_conf" => false,
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
+  "packages" => node['qemu']['current_config']['packages'],
   "runcmd" => node['qemu']['current_config']['runcmd'] + [
     [
       "chef-client", "-o",
