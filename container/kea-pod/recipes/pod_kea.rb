@@ -1,5 +1,7 @@
-include_recipe "kea-pod::_mysql_packages"
-include_recipe "kea-pod::_mysql_seed"
+require 'open-uri'
+
+# include_recipe "kea-pod::_mysql_packages"
+# include_recipe "kea-pod::_mysql_seed"
 include_recipe "kea-pod::_mysql"
 
 include_recipe "kea-pod::_kea_dhcp4"
@@ -110,6 +112,10 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
           {
             "name" => "CONFIG",
             "value" => JSON.pretty_generate(node['kubelet']['dhcp4_mysql']['config'])
+          },
+          {
+            "name" => "INIT",
+            "value" => open('https://raw.githubusercontent.com/randomcoww/chef-apps/master/container/kea-pod/files/default/mysql_cluster_seed.sql').read
           }
         ]
       },
