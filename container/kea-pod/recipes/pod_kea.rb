@@ -1,5 +1,3 @@
-require 'open-uri'
-
 # include_recipe "kea-pod::_mysql_packages"
 # include_recipe "kea-pod::_mysql_seed"
 include_recipe "kea-pod::_mysql"
@@ -79,6 +77,10 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
   "spec" => {
     "restartPolicy" => "Always",
     "hostNetwork" => true,
+    "volumes" => [
+      "name" => "mysql-socket",
+      "emptyDir" => {}
+    ],
     "containers" => [
       {
         "name" => "mysqld",
@@ -100,6 +102,12 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
               %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
             ].join($/)
           }
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "mysql-socket",
+            "mountPath" => "/var/run/mysqld"
+          }
         ]
       },
       {
@@ -115,7 +123,13 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
           },
           {
             "name" => "INIT",
-            "value" => open('https://raw.githubusercontent.com/randomcoww/chef-apps/master/container/kea-pod/files/default/mysql_cluster_seed.sql').read
+            "value" => node['kubelet']['dhcp4_mysql']['sql']
+          }
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "mysql-socket",
+            "mountPath" => "/var/run/mysqld"
           }
         ]
       },

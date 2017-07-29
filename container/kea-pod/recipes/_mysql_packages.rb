@@ -1,3 +1,5 @@
+## deprecated
+
 package 'default-libmysqlclient-dev' do
   action :install
 end

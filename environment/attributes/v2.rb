@@ -164,10 +164,6 @@ node.default['environment_v2']['host']['unifi1'] = {
   'ip_lan' => "192.168.62.217",
 }
 
-# node.default['environment_v2']['host']['transmission1'] = {
-#   'ip_lan' => "192.168.62.218",
-# }
-
 
 ##
 ## hardware

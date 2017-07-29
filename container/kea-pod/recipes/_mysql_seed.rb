@@ -1,3 +1,5 @@
+## deprecated
+
 kea_mysql_seed 'seed' do
   url 'https://raw.githubusercontent.com/randomcoww/chef-apps/master/container/kea-pod/files/default/mysql_cluster_seed.sql'
   options ({
