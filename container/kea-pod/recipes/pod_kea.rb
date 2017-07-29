@@ -77,10 +77,6 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
   "spec" => {
     "restartPolicy" => "Always",
     "hostNetwork" => true,
-    "volumes" => [
-      "name" => "mysql-socket",
-      "emptyDir" => {}
-    ],
     "containers" => [
       {
         "name" => "mysqld",
@@ -102,14 +98,39 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
               %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
             ].join($/)
           }
+        ]
+      }
+    ]
+  }
+}
+
+node.default['kubelet']['static_pods']['kea-mysql.yaml'] = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    "name" => "kea-mysql"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "initContainers" => [
+      {
+        "name" => "kea-mysql-seeder",
+        "image" => node['kube']['images']['mysql_cluster_seeder'],
+        "args" => [
+          "--host=127.0.0.1",
+          "--user=#{node['mysql_credentials']['kea']['username']}",
+          "--password=#{node['mysql_credentials']['kea']['password']}"
         ],
-        "volumeMounts" => [
+        "env" => [
           {
-            "name" => "mysql-socket",
-            "mountPath" => "/var/run/mysqld"
+            "name" => "SQL",
+            "value" => node['kubelet']['dhcp4_mysql']['sql']
           }
         ]
-      },
+      }
+    ],
+    "containers" => [
       {
         "name" => "kea-dhcp4",
         "image" => node['kube']['images']['kea_dhcp4'],
@@ -120,16 +141,6 @@ node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
           {
             "name" => "CONFIG",
             "value" => JSON.pretty_generate(node['kubelet']['dhcp4_mysql']['config'])
-          },
-          {
-            "name" => "INIT",
-            "value" => node['kubelet']['dhcp4_mysql']['sql']
-          }
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "mysql-socket",
-            "mountPath" => "/var/run/mysqld"
           }
         ]
       },
