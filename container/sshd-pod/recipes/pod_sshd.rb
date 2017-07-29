@@ -30,7 +30,7 @@ node.default['kubelet']['static_pods']['sshd.yaml'] = {
         "ports" => [
           {
             "protocol" => "TCP",
-            "containerPort" => 22,
+            "containerPort" => 2222,
             "hostPort" => 2222,
           }
         ]

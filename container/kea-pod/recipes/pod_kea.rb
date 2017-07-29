@@ -33,44 +33,6 @@ node.default['kubelet']['static_pods']['kea-mysql-mgmd.yaml'] = {
   }
 }
 
-
-node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "kea-mysql-mysqld"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "mysqld",
-        "image" => node['kube']['images']['mysql_cluster_mysqld'],
-        "args" => [
-          "--ndbcluster",
-          "--default_storage_engine=ndbcluster",
-          "--bind-address=0.0.0.0",
-          %Q{--ndb-connectstring=#{node['environment_v2']['set']['kea-mysql-mgmd']['hosts'].map { |e|
-              node['environment_v2']['host'][e]['ip_lan']
-            }.join(',')}}
-        ],
-        "env" => [
-          {
-            "name" => "INIT",
-            "value" => [
-              %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
-              %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'%' IDENTIFIED BY '#{node['mysql_credentials']['kea']['password']}';},
-              %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
-            ].join($/)
-          }
-        ]
-      }
-    ]
-  }
-}
-
-
 node.default['kubelet']['static_pods']['kea-mysql-ndbd.yaml'] = {
   "apiVersion" => "v1",
   "kind" => "Pod",
@@ -106,17 +68,38 @@ node.default['kubelet']['static_pods']['kea-mysql-ndbd.yaml'] = {
   }
 }
 
-
-node.default['kubelet']['static_pods']['kea.yaml'] = {
+node.default['kubelet']['static_pods']['kea-mysql-mysqld.yaml'] = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {
-    "name" => "kea-dhcp4"
+    "name" => "kea-mysql-mysqld"
   },
   "spec" => {
     "restartPolicy" => "Always",
     "hostNetwork" => true,
     "containers" => [
+      {
+        "name" => "mysqld",
+        "image" => node['kube']['images']['mysql_cluster_mysqld'],
+        "args" => [
+          "--ndbcluster",
+          "--default_storage_engine=ndbcluster",
+          "--bind-address=0.0.0.0",
+          %Q{--ndb-connectstring=#{node['environment_v2']['set']['kea-mysql-mgmd']['hosts'].map { |e|
+              node['environment_v2']['host'][e]['ip_lan']
+            }.join(',')}}
+        ],
+        "env" => [
+          {
+            "name" => "INIT",
+            "value" => [
+              %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
+              %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'%' IDENTIFIED BY '#{node['mysql_credentials']['kea']['password']}';},
+              %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
+            ].join($/)
+          }
+        ]
+      },
       {
         "name" => "kea-dhcp4",
         "image" => node['kube']['images']['kea_dhcp4'],
@@ -129,35 +112,20 @@ node.default['kubelet']['static_pods']['kea.yaml'] = {
             "value" => JSON.pretty_generate(node['kubelet']['dhcp4_mysql']['config'])
           }
         ]
-      }
+      },
+      # {
+      #   "name" => "kea-dhcp-ddns",
+      #   "image" => node['kube']['images']['kea_dhcp_ddns'],
+      #   "args" => [
+      #     "kea-dhcp-ddns"
+      #   ],
+      #   "env" => [
+      #     {
+      #       "name" => "CONFIG",
+      #       "value" => JSON.pretty_generate(node['kubelet']['ddns']['config'])
+      #     }
+      #   ]
+      # }
     ]
   }
 }
-
-
-# node.default['kubelet']['static_pods']['kea.yaml'] = {
-#   "apiVersion" => "v1",
-#   "kind" => "Pod",
-#   "metadata" => {
-#     "name" => "kea-dhcp-ddns"
-#   },
-#   "spec" => {
-#     "restartPolicy" => "Always",
-#     "hostNetwork" => true,
-#     "containers" => [
-#       {
-#         "name" => "kea-dhcp-ddns",
-#         "image" => node['kube']['images']['kea_dhcp_ddns'],
-#         "args" => [
-#           "kea-dhcp-ddns"
-#         ],
-#         "env" => [
-#           {
-#             "name" => "CONFIG",
-#             "value" => JSON.pretty_generate(node['kubelet']['ddns']['config'])
-#           }
-#         ]
-#       }
-#     ]
-#   }
-# }
