@@ -27,7 +27,7 @@ node.default['environment_v2']['set']['haproxy'] = {
     'kubelet1',
     'kubelet2'
   ],
-  'vip_lan' => "192.168.62.240"
+  'vip_lan' => "192.168.62.220"
 }
 
 node.default['environment_v2']['set']['dns'] = {
