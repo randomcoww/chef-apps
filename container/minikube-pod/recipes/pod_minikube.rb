@@ -51,6 +51,7 @@ node.default['kubelet']['static_pods']['etcd.yaml'] = {
   }
 }
 
+
 node.default['kubelet']['static_pods']['kube-apiserver.yaml'] = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -99,7 +100,23 @@ node.default['kubelet']['static_pods']['kube-apiserver.yaml'] = {
           "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         }
-      },
+      }
+    ]
+  }
+}
+
+
+node.default['kubelet']['static_pods']['kube-controller-manager.yaml'] = {
+  "kind" => "Pod",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "namespace" => "kube-system",
+    "name" => "kube-controller-manager"
+  },
+  "spec" => {
+    "hostNetwork" => true,
+    "restartPolicy" => 'Always',
+    "containers" => [
       {
         "name" => "kube-controller-manager",
         "image" => node['kubernetes']['hyperkube_image'],
@@ -122,7 +139,23 @@ node.default['kubelet']['static_pods']['kube-apiserver.yaml'] = {
           "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         }
-      },
+      }
+    ]
+  }
+}
+
+
+node.default['kubelet']['static_pods']['kube-scheduler.yaml'] = {
+  "kind" => "Pod",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "namespace" => "kube-system",
+    "name" => "kube-scheduler"
+  },
+  "spec" => {
+    "hostNetwork" => true,
+    "restartPolicy" => 'Always',
+    "containers" => [
       {
         "name" => "kube-scheduler",
         "image" => node['kubernetes']['hyperkube_image'],

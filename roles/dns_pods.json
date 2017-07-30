@@ -10,7 +10,8 @@
   },
   "chef_type": "role",
   "run_list": [
-    "recipe[dns-pod::pod_dns]"
+    "recipe[dns-pod::pod_dns]",
+    "recipe[keepalived-pod::pod_keepalived_dns]"
   ],
   "env_run_lists": {
 

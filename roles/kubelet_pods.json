@@ -10,12 +10,11 @@
   },
   "chef_type": "role",
   "run_list": [
-    "recipe[dns-pod::pod_dns]",
     "recipe[kea-pod::pod_kea]",
-    "recipe[keepalived-pod::pod_keepalived_dns]",
     "recipe[ddclient-pod::pod_ddclient]",
     "recipe[sshd-pod::pod_sshd]",
-    "recipe[haproxy-pod::pod_haproxy]"
+    "recipe[haproxy-pod::pod_haproxy]",
+    "recipe[keepalived-pod::pod_keepalived_haproxy]"
   ],
   "env_run_lists": {
 
