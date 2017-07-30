@@ -38,13 +38,13 @@ node.default['environment_v2']['set']['dns'] = {
   'vip_lan' => "192.168.62.230"
 }
 
-node.default['environment_v2']['set']['kubelet'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ],
-  'vip_lan' => "192.168.62.230"
-}
+# node.default['environment_v2']['set']['kubelet'] = {
+#   'hosts' => [
+#     'kubelet1',
+#     'kubelet2'
+#   ],
+#   'vip_lan' => "192.168.62.230"
+# }
 
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
