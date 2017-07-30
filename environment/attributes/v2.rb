@@ -32,8 +32,8 @@ node.default['environment_v2']['set']['haproxy'] = {
 
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'dns1',
+    'dns2'
   ],
   'vip_lan' => "192.168.62.230"
 }
@@ -141,6 +141,16 @@ node.default['environment_v2']['host']['minikube1'] = {
 node.default['environment_v2']['host']['minikube2'] = {
   'ip_lan' => "192.168.62.212",
   'ip_store' => "192.168.126.212"
+}
+
+node.default['environment_v2']['host']['dns1'] = {
+  'ip_lan' => "192.168.62.221",
+  'if_lan' => 'eth0',
+}
+
+node.default['environment_v2']['host']['dns2'] = {
+  'ip_lan' => "192.168.62.222",
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['kubelet1'] = {

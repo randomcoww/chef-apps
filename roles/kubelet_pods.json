@@ -14,7 +14,8 @@
     "recipe[kea-pod::pod_kea]",
     "recipe[keepalived-pod::pod_keepalived_dns]",
     "recipe[ddclient-pod::pod_ddclient]",
-    "recipe[sshd-pod::pod_sshd]"
+    "recipe[sshd-pod::pod_sshd]",
+    "recipe[haproxy-pod::pod_haproxy]"
   ],
   "env_run_lists": {
 

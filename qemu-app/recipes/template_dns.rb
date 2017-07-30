@@ -5,12 +5,12 @@ node.default['qemu']['current_config']['chef_interval'] = '5min'
 
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "role[kubelet_pods]",
+  "role[dns_pods]",
   "recipe[kubelet-app::kubelet]",
 ]
 
-node.default['qemu']['current_config']['memory'] = 2048
-node.default['qemu']['current_config']['vcpu'] = 4
+node.default['qemu']['current_config']['memory'] = 512
+node.default['qemu']['current_config']['vcpu'] = 2
 
 node.default['qemu']['current_config']['packages'] = []
 node.default['qemu']['current_config']['runcmd'] = []

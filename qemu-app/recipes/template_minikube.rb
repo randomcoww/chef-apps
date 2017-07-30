@@ -10,7 +10,7 @@ node.default['qemu']['current_config']['chef_recipes'] = [
 ]
 
 node.default['qemu']['current_config']['memory'] = 2048
-node.default['qemu']['current_config']['vcpu'] = 2
+node.default['qemu']['current_config']['vcpu'] = 4
 
 node.default['qemu']['current_config']['packages'] = [
   'glusterfs-client'

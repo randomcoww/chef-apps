@@ -11,7 +11,7 @@ node.default['kubelet']['keepalived']['config'] = KeepalivedHelper::ConfigGenera
   'vrrp_instance VI_haproxy' => [
     {
       'state' => 'BACKUP',
-      'virtual_router_id' => 21,
+      'virtual_router_id' => 22,
       'interface' => node['environment_v2']['current_host']['if_lan'],
       'priority' => 100,
       'authentication' => [

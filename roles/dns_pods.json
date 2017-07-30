@@ -1,5 +1,5 @@
 {
-  "name": "gateway_pods",
+  "name": "dns_pods",
   "description": "",
   "json_class": "Chef::Role",
   "default_attributes": {
@@ -10,8 +10,7 @@
   },
   "chef_type": "role",
   "run_list": [
-    "recipe[keepalived-pod::pod_keepalived_gateway]",
-    "recipe[haproxy-pod::pod_haproxy]"
+    "recipe[dns-pod::pod_dns]"
   ],
   "env_run_lists": {
 

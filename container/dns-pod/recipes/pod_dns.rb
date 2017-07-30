@@ -12,6 +12,7 @@ node.default['kubelet']['static_pods']['dns.yaml'] = {
   },
   "spec" => {
     "restartPolicy" => "Always",
+    "hostNetwork" => true,
     "containers" => [
       {
         "name" => "unbound",
@@ -22,13 +23,13 @@ node.default['kubelet']['static_pods']['dns.yaml'] = {
             "value" => node['kubelet']['unbound']['config']
           }
         ],
-        "ports" => [
-          {
-            "protocol" => "UDP",
-            "containerPort" => 53,
-            "hostPort" => 53,
-          }
-        ]
+        # "ports" => [
+        #   {
+        #     "protocol" => "UDP",
+        #     "containerPort" => 53,
+        #     "hostPort" => 53,
+        #   }
+        # ]
       },
       {
         "name" => "knot",
@@ -54,12 +55,9 @@ node.default['kubelet']['static_pods']['dns.yaml'] = {
             ]
           }
         },
-        "args" => [
-          "--route 10.0.0.0 255.0.0.0 net_gateway",
-          "--route 172.16.0.0 255.240.0.0 net_gateway",
-          "--route 192.168.0.0 255.255.0.0 net_gateway",
-          # "--route 169.254.0.0 255.255.0.0 net_gateway"
-        ],
+        # "args" => [
+        #   "--route 192.168.0.0 255.255.0.0 net_gateway",
+        # ],
         "env" => [
           {
             "name" => "OVPN_CONFIG",
