@@ -24,8 +24,8 @@ node.default['environment_v2']['set']['gluster'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'kubelet1',
+    'kubelet2'
   ],
   'vip_lan' => "192.168.62.240"
 }

@@ -5,9 +5,7 @@ node.default['qemu']['current_config']['chef_interval'] = '5min'
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
   "recipe[nftables-app::gateway]",
-  "role[gateway_pods]",
-  "recipe[kubelet-app::docker_iptables_override]",
-  "recipe[kubelet-app::kubelet]",
+  "recipe[keepalived-app::gateway]"
 ]
 
 node.default['qemu']['current_config']['memory'] = 512
