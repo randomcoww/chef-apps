@@ -114,16 +114,6 @@ node.default['environment_v2']['host']['gateway2'] = {
   'if_wan' => 'eth1',
 }
 
-node.default['environment_v2']['host']['minikube1'] = {
-  'ip_lan' => "192.168.62.211",
-  'ip_store' => "192.168.126.211"
-}
-
-node.default['environment_v2']['host']['minikube2'] = {
-  'ip_lan' => "192.168.62.212",
-  'ip_store' => "192.168.126.212"
-}
-
 node.default['environment_v2']['host']['dns1'] = {
   'ip_lan' => "192.168.62.221",
   'if_lan' => 'eth0',
@@ -160,12 +150,18 @@ node.default['environment_v2']['host']['kube-node2'] = {
   'if_store' => 'eth1'
 }
 
+
 ##
 ## one off
 ##
 
 node.default['environment_v2']['host']['unifi1'] = {
   'ip_lan' => "192.168.62.217",
+}
+
+node.default['environment_v2']['host']['gamestream'] = {
+  'ip_lan' => '192.168.63.99',
+  'mac_lan' => '52:54:00:ac:da:f3'
 }
 
 
@@ -217,11 +213,6 @@ node.default['environment_v2']['host']['vm2-ipmi'] = {
 
 node.default['environment_v2']['host']['sw'] = {
   'ip_lan' => '192.168.63.95'
-}
-
-node.default['environment_v2']['host']['gamestream'] = {
-  'ip_lan' => '192.168.63.99',
-  'mac_lan' => '52:54:00:ac:da:f3'
 }
 
 
