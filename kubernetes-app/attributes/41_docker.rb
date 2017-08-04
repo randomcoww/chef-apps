@@ -1,5 +1,3 @@
-node.default['kubernetes']['docker']['pkg_names'] = ['docker-ce']
-
 node.default['kubernetes']['docker']['systemd_dropin'] = {
   'Unit' => {
     'After' => 'flannel.service',

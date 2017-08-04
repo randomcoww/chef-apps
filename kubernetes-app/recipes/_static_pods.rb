@@ -1,3 +1,12 @@
+[
+  node['kubernetes']['manifests_path'],
+].each do |d|
+  directory d do
+    recursive true
+    action [:create]
+  end
+end
+
 node['kubernetes']['static_pods'].each do |f, config|
   kubernetes_pod ::File.join(node['kubernetes']['manifests_path'], f) do
     config config

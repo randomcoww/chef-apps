@@ -1,3 +1,45 @@
+node.default['kubernetes']['static_pods']['etcd.yaml'] = {
+  "kind" => "Pod",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "namespace" => "kube-system",
+    "name" => "etcd"
+  },
+  "spec" => {
+    "hostNetwork" => true,
+    "restartPolicy" => 'Always',
+    "containers" => [
+      {
+        "name" => "kube-etcd",
+        "image" => "quay.io/coreos/etcd:latest",
+        "command" => [
+          "/usr/local/bin/etcd",
+          "--data-dir=/var/lib/etcd"
+        ],
+        "env" => node['kubernetes']['etcd']['environment'].map { |k, v|
+          {
+            "name" => k,
+            "value" => v
+          }
+        },
+        "volumeMounts" => [
+          {
+            "mountPath" => "/var/lib/etcd",
+            "name" => "etcd-data"
+          }
+        ]
+      }
+    ],
+    "volumes" => [
+      {
+        "name" => "etcd-data",
+        "emptyDir" => {}
+      }
+    ]
+  }
+}
+
+
 node.default['kubernetes']['static_pods']['kube-apiserver.yaml'] = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -20,7 +62,7 @@ node.default['kubernetes']['static_pods']['kube-apiserver.yaml'] = {
           # "--address=127.0.0.1",
           "--secure-port=#{node['kubernetes']['secure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=#{node['kubernetes']['etcd']['nodes']}",
+          "--etcd-servers=http://127.0.0.1:2379",
           "--tls-cert-file=#{node['kubernetes']['cert_path']}",
           "--tls-private-key-file=#{node['kubernetes']['key_path']}",
           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
@@ -184,52 +226,52 @@ node.default['kubernetes']['static_pods']['kube-scheduler.yaml'] = {
   }
 }
 
-node.default['kubernetes']['static_pods']['kube-addon-manager.yaml'] = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "kube-addon-manager",
-    "namespace" => "kube-system",
-    "labels" => {
-      "component" => "kube-addon-manager"
-    }
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "kube-addon-manager",
-        "image" => "gcr.io/google-containers/kube-addon-manager:v6.1",
-        "command" => [
-          "/bin/bash",
-          "-c",
-          "/opt/kube-addons.sh"
-        ],
-        "resources" => {
-          "requests" => {
-            "cpu" => "5m",
-            "memory" => "50Mi"
-          }
-        },
-        "volumeMounts" => [
-          {
-            "mountPath" => node['kubernetes']['addons_path'],
-            "name" => "addons",
-            "readOnly" => true
-          }
-        ]
-      }
-    ],
-    "volumes" => [
-      {
-        "hostPath" => {
-          "path" => node['kubernetes']['addons_path']
-        },
-        "name" => "addons"
-      }
-    ]
-  }
-}
+# node.default['kubernetes']['static_pods']['kube-addon-manager.yaml'] = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     "name" => "kube-addon-manager",
+#     "namespace" => "kube-system",
+#     "labels" => {
+#       "component" => "kube-addon-manager"
+#     }
+#   },
+#   "spec" => {
+#     "hostNetwork" => true,
+#     "containers" => [
+#       {
+#         "name" => "kube-addon-manager",
+#         "image" => "gcr.io/google-containers/kube-addon-manager:v6.1",
+#         "command" => [
+#           "/bin/bash",
+#           "-c",
+#           "/opt/kube-addons.sh"
+#         ],
+#         "resources" => {
+#           "requests" => {
+#             "cpu" => "5m",
+#             "memory" => "50Mi"
+#           }
+#         },
+#         "volumeMounts" => [
+#           {
+#             "mountPath" => node['kubernetes']['addons_path'],
+#             "name" => "addons",
+#             "readOnly" => true
+#           }
+#         ]
+#       }
+#     ],
+#     "volumes" => [
+#       {
+#         "hostPath" => {
+#           "path" => node['kubernetes']['addons_path']
+#         },
+#         "name" => "addons"
+#       }
+#     ]
+#   }
+# }
 
 # node.default['kubernetes']['static_pods']['kubernetes-dashboard.yaml'] = {
 #   "apiVersion" => "v1",

@@ -1,6 +1,4 @@
-node.default['kubernetes']['flannel']['pkg_names'] = ['flannel']
-
-node.default['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS'] = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+node.default['kubernetes']['flannel']['environment']['FLANNELD_ETCD_ENDPOINTS'] = node['environment_v2']['set']['etcd-flannel']['hosts'].map { |e|
     "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379"
   }.join(',')
 

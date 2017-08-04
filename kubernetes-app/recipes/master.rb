@@ -1,30 +1,16 @@
-include_recipe "kubernetes-app::_etcd"
 include_recipe "kubernetes-app::_flannel"
 include_recipe "kubernetes-app::_docker"
+include_recipe "kubernetes-app::_static_pods"
 
-
-[
-  'kubelet',
-  'kube_proxy',
-].each do |e|
-  remote_file node['kubernetes'][e]['binary_path'] do
-    source node['kubernetes'][e]['remote_file']
-    mode '0750'
-    action :create_if_missing
-  end
-end
 
 [
   node['kubernetes']['srv_path'],
-  node['kubernetes']['manifests_path'],
-  node['kubernetes']['addons_path'],
 ].each do |d|
   directory d do
     recursive true
     action [:create]
   end
 end
-
 
 ## ssl
 kubernetes_ca 'ca' do
@@ -54,21 +40,25 @@ kubernetes_node_cert 'master' do
 end
 
 
+[
+  'kubelet',
+  'kube_proxy',
+].each do |e|
+  remote_file node['kubernetes'][e]['binary_path'] do
+    source node['kubernetes'][e]['remote_file']
+    mode '0750'
+    action :create_if_missing
+  end
+end
+
 ## kubelet
 systemd_unit 'kubelet.service' do
   content node['kube_master']['kubelet']['systemd']
   action [:create, :enable, :start]
-  subscribes :restart, "kubernetes_ca[ca]", :delayed
 end
-
 
 ## kube-proxy
 systemd_unit 'kube-proxy.service' do
   content node['kube_master']['kube_proxy']['systemd']
   action [:create, :enable, :start]
-  subscribes :restart, "kubernetes_ca[ca]", :delayed
 end
-
-
-include_recipe "kubernetes-app::_static_pods"
-include_recipe "kubernetes-app::_addons"

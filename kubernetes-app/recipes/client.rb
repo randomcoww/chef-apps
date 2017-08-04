@@ -8,6 +8,7 @@
   end
 end
 
+
 [
   node['kubernetes']['srv_path'],
 ].each do |d|
@@ -16,7 +17,6 @@ end
     action [:create]
   end
 end
-
 
 ## ssl
 kubernetes_ca 'ca' do

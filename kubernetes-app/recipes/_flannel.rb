@@ -1,8 +1,3 @@
-# package node['kubernetes']['flannel']['pkg_names'] do
-#   action :install
-#   notifies :stop, "service[flannel]", :immediately
-# end
-
 systemd_unit "flannel.service" do
   content node['kubernetes']['flannel']['systemd_unit']
   action [:create]

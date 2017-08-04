@@ -1,18 +1,7 @@
-include_recipe "kubernetes-app::_etcd_client"
 include_recipe "kubernetes-app::_flannel"
 include_recipe "kubernetes-app::_docker"
+include_recipe "kubernetes-app::_static_pods"
 
-
-[
-  'kubelet',
-  'kube_proxy',
-].each do |e|
-  remote_file node['kubernetes'][e]['binary_path'] do
-    source node['kubernetes'][e]['remote_file']
-    mode '0750'
-    action :create_if_missing
-  end
-end
 
 [
   node['kubernetes']['srv_path']
@@ -22,7 +11,6 @@ end
     action [:create]
   end
 end
-
 
 kubernetes_ca 'ca' do
   data_bag 'deploy_config'
@@ -45,10 +33,14 @@ kubernetes_node_cert 'worker' do
 end
 
 
-## kubelet
-directory ::File.dirname(node['kube_worker']['kubelet']['kubeconfig_path']) do
-  recursive true
-  action [:create]
+[
+  node['kube_worker']['kubelet']['kubeconfig_path'],
+  node['kube_worker']['kube_proxy']['kubeconfig_path']
+].each do |d|
+  directory ::File.dirname(d) do
+    recursive true
+    action [:create]
+  end
 end
 
 file node['kube_worker']['kubelet']['kubeconfig_path'] do
@@ -56,22 +48,27 @@ file node['kube_worker']['kubelet']['kubeconfig_path'] do
   action :create
 end
 
+file node['kube_worker']['kube_proxy']['kubeconfig_path'] do
+  content node['kube_worker']['kube_proxy']['kubeconfig'].to_hash.to_yaml
+  action :create
+end
+
+
+[
+  'kubelet',
+  'kube_proxy',
+].each do |e|
+  remote_file node['kubernetes'][e]['binary_path'] do
+    source node['kubernetes'][e]['remote_file']
+    mode '0750'
+    action :create_if_missing
+  end
+end
+
 systemd_unit 'kubelet.service' do
   content node['kube_worker']['kubelet']['systemd']
   action [:create, :enable, :start]
   subscribes :restart, "kubernetes_ca[ca]", :delayed
-end
-
-
-## kube-proxy
-directory ::File.dirname(node['kube_worker']['kube_proxy']['kubeconfig_path']) do
-  recursive true
-  action [:create]
-end
-
-file node['kube_worker']['kube_proxy']['kubeconfig_path'] do
-  content node['kube_worker']['kube_proxy']['kubeconfig'].to_hash.to_yaml
-  action :create
 end
 
 systemd_unit 'kube-proxy.service' do
