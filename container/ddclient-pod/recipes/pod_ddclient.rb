@@ -8,7 +8,7 @@ node.default['kubelet']['static_pods']['ddclient.yaml'] = {
   },
   "spec" => {
     "restartPolicy" => "Always",
-    "hostNetwork" => true,
+    # "hostNetwork" => true,
     "containers" => [
       {
         "name" => "ddclient",
