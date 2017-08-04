@@ -1,5 +1,5 @@
 {
-  "name": "kubelet_pods",
+  "name": "kube-node_pods",
   "description": "",
   "json_class": "Chef::Role",
   "default_attributes": {
@@ -10,8 +10,8 @@
   },
   "chef_type": "role",
   "run_list": [
-    "recipe[kea-pod::pod_kea]",
-    "recipe[etcd-pod::pod_etcd_flannel]"
+    "recipe[haproxy-pod::pod_haproxy]",
+    "recipe[keepalived-pod::pod_keepalived_haproxy]"
   ],
   "env_run_lists": {
 
