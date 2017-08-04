@@ -22,14 +22,6 @@ node.default['environment_v2']['set']['gluster'] = {
   'vip_store' => "192.168.126.250"
 }
 
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ],
-  'vip_lan' => "192.168.62.220"
-}
-
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
     'dns1',
@@ -38,13 +30,26 @@ node.default['environment_v2']['set']['dns'] = {
   'vip_lan' => "192.168.62.230"
 }
 
-# node.default['environment_v2']['set']['kubelet'] = {
-#   'hosts' => [
-#     'kubelet1',
-#     'kubelet2'
-#   ],
-#   'vip_lan' => "192.168.62.230"
-# }
+
+##
+## kubelet nodes
+##
+
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ],
+  'vip_lan' => "192.168.62.220"
+}
+
+node.default['environment_v2']['set']['sshd'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ],
+  'vip_lan' => "192.168.62.220"
+}
 
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
@@ -60,14 +65,21 @@ node.default['environment_v2']['set']['kea-mysql'] = {
   ]
 }
 
-# node.default['environment_v2']['set']['etcd'] = {
-#   'hosts' => [
-#     'kube-master1',
-#     'kube-master2',
-#     'kube-master3'
-#   ]
-# }
-#
+node.default['environment_v2']['set']['etcd-flannel'] = {
+  'hosts' => [
+    'kubelet1',
+    'kubelet2'
+  ]
+}
+
+node.default['environment_v2']['set']['etcd-kube'] = {
+  'hosts' => [
+    'kube-node1',
+    'kube-node2'
+  ]
+}
+
+
 # node.default['environment_v2']['set']['kube-master'] = {
 #   'hosts' => [
 #     'kube-master1',
@@ -84,40 +96,9 @@ node.default['environment_v2']['set']['kea-mysql'] = {
 # }
 
 
-## hardware override
-node.default['environment_v2']['host']['vm1'] = {
-  'ip_lan' => '192.168.62.251',
-  'ip_store' => '192.168.126.251',
-  'if_lan' => 'host_lan',
-  'if_store' => 'host_store',
-  'vf_lan' => 'eno1',
-  'vf_wan' => 'eno2',
-  'vf_store' => 'ens1',
-  # 'passthrough_hba' => {
-  #   'domain' => "0x0000",
-  #   'bus' => "0x01",
-  #   'slot' => "0x00",
-  #   'function' => "0x0",
-  #   'file' => "/data/kvm/firmware/mptsas3.rom"
-  # }
-}
-
-node.default['environment_v2']['host']['vm2'] = {
-  'ip_lan' => '192.168.62.252',
-  'ip_store' => '192.168.126.252',
-  'if_lan' => 'host_lan',
-  'if_store' => 'host_store',
-  'vf_lan' => 'eno1',
-  'vf_wan' => 'eno2',
-  'vf_store' => 'ens1',
-  # 'passthrough_hba' => {
-  #   'domain' => "0x0000",
-  #   'bus' => "0x01",
-  #   'slot' => "0x00",
-  #   'function' => "0x0",
-  #   'file' => "/data/kvm/firmware/mptsas3.rom"
-  # }
-}
+##
+## hosts
+##
 
 node.default['environment_v2']['host']['gateway1'] = {
   'ip_lan' => "192.168.62.241",
@@ -165,9 +146,22 @@ node.default['environment_v2']['host']['kubelet2'] = {
   'if_store' => 'eth1',
 }
 
+node.default['environment_v2']['host']['kube-node1'] = {
+  'ip_lan' => "192.168.62.233",
+  'ip_store' => "192.168.126.233",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1'
+}
+
+node.default['environment_v2']['host']['kube-node2'] = {
+  'ip_lan' => "192.168.62.234",
+  'ip_store' => "192.168.126.234",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1'
+}
 
 ##
-## one offs..
+## one off
 ##
 
 node.default['environment_v2']['host']['unifi1'] = {
@@ -178,6 +172,40 @@ node.default['environment_v2']['host']['unifi1'] = {
 ##
 ## hardware
 ##
+
+node.default['environment_v2']['host']['vm1'] = {
+  'ip_lan' => '192.168.62.251',
+  'ip_store' => '192.168.126.251',
+  'if_lan' => 'host_lan',
+  'if_store' => 'host_store',
+  'vf_lan' => 'eno1',
+  'vf_wan' => 'eno2',
+  'vf_store' => 'ens1',
+  # 'passthrough_hba' => {
+  #   'domain' => "0x0000",
+  #   'bus' => "0x01",
+  #   'slot' => "0x00",
+  #   'function' => "0x0",
+  #   'file' => "/data/kvm/firmware/mptsas3.rom"
+  # }
+}
+
+node.default['environment_v2']['host']['vm2'] = {
+  'ip_lan' => '192.168.62.252',
+  'ip_store' => '192.168.126.252',
+  'if_lan' => 'host_lan',
+  'if_store' => 'host_store',
+  'vf_lan' => 'eno1',
+  'vf_wan' => 'eno2',
+  'vf_store' => 'ens1',
+  # 'passthrough_hba' => {
+  #   'domain' => "0x0000",
+  #   'bus' => "0x01",
+  #   'slot' => "0x00",
+  #   'function' => "0x0",
+  #   'file' => "/data/kvm/firmware/mptsas3.rom"
+  # }
+}
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
   'ip_lan' => '192.168.63.61'
