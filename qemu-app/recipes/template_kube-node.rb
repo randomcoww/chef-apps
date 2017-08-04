@@ -19,12 +19,7 @@ node.default['qemu']['current_config']['packages'] = [
 ]
 
 node.default['qemu']['current_config']['runcmd'] = [
-  'wget -O /tmp/etcd.tar.gz https://github.com/coreos/etcd/releases/download/v3.2.4/etcd-v3.2.4-linux-amd64.tar.gz',
-  'tar xzf /tmp/etcd.tar.gz --wildcards --strip-components=1 -C /usr/local/bin */etcdctl */etcd',
-  'wget -O /tmp/flannel.tar.gz https://github.com/coreos/flannel/releases/download/v0.8.0/flannel-v0.8.0-linux-amd64.tar.gz',
-  "tar xzf /tmp/flannel.tar.gz -C /usr/local/bin 'flanneld'",
-  'wget -O /tmp/cni-plugins.tar.gz https://github.com/containernetworking/plugins/releases/download/v0.6.0-rc1/cni-plugins-amd64-v0.6.0-rc1.tgz',
-  'mkdir -p /opt/cni/bin/ && tar xzf /tmp/cni-plugins.tar.gz -C /opt/cni/bin'
+
 ]
 
 include_recipe "qemu-app::_cloud_config_common"
