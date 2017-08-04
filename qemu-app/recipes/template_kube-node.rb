@@ -5,7 +5,7 @@ node.default['qemu']['current_config']['chef_interval'] = '10min'
 
 node.default['qemu']['current_config']['chef_recipes'] = [
   "recipe[system_update::debian]",
-  "recipe[minikube-pod::pod_minikube]",
+  "role[kube-node_pods]",
   "recipe[kubernetes-app::master]",
 ]
 
@@ -18,9 +18,7 @@ node.default['qemu']['current_config']['packages'] = [
   'socat'
 ]
 
-node.default['qemu']['current_config']['runcmd'] = [
-
-]
+node.default['qemu']['current_config']['runcmd'] = []
 
 include_recipe "qemu-app::_cloud_config_common"
 # include_recipe "qemu-app::_libvirt_common"
