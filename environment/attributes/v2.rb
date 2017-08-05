@@ -30,27 +30,6 @@ node.default['environment_v2']['set']['dns'] = {
   'vip_lan' => "192.168.62.230"
 }
 
-
-##
-## kubelet nodes
-##
-
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ],
-  'vip_lan' => "192.168.62.220"
-}
-
-node.default['environment_v2']['set']['sshd'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ],
-  'vip_lan' => "192.168.62.220"
-}
-
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
     'kubelet1',
@@ -72,28 +51,20 @@ node.default['environment_v2']['set']['etcd-flannel'] = {
   ]
 }
 
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'kube-node1',
+    'kube-node2'
+  ],
+  'vip_lan' => "192.168.62.220"
+}
+
 node.default['environment_v2']['set']['etcd-kube'] = {
   'hosts' => [
     'kube-node1',
     'kube-node2'
   ]
 }
-
-
-# node.default['environment_v2']['set']['kube-master'] = {
-#   'hosts' => [
-#     'kube-master1',
-#     'kube-master2',
-#     'kube-master3'
-#   ]
-# }
-#
-# node.default['environment_v2']['set']['kube-worker'] = {
-#   'hosts' => [
-#     'kube-worker1',
-#     'kube-worker2'
-#   ]
-# }
 
 
 ##
