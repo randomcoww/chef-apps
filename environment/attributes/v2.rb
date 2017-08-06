@@ -186,6 +186,10 @@ node.default['environment_v2']['host']['sw'] = {
   'ip_lan' => '192.168.63.95'
 }
 
+node.default['environment_v2']['host']['chromebook'] = {
+  'ip_lan' => '192.168.63.96'
+}
+
 
 ## load current host under 'current_host'
 node.default['environment_v2']['current_host'] = node['environment_v2']['host'][node['hostname']]
