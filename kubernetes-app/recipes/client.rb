@@ -3,7 +3,7 @@
 ].each do |e|
   remote_file node['kubernetes'][e]['binary_path'] do
     source node['kubernetes'][e]['remote_file']
-    mode '0750'
+    mode '0755'
     action :create_if_missing
   end
 end
