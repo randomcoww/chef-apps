@@ -1,0 +1,9 @@
+source "https://supermarket.chef.io"
+
+metadata
+
+cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
+cookbook "dbag", github: "randomcoww/chef-dbag"
+cookbook "openvpn", github: "randomcoww/chef-openvpn"
+cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
+cookbook "openssl_cert", github: "randomcoww/chef-openssl_cert"
