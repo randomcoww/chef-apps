@@ -126,7 +126,7 @@ node.default['environment_v2']['host']['kube-node2'] = {
 ## one off
 ##
 
-node.default['environment_v2']['host']['unifi1'] = {
+node.default['environment_v2']['host']['unifi'] = {
   'ip_lan' => "192.168.62.217",
 }
 
