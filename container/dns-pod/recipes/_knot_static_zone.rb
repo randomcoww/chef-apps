@@ -21,10 +21,10 @@ end
 
 node.default['kubelet']['knot']['static_zone'] = DnsZoneHelper::ConfigGenerator.generate_from_hash({
   'soa' => {
-    name: 'st.lan.',
+    name: 'l.lan.',
     ttl: 300,
-    ns: 'ns.st.lan.',
-    email: 'root.st.lan.',
+    ns: 'ns.l.lan.',
+    email: 'root.l.lan.',
     sn: 2017010101,
     ref: 28800,
     ret: 14400,
@@ -32,9 +32,9 @@ node.default['kubelet']['knot']['static_zone'] = DnsZoneHelper::ConfigGenerator.
     nx: 86400
   },
   'ns' => {
-    name: 'st.lan.',
+    name: 'l.lan.',
     ttl: 300,
-    host: 'ns.st.lan.'
+    host: 'ns.l.lan.'
   },
   'a' => a_records
 })
