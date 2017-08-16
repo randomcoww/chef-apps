@@ -2,7 +2,7 @@ a_records = []
 node['environment_v2']['host'].each do |hostname, d|
   if !d['ip_lan'].nil?
     a_records << {
-        name: "#{hostname}.h",
+        name: [hostname, node['environment_v2']['domain']['host_lan']].join('.'),
         ttl: 300,
         host: d['ip_lan']
       }
@@ -12,20 +12,19 @@ end
 node['environment_v2']['set'].each do |set, d|
   if !d['vip_lan'].nil?
     a_records << {
-        name: "#{set}.v",
+        name: [set, node['environment_v2']['domain']['vip_lan']].join('.'),
         ttl: 300,
         host: d['vip_lan']
       }
   end
 end
 
-node.default['kubelet']['knot']['domain'] = 'lan'
 node.default['kubelet']['knot']['static_zone'] = DnsZoneHelper::ConfigGenerator.generate_from_hash({
   'soa' => {
-    name: "#{node['kubelet']['knot']['domain']}.",
+    name: "#{node['environment_v2']['domain']['top']}.",
     ttl: 300,
-    ns: "ns.#{node['kubelet']['knot']['domain']}.",
-    email: "root.#{node['kubelet']['knot']['domain']}.",
+    ns: "ns.#{node['environment_v2']['domain']['top']}.",
+    email: "root.#{node['environment_v2']['domain']['top']}.",
     sn: 2017010101,
     ref: 28800,
     ret: 14400,
@@ -33,9 +32,9 @@ node.default['kubelet']['knot']['static_zone'] = DnsZoneHelper::ConfigGenerator.
     nx: 86400
   },
   'ns' => {
-    name: "#{node['kubelet']['knot']['domain']}.",
+    name: "#{node['environment_v2']['domain']['top']}.",
     ttl: 300,
-    host: "ns.#{node['kubelet']['knot']['domain']}."
+    host: "ns.#{node['environment_v2']['domain']['top']}."
   },
   'a' => a_records
 })
