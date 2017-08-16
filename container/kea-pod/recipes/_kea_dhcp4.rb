@@ -57,7 +57,7 @@ node.default['kubelet']['dhcp4_mysql']['config'] = {
     ],
     "dhcp-ddns" => {
       "enable-updates" => true,
-      "qualifying-suffix" => "l.lan",
+      "qualifying-suffix" => "h.lan",
       "override-client-update" => true,
       "override-no-update" => true,
       "replace-client-name" => "when-not-present"

@@ -17,7 +17,7 @@ node.default['kubelet']['ddns']['config'] = {
     "forward-ddns" => {
       "ddns-domains" => [
         {
-          "name" => "l.lan.",
+          "name" => "h.lan.",
           "key-name" => "update_key",
           "dns-servers" => [
             {
