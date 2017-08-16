@@ -37,14 +37,14 @@ node.default['knot']['main']['config'] = {
   ],
   'zone' => [
     {
-      'domain' => 'st.lan',
+      'domain' => 'l.lan',
       # 'storage' => ::File.join(Chef::Config[:file_cache_path], 'knot'),
-      'file' => 'st.lan',
+      'file' => 'l.lan',
     },
     {
-      'domain' => 'dy.lan',
+      'domain' => 'l.lan',
       # 'storage' => ::File.join(Chef::Config[:file_cache_path], 'knot'),
-      'file' => 'dy.lan',
+      'file' => 'l.lan',
       'acl' => 'update_acl'
     }
   ]

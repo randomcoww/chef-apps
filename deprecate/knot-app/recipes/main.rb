@@ -42,20 +42,20 @@ node['environment_v2']['set'].each do |set, d|
   end
 end
 
-knot_zonefile 'st.lan' do
-  domain 'st.lan'
-  name_server 'ns1.st.lan'
-  email_addr 'root.st.lan'
+knot_zonefile 'l.lan' do
+  domain 'l.lan'
+  name_server 'ns1.l.lan'
+  email_addr 'root.l.lan'
   hosts static_hosts
   notifies :reload, "service[knot]", :delayed
 end
 
 ## dynamic zones
 
-# knot_zonefile 'dy.lan' do
-#   domain 'dy.lan'
-#   name_server 'ns1.dy.lan'
-#   email_addr 'root.dy.lan'
+# knot_zonefile 'l.lan' do
+#   domain 'l.lan'
+#   name_server 'ns1.l.lan'
+#   email_addr 'root.l.lan'
 #   hosts ({})
 #   action :create_if_missing
 #   notifies :reload, "service[knot]", :delayed
@@ -63,10 +63,10 @@ end
 
 include_recipe "knot-app::_mysql_support"
 
-knot_kea_zonefile 'dy.lan' do
-  domain 'dy.lan'
-  name_server 'ns1.dy.lan'
-  email_addr 'root.dy.lan'
+knot_kea_zonefile 'l.lan' do
+  domain 'l.lan'
+  name_server 'ns1.l.lan'
+  email_addr 'root.l.lan'
   username node['mysql_credentials']['kea']['username']
   database node['mysql_credentials']['kea']['database']
   host node['environment_v2']['set']['haproxy']['vip_lan']

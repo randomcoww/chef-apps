@@ -31,10 +31,10 @@ node['environment_v2']['set'].each do |set, d|
   end
 end
 
-nsd_zonefile 'st.lan' do
-  domain 'st.lan'
-  name_server 'ns1.st.lan'
-  email_addr 'root.st.lan'
+nsd_zonefile 'l.lan' do
+  domain 'l.lan'
+  name_server 'ns1.l.lan'
+  email_addr 'root.l.lan'
   hosts static_hosts
   notifies :reload, "service[nsd]", :delayed
 end
@@ -45,8 +45,8 @@ nsd_config 'nsd' do
   config node['nsd']['main']['config'].merge({
     'zone' => [
       {
-        'name' => 'st.lan',
-        'zonefile' => ::File.join(Chef::Config[:file_cache_path], 'nsd', 'st.lan')
+        'name' => 'l.lan',
+        'zonefile' => ::File.join(Chef::Config[:file_cache_path], 'nsd', 'l.lan')
       }
     ]
   })

@@ -18,7 +18,7 @@ node.default['kea']['ddns']['config'] = {
     "forward-ddns" => {
       "ddns-domains" => [
         {
-          "name" => "dy.lan.",
+          "name" => "l.lan.",
           "key-name" => "update_key",
           "dns-servers" => [
             {
