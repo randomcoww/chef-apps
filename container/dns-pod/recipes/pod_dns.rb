@@ -40,7 +40,7 @@ node.default['kubelet']['static_pods']['dns.yaml'] = {
             "value" => node['kubelet']['knot']['config']
           },
           {
-            "name" => "ZONE_#{node['kubelet']['knot']['domain'].gsub('.', '_').upcase}",
+            "name" => "ZONE_#{node['environment_v2']['domain']['top'].gsub('.', '_').upcase}",
             "value" => node['kubelet']['knot']['static_zone']
           }
         ]
