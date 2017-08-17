@@ -1,3 +1,5 @@
+include_recipe "kubernetes-app::pod_kube_master"
+
 include_recipe "kubernetes-app::_flannel"
 include_recipe "kubernetes-app::_docker"
 include_recipe "kubernetes-app::_static_pods"
