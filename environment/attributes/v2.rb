@@ -5,10 +5,10 @@ node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
 node.default['environment_v2']['subnet']['vpn_dhcp_pool'] = "192.168.30.32/27"
 
 node.default['environment_v2']['domain']['top'] = 'lan'
-node.default['environment_v2']['domain']['host_lan'] = 'hl'
-node.default['environment_v2']['domain']['vip_lan'] = 'vl'
-node.default['environment_v2']['domain']['host_store'] = 'hs'
-node.default['environment_v2']['domain']['vip_store'] = 'vs'
+node.default['environment_v2']['domain']['host_lan'] = 'h.l'
+node.default['environment_v2']['domain']['vip_lan'] = 'v.l'
+node.default['environment_v2']['domain']['host_store'] = 'h.s'
+node.default['environment_v2']['domain']['vip_store'] = 'v.s'
 
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
