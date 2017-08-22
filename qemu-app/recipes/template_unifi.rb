@@ -39,6 +39,12 @@ node.default['qemu']['current_config']['cloud_config'] = {
   "packages" => [
     "unifi"
   ],
+  "bootcmd" => [
+    [ "cloud-init-per", "once", "systemd_load",
+      "systemctl", "daemon-reload" ],
+    [ "cloud-init-per", "once", "networkd_load",
+      "systemctl", "restart", "systemd-networkd" ]
+  ],
   "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
   "runcmd" => node['qemu']['current_config']['runcmd'] + [
     [
