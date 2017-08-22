@@ -1,9 +1,12 @@
 node.default['qemu']['current_config']['cloud_config'] = {
   "write_files" => [],
-  "password" => "password",
-  "chpasswd" => {
-    "expire" => false
-  },
+  "users" => [
+    {
+      "name" => "debian",
+      "lock_passwd" => false,
+      "ssh-authorized-keys" => node['environment_v2']['ssh_authorized_keys']['default']
+    }
+  ],
   "ssh_pwauth" => false,
   "package_update" => false,
   "package_upgrade" => false,
@@ -12,6 +15,10 @@ node.default['qemu']['current_config']['cloud_config'] = {
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
   "packages" => node['qemu']['current_config']['packages'],
+  "bootcmd" => [
+    "systemctl daemon-reload",
+    "systemctl restart systemd-networkd"
+  ],
   "runcmd" => node['qemu']['current_config']['runcmd'] + [
     [
       "chef-client", "-o",
