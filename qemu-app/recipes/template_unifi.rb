@@ -17,17 +17,15 @@ node.default['qemu']['current_config']['runcmd'] = [
 
 node.default['qemu']['current_config']['cloud_config'] = {
   "write_files" => [],
-  "password" => "password",
-  "chpasswd" => {
-    "expire" => false
-  },
-  "ssh_pwauth" => false,
-  "package_update" => false,
-  "package_upgrade" => false,
-  "package_reboot_if_required" => false,
-  "cc_resolv_conf" => false,
-  "manage_etc_hosts" => true,
+  "users" => [
+    {
+      "name" => "debian",
+      "lock_passwd" => false,
+      "ssh-authorized-keys" => node['environment_v2']['ssh_authorized_keys']['default']
+    }
+  ],
   "apt" => {
+    "preserve_sources_list" => true,
     "sources" => {
       "unifi" => {
         "keyid" => "C0A52C50",
@@ -36,16 +34,22 @@ node.default['qemu']['current_config']['cloud_config'] = {
       }
     }
   },
+  "ssh_pwauth" => false,
   "packages" => [
     "unifi"
   ],
+  "package_update" => false,
+  "package_upgrade" => false,
+  "package_reboot_if_required" => false,
+  "manage_resolv_conf" => false,
+  "manage_etc_hosts" => true,
+  "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
   "bootcmd" => [
     [ "cloud-init-per", "once", "systemd_load",
       "systemctl", "daemon-reload" ],
     [ "cloud-init-per", "once", "networkd_load",
       "systemctl", "restart", "systemd-networkd" ]
   ],
-  "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
   "runcmd" => node['qemu']['current_config']['runcmd'] + [
     [
       "chef-client", "-o",

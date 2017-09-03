@@ -11,8 +11,8 @@ node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER'] = node['e
     "#{e}=http://#{node['environment_v2']['host'][e]['ip_lan']}:2380"
   }.join(',')
 
-node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
-# node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
+# node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
+node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
 
 node.default['kubelet']['etcd']['environment']['ETCD_INITIAL_CLUSTER_TOKEN'] = "etcd-cluster-1"
 node.default['kubelet']['etcd']['environment']['ETCD_ADVERTISE_CLIENT_URLS'] = "http://#{nodeip}:2379"

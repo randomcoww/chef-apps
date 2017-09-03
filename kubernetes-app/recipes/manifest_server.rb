@@ -1,25 +1,19 @@
-node['kubernetes']['static_pods'].each do |host, manifests|
-  path = ::File.join(node['kubernetes']['manifests_path'], host)
-
-  directory path do
+[
+  node['kubernetes']['manifests_path'],
+].each do |d|
+  directory d do
     recursive true
     action [:create]
   end
+end
 
-  Dir.entries(path).each do |f|
-    next unless manifests.has_key?(f)
+node['kubernetes']['static_pods'].each do |host, manifests|
 
-    file = ::File.join(path, f)
-    next unless ::File.file?(file)
+  if manifests.is_a?(Hash)
+    content = manifests.values.map { |m| m.to_hash.to_yaml }.join($/)
 
-    kubernetes_pod file do
-      action :delete
-    end
-  end
-
-  manifests.each do |f, config|
-    kubernetes_pod ::File.join(path, f) do
-      config config
+    kubernetes_pod ::File.join(node['kubernetes']['manifests_path'], host) do
+      content content
       action :create
     end
   end

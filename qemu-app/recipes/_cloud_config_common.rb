@@ -7,14 +7,17 @@ node.default['qemu']['current_config']['cloud_config'] = {
       "ssh-authorized-keys" => node['environment_v2']['ssh_authorized_keys']['default']
     }
   ],
+  "apt" => {
+    "preserve_sources_list" => true
+  },
   "ssh_pwauth" => false,
+  "packages" => node['qemu']['current_config']['packages'],
   "package_update" => false,
   "package_upgrade" => false,
   "package_reboot_if_required" => false,
-  "cc_resolv_conf" => false,
+  "manage_resolv_conf" => false,
   "manage_etc_hosts" => true,
   "fqdn" => "#{node['qemu']['current_config']['hostname']}.lan",
-  "packages" => node['qemu']['current_config']['packages'],
   "bootcmd" => [
     [ "cloud-init-per", "once", "systemd_load",
       "systemctl", "daemon-reload" ],
