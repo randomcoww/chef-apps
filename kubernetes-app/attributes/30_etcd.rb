@@ -12,8 +12,8 @@ node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER'] = node
 
 ## for now this needs to be manually set to either new or existing depending on cluster state
 ## i don't have a good solution to this
-node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
-# node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
+# node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "new"
+node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER_STATE'] = "existing"
 
 node.default['kubernetes']['etcd']['environment']['ETCD_INITIAL_CLUSTER_TOKEN'] = "etcd-cluster-1"
 node.default['kubernetes']['etcd']['environment']['ETCD_ADVERTISE_CLIENT_URLS'] = "http://#{node['kubernetes']['node_ip']}:2379"
