@@ -27,10 +27,9 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
           },
           {
             "name" => "domain-name-servers",
-            "data" => [
-              node['environment_v2']['set']['dns']['vip_lan'],
-              '8.8.8.8'
-            ].join(','),
+            "data" => (node['environment_v2']['set']['dns']['hosts'].map { |host|
+              node['environment_v2']['host'][host]['ip_lan']
+            } + [ '8.8.8.8' ]).join(','),
             "csv-format" => true
           }
         ],

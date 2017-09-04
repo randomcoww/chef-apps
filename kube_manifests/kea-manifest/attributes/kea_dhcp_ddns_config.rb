@@ -23,12 +23,12 @@ node.default['kube_manifests']['kea']['dhcp_ddns_config'] = {
             ''
           ].join('.'),
           "key-name" => "update_key",
-          "dns-servers" => [
+          "dns-servers" => node['environment_v2']['set']['dns']['hosts'].map { |host|
             {
-              "ip-address" => node['environment_v2']['set']['dns']['vip_lan'],
+              "ip-address" => node['environment_v2']['host'][host]['ip_lan'],
               "port" => 53530
             }
-          ]
+          }
         }
       ]
     },
