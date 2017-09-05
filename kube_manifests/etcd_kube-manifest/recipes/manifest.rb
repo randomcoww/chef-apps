@@ -1,8 +1,8 @@
-etcd_initial_cluster = node['kube_manifests']['etcd_flannel']['hosts'].map { |host|
+etcd_initial_cluster = node['kube_manifests']['etcd_kube']['hosts'].map { |host|
   "#{host}=http://#{node['environment_v2']['host'][host]['ip_lan']}:2380"
 }
 
-node['kube_manifests']['etcd_flannel']['hosts'].each do |host|
+node['kube_manifests']['etcd_kube']['hosts'].each do |host|
 
   ip = node['environment_v2']['host'][host]['ip_lan']
   environment = {
@@ -15,11 +15,11 @@ node['kube_manifests']['etcd_flannel']['hosts'].each do |host|
     "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster.join(','),
     "ETCD_INITIAL_CLUSTER_STATE" => "new",
     # "ETCD_INITIAL_CLUSTER_STATE" => "existing",
-    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-flannel",
+    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-kube",
     "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{ip}:2379"
   }
 
-  etcd_flannel_manifest = {
+  etcd_kube_manifest = {
     "kind" => "Pod",
     "apiVersion" => "v1",
     "metadata" => {
@@ -60,5 +60,5 @@ node['kube_manifests']['etcd_flannel']['hosts'].each do |host|
     }
   }
 
-  node.default['kubernetes']['static_pods'][host]['etcd-flannel.yaml'] = etcd_flannel_manifest
+  node.default['kubernetes']['static_pods'][host]['etcd-kube.yaml'] = etcd_kube_manifest
 end

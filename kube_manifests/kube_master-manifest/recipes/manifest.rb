@@ -1,44 +1,3 @@
-etcd_manifest = {
-  "kind" => "Pod",
-  "apiVersion" => "v1",
-  "metadata" => {
-    "namespace" => "kube-system",
-    "name" => "etcd"
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "restartPolicy" => 'Always',
-    "containers" => [
-      {
-        "name" => "kube-etcd",
-        "image" => "quay.io/coreos/etcd:latest",
-        "command" => [
-          "/usr/local/bin/etcd",
-          "--data-dir=/var/lib/etcd"
-        ],
-        "env" => node['kubernetes']['etcd']['environment'].map { |k, v|
-          {
-            "name" => k,
-            "value" => v
-          }
-        },
-        "volumeMounts" => [
-          {
-            "mountPath" => "/var/lib/etcd",
-            "name" => "etcd-data"
-          }
-        ]
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "etcd-data",
-        "emptyDir" => {}
-      }
-    ]
-  }
-}
-
 kube_controller_manager_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -52,7 +11,7 @@ kube_controller_manager_manifest = {
     "containers" => [
       {
         "name" => "kube-controller-manager",
-        "image" => node['kubernetes']['hyperkube_image'],
+        "image" => node['kube']['images']['hyperkube'],
         "command" => [
           "/hyperkube",
           "controller-manager",
@@ -118,7 +77,7 @@ kube_scheduler_manifest = {
     "containers" => [
       {
         "name" => "kube-scheduler",
-        "image" => node['kubernetes']['hyperkube_image'],
+        "image" => node['kube']['images']['hyperkube'],
         "command" => [
           "/hyperkube",
           "scheduler",
@@ -152,7 +111,7 @@ kube_proxy_manifest = {
     "containers": [
       {
         "name": "kube-proxy",
-        "image": node['kubernetes']['hyperkube_image'],
+        "image": node['kube']['images']['hyperkube'],
         "command": [
           "/hyperkube",
           "proxy",
@@ -194,7 +153,7 @@ kube_apiserver_manifest = {
     "containers" => [
       {
         "name" => "kube-apiserver",
-        "image" => node['kubernetes']['hyperkube_image'],
+        "image" => node['kube']['images']['hyperkube'],
         "command" => [
           "/hyperkube",
           "apiserver",
@@ -268,7 +227,6 @@ kube_apiserver_manifest = {
 
 
 node['kube_manifests']['kube_master']['hosts'].each do |host|
-  node.default['kubernetes']['static_pods'][host]['etcd_manifest.yaml'] = etcd_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
