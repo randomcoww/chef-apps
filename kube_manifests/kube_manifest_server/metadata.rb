@@ -19,3 +19,6 @@ chef_version '>= 12.1' if respond_to?(:chef_version)
 #
 # source_url 'https://github.com/<insert_org_here>/kube_manifest_server'
 depends          'environment'
+depends          'dbag'
+depends          'openssl_cert'
+depends          'kubernetes'

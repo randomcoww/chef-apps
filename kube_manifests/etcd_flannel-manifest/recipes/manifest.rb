@@ -31,7 +31,7 @@ node['kube_manifests']['etcd_flannel']['hosts'].each do |host|
       "restartPolicy" => 'Always',
       "containers" => [
         {
-          "name" => "kube-etcd",
+          "name" => "etcd-flannel",
           "image" => node['kube']['images']['etcd'],
           "command" => [
             "/usr/local/bin/etcd",
