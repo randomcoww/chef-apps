@@ -1,5 +1,7 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
-node.default['qemu']['current_config']['ignition_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}.ign"
+current_host = node['qemu']['current_config']['hostname']
+
+node.default['qemu']['current_config']['ignition_config_path'] = "/data/cloud-init/#{current_host}.ign"
 
 node.default['qemu']['current_config']['ignition_config'] = {
   "passwd" => {
@@ -18,7 +20,7 @@ node.default['qemu']['current_config']['ignition_files'] = [
   {
     "path" => "/etc/hostname",
     "mode" => 420,
-    "contents" => "data:,#{node['qemu']['current_config']['hostname']}"
+    "contents" => "data:,#{current_host}"
   },
   {
     "path" => node['kubernetes']['key_path'],
@@ -39,10 +41,10 @@ node.default['qemu']['current_config']['ignition_files'] = [
 
 node.default['qemu']['current_config']['ignition_networkd'] = [
   {
-    "name" => "ens2",
+    "name" => node['environment_v2']['host'][current_host]['if_lan'],
     "contents" => {
       "Match" => {
-        "Name" => "ens2"
+        "Name" => node['environment_v2']['host'][current_host]['if_lan']
       },
       "Network" => {
         "LinkLocalAddressing" => "no",
@@ -52,7 +54,7 @@ node.default['qemu']['current_config']['ignition_networkd'] = [
         } + [ '8.8.8.8' ])
       },
       "Address" => {
-        "Address" => "#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+        "Address" => "#{node['environment_v2']['host'][current_host]['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
       },
       "Route" => {
         "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
@@ -63,7 +65,7 @@ node.default['qemu']['current_config']['ignition_networkd'] = [
 
 
 flanneld_environment = {
-  "FLANNELD_IFACE" => node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan'],
+  "FLANNELD_IFACE" => node['environment_v2']['host'][current_host]['ip_lan'],
   "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd_flannel']['hosts'].map { |e|
     "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379"
   }.join(','),
@@ -108,8 +110,8 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
           "--network-plugin=${NETWORK_PLUGIN}",
           "--container-runtime=docker",
           "--allow-privileged=true",
-          "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{node['qemu']['current_config']['hostname']}",
-          "--hostname-override=#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}",
+          "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{current_host}",
+          "--hostname-override=#{node['environment_v2']['host'][current_host]['ip_lan']}",
           "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
           "--cluster_domain=#{node['kubernetes']['cluster_domain']}"
         ].join(' '),
