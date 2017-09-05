@@ -15,6 +15,41 @@ node.default['environment_v2']['domain']['vip_lan'] = 'v.l'
 node.default['environment_v2']['domain']['host_store'] = 'h.s'
 node.default['environment_v2']['domain']['vip_store'] = 'v.s'
 
+
+node.default['environment_v2']['set']['dns'] = {
+  'hosts' => [
+    'coreos-dns1',
+    'coreos-dns2'
+  ],
+  'vip_lan' => "192.168.62.230"
+}
+
+node.default['environment_v2']['set']['kea'] = {
+  'hosts' => [
+    'coreos-kea1',
+    'coreos-kea2'
+  ]
+}
+
+node.default['environment_v2']['set']['etcd_flannel'] = {
+  'hosts' => [
+    'coreos-kea1',
+    'coreos-kea2'
+  ]
+}
+
+node.default['environment_v2']['set']['kube_master'] = {
+  'hosts' => [
+    'coreos-kube-master1',
+    'coreos-kube-master2'
+  ]
+}
+
+
+
+
+
+
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
     'gateway1',
@@ -32,25 +67,17 @@ node.default['environment_v2']['set']['gluster'] = {
   'vip_store' => "192.168.126.250"
 }
 
-node.default['environment_v2']['set']['dns'] = {
-  'hosts' => [
-    'dns1',
-    'dns2'
-  ],
-  'vip_lan' => "192.168.62.230"
-}
-
 node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'vm1',
+    'vm2'
   ]
 }
 
 node.default['environment_v2']['set']['kea-mysql'] = {
   'hosts' => [
-    'kubelet1',
-    'kubelet2'
+    'vm1',
+    'vm2'
   ]
 }
 
@@ -74,6 +101,31 @@ node.default['environment_v2']['set']['etcd-kube'] = {
     'kube-node1',
     'kube-node2'
   ]
+}
+
+
+node.default['environment_v2']['host']['coreos-dns1'] = {
+  'ip_lan' => "192.168.62.211",
+}
+
+node.default['environment_v2']['host']['coreos-dns2'] = {
+  'ip_lan' => "192.168.62.212",
+}
+
+node.default['environment_v2']['host']['coreos-kea1'] = {
+  'ip_lan' => "192.168.62.213",
+}
+
+node.default['environment_v2']['host']['coreos-kea2'] = {
+  'ip_lan' => "192.168.62.214",
+}
+
+node.default['environment_v2']['host']['coreos-kube-master1'] = {
+  'ip_lan' => "192.168.62.215",
+}
+
+node.default['environment_v2']['host']['coreos-kube-master2'] = {
+  'ip_lan' => "192.168.62.216",
 }
 
 
@@ -142,6 +194,10 @@ node.default['environment_v2']['host']['unifi'] = {
 
 node.default['environment_v2']['host']['test'] = {
   'ip_lan' => "192.168.62.227",
+}
+
+node.default['environment_v2']['host']['coreos'] = {
+  'ip_lan' => "192.168.62.228",
 }
 
 node.default['environment_v2']['host']['gamestream'] = {

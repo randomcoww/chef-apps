@@ -145,6 +145,21 @@ node.default['qemu']['current_config']['libvirt_coreos'] = {
               "type"=>"virtio-net"
             }
           }
+        },
+        {
+          "#attributes"=>{
+            "type"=>"network"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "network"=>node['qemu']['libvirt_network_store']
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
+          }
         }
       ],
       "serial"=>{

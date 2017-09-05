@@ -1,10 +1,6 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['ignition_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}.ign"
 
-node.default['qemu']['current_config']['memory'] = 1024
-node.default['qemu']['current_config']['vcpu'] = 2
-
-
 node.default['qemu']['current_config']['ignition_config'] = {
   "passwd" => {
     "users" => [

@@ -1,10 +1,6 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 node.default['qemu']['current_config']['ignition_config_path'] = "/data/cloud-init/#{node['qemu']['current_config']['hostname']}.ign"
 
-node.default['qemu']['current_config']['memory'] = 1024
-node.default['qemu']['current_config']['vcpu'] = 2
-
-
 node.default['qemu']['current_config']['ignition_config'] = {
   "passwd" => {
     "users" => [
@@ -87,7 +83,9 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
             "--volume var-log,kind=host,source=/var/log",
             "--mount volume=var-log,target=/var/log",
             "--volume dns,kind=host,source=/etc/resolv.conf",
-            "--mount volume=dns,target=/etc/resolv.conf"
+            "--mount volume=dns,target=/etc/resolv.conf",
+            "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
+            "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
           ].join(' ')}"}
         ],
         "ExecStartPre" => [
