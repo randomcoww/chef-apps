@@ -50,7 +50,7 @@ node.default['environment_v2']['set']['kube_master'] = {
     'coreos-kube-master1',
     'coreos-kube-master2'
   ],
-  'vip_lan' => "192.168.62.220"
+  'vip_lan' => "192.168.62.210"
 }
 
 
@@ -115,26 +115,38 @@ node.default['environment_v2']['set']['etcd-kube'] = {
 
 node.default['environment_v2']['host']['coreos-dns1'] = {
   'ip_lan' => "192.168.62.211",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-dns2'] = {
   'ip_lan' => "192.168.62.212",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-kea1'] = {
   'ip_lan' => "192.168.62.213",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-kea2'] = {
   'ip_lan' => "192.168.62.214",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-kube-master1'] = {
   'ip_lan' => "192.168.62.215",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-kube-master2'] = {
   'ip_lan' => "192.168.62.216",
+  'if_lan' => 'ens2',
+  'if_store' => 'ens3',
 }
 
 
