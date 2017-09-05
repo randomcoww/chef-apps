@@ -22,7 +22,7 @@ cert = cert_generator.node_cert(
     'DNS.3' => 'kubernetes.default.svc',
     'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
     'IP.1' => node['kubernetes']['cluster_service_ip'],
-    'IP.2' => node['kubernetes']['node_ip'],
+    'IP.2' => node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan'],
     'IP.3' => node['kubernetes']['master_ip'],
   }
 )

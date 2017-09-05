@@ -61,13 +61,32 @@ node.default['qemu']['current_config']['ignition_networkd'] = [
   }
 ]
 
+
+flanneld_environment = {
+  "FLANNELD_IFACE" => node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan'],
+  "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd_flannel']['hosts'].map { |e|
+    "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379"
+  }.join(','),
+  "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
+  "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
+  "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
+  "FLANNELD_IP_MASQ" => true
+}
+
+flanneld_network = {
+  "Network" => node['kubernetes']['cluster_cidr'],
+  "Backend" => {
+    "Type" => "vxlan"
+  }
+}
+
 node.default['qemu']['current_config']['ignition_systemd'] = [
   {
     "name" => "kubelet",
     "contents" => {
       "Service" => {
         "Environment" => [
-          "KUBELET_IMAGE_TAG=v1.7.4_coreos.0",
+          "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
           %Q{RKT_RUN_ARGS="#{[
             "--uuid-file-save=/var/run/kubelet-pod.uuid",
             "--volume var-log,kind=host,source=/var/log",
@@ -92,7 +111,7 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
           "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{node['qemu']['current_config']['hostname']}",
           "--hostname-override=#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}",
           "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-          "--cluster_domain=cluster.local"
+          "--cluster_domain=#{node['kubernetes']['cluster_domain']}"
         ].join(' '),
         "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
         "Restart" => "always",
@@ -102,10 +121,45 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
         "WantedBy" => "multi-user.target"
       }
     }
+  },
+  {
+    "name" => "flanneld",
+    "dropins" => [
+      {
+        "name" => "etcd-env",
+        "contents" => {
+          "Service" => {
+            "Environment" => flanneld_environment.map { |k, v|
+              "#{k}=#{v}"
+            },
+            "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{flanneld_network.to_json}'",
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name" => "docker",
+    "dropins" => [
+      {
+        "name" => "flannel",
+        "contents" => {
+          "Unit" => {
+            "Requires" => "flanneld.service",
+            "After" => "flanneld.service"
+          },
+          "Service" => {
+            "Environment" => [
+              %Q{DOCKER_OPT_BIP=""},
+              %Q{DOCKER_OPT_IPMASQ=""}
+            ]
+          }
+        }
+      }
+    ]
   }
 ]
 
-node.default['qemu']['current_config']['ignition_systemd_dropins'] = []
 
 include_recipe "qemu-app::_libvirt_coreos"
 include_recipe "qemu-app::_deploy_coreos"

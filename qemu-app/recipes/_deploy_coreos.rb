@@ -41,7 +41,6 @@ qemu_ignition_config node['qemu']['current_config']['hostname'] do
   path node['qemu']['current_config']['ignition_config_path']
   networkd node['qemu']['current_config']['ignition_networkd']
   systemd node['qemu']['current_config']['ignition_systemd']
-  systemd_dropins node['qemu']['current_config']['ignition_systemd_dropins']
   files node['qemu']['current_config']['ignition_files']
   base node['qemu']['current_config']['ignition_config']
   action :create

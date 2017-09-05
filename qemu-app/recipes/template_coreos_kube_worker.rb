@@ -36,12 +36,12 @@ node.default['qemu']['current_config']['ignition_files'] = [
     "contents" => "data:;base64,#{Base64.encode64(node['qemu']['current_config']['kube_ca'])}"
   },
   {
-    "path" => node['kube_worker']['kubelet']['kubeconfig_path'],
+    "path" => node['kubernetes']['kubelet']['kubeconfig_path'],
     "mode" => 420,
     "contents" => "data:;base64,#{Base64.encode64(node['kube_worker']['kubelet']['kubeconfig'].to_hash.to_yaml)}"
   },
   {
-    "path" => node['kube_worker']['kube_proxy']['kubeconfig_path'],
+    "path" => node['kubernetes']['kube_proxy']['kubeconfig_path'],
     "mode" => 420,
     "contents" => "data:;base64,#{Base64.encode64(node['kube_worker']['kube_proxy']['kubeconfig'].to_hash.to_yaml)}"
   }
@@ -77,7 +77,7 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
     "contents" => {
       "Service" => {
         "Environment" => [
-          "KUBELET_IMAGE_TAG=v1.7.4_coreos.0",
+          "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
           %Q{RKT_RUN_ARGS="#{[
             "--uuid-file-save=/var/run/kubelet-pod.uuid",
             "--volume var-log,kind=host,source=/var/log",
@@ -104,7 +104,7 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
           "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{node['qemu']['current_config']['hostname']}",
           "--hostname-override=#{node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']}",
           "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-          "--cluster_domain=cluster.local",
+          "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
           "--kubeconfig=#{node['kube_worker']['kubelet']['kubeconfig_path']}",
           "--tls-cert-file=#{node['kubernetes']['cert_path']}",
           "--tls-private-key-file=#{node['kubernetes']['key_path']}"
@@ -119,8 +119,6 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
     }
   }
 ]
-
-node.default['qemu']['current_config']['ignition_systemd_dropins'] = []
 
 include_recipe "qemu-app::_libvirt_coreos"
 include_recipe "qemu-app::_deploy_coreos"
