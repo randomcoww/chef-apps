@@ -38,6 +38,13 @@ node.default['environment_v2']['set']['etcd_flannel'] = {
   ]
 }
 
+node.default['environment_v2']['set']['etcd_kube'] = {
+  'hosts' => [
+    'coreos-kube-master1',
+    'coreos-kube-master2'
+  ]
+}
+
 node.default['environment_v2']['set']['kube_master'] = {
   'hosts' => [
     'coreos-kube-master1',
@@ -46,12 +53,7 @@ node.default['environment_v2']['set']['kube_master'] = {
   'vip_lan' => "192.168.62.220"
 }
 
-node.default['environment_v2']['set']['etcd_kube'] = {
-  'hosts' => [
-    'coreos-kube-master1',
-    'coreos-kube-master2'
-  ]
-}
+
 
 
 
