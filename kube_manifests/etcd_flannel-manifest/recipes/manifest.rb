@@ -13,8 +13,8 @@ node['kube_manifests']['etcd_flannel']['hosts'].each do |host|
       }.join(','),
     "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{ip}:2380",
     "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster.join(','),
-    "ETCD_INITIAL_CLUSTER_STATE" => "new",
-    # "ETCD_INITIAL_CLUSTER_STATE" => "existing",
+    # "ETCD_INITIAL_CLUSTER_STATE" => "new",
+    "ETCD_INITIAL_CLUSTER_STATE" => "existing",
     "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-flannel",
     "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{ip}:2379"
   }
