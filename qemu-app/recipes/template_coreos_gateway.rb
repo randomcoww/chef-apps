@@ -8,7 +8,7 @@ node.default['qemu']['current_config']['ignition_config'] = {
     "users" => [
       {
         "name" => "core",
-        "passwordHash" => "$6$c6en5k51$fJnDYVaIDbasJQNWo.ezDdX4zfW9jsVlZAQwztQbMvRVUei/iGfGzBlhxqCAWCI6kAkrQLwy2Yr6D9HImPWWU/",
+        # "passwordHash" => "$6$c6en5k51$fJnDYVaIDbasJQNWo.ezDdX4zfW9jsVlZAQwztQbMvRVUei/iGfGzBlhxqCAWCI6kAkrQLwy2Yr6D9HImPWWU/",
         "sshAuthorizedKeys" => node['environment_v2']['ssh_authorized_keys']['default']
       }
     ]
@@ -16,6 +16,29 @@ node.default['qemu']['current_config']['ignition_config'] = {
 }
 
 include_recipe "qemu-app::_kube_worker_certs"
+
+
+t = Tempfile.new('/tmp')
+template t.path do
+  source 'nft.erb'
+  variables ({
+    current_host: node['environment_v2']['host'][current_host],
+    sets: node['environment_v2']['set'],
+    hosts: node['environment_v2']['host']
+  })
+  action :nothing
+end.run_action(:create)
+
+t.close
+nftables_config = IO.binread(t.path).gsub(/\t/, "  ")
+nftables_path = "/etc/nft.rules"
+
+
+sysctl_config = [
+  "net.ipv4.ip_forward=1",
+  "net.ipv4.ip_nonlocal_bind=1"
+].join($/)
+
 
 node.default['qemu']['current_config']['ignition_files'] = [
   {
@@ -47,8 +70,19 @@ node.default['qemu']['current_config']['ignition_files'] = [
     "path" => node['kubernetes']['kube_proxy']['kubeconfig_path'],
     "mode" => 420,
     "contents" => "data:;base64,#{Base64.encode64(node['kube_worker']['kube_proxy']['kubeconfig'].to_hash.to_yaml)}"
+  },
+  {
+    "path" => nftables_path,
+    "mode" => 420,
+    "contents" => "data:;base64,#{Base64.encode64(nftables_config)}"
+  },
+  {
+    "path" => "/etc/sysctl.d/ipforward.conf",
+    "mode" => 420,
+    "contents" => "data:;base64,#{Base64.encode64(sysctl_config)}"
   }
 ]
+
 
 node.default['qemu']['current_config']['networking'] ||= []
 node.default['qemu']['current_config']['ignition_networkd'] = node['qemu']['current_config']['networking'].map { |name, contents|
@@ -82,19 +116,20 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
         ],
         "ExecStart" => [
           "/usr/lib/coreos/kubelet-wrapper",
-          "--api-servers=http://#{node['kubernetes']['master_ip']}",
+          # "--api-servers=http://#{node['kubernetes']['master_ip']}",
           "--register-schedulable=false",
-          "--cni-conf-dir=/etc/kubernetes/cni/net.d",
-          "--network-plugin=${NETWORK_PLUGIN}",
+          # "--cni-conf-dir=/etc/kubernetes/cni/net.d",
+          # "--network-plugin=${NETWORK_PLUGIN}",
           "--container-runtime=docker",
           "--allow-privileged=true",
           "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{current_host}",
           "--hostname-override=#{node['environment_v2']['host'][current_host]['ip_lan']}",
-          "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-          "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-          "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
-          "--tls-cert-file=#{node['kubernetes']['cert_path']}",
-          "--tls-private-key-file=#{node['kubernetes']['key_path']}"
+          # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
+          # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+          # "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
+          # "--tls-cert-file=#{node['kubernetes']['cert_path']}",
+          # "--tls-private-key-file=#{node['kubernetes']['key_path']}",
+          "--make-iptables-util-chains=false"
         ].join(' '),
         "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
         "Restart" => "always",
@@ -104,8 +139,43 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
         "WantedBy" => "multi-user.target"
       }
     }
+  },
+  {
+    "name" => "docker",
+    "dropins" => [
+      {
+        "name" => "iptables",
+        "contents" => {
+          "Service" => {
+            "Environment" => [
+              "DOCKER_OPTS=--iptables=false"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name" => "nftables",
+    "contents" => {
+      "Unit" => {
+        "Wants" => "network-pre.target",
+        "Before" => "network-pre.target"
+      },
+      "Service" => {
+        "Type" => "oneshot",
+        "ExecStartPre" => "-/usr/sbin/nft flush ruleset",
+        "ExecStart" => "/usr/sbin/nft -f #{nftables_path}",
+        "ExecStop" => "/usr/sbin/nft flush ruleset",
+        "RemainAfterExit" => "yes"
+      },
+      "Install" => {
+        "WantedBy" => "multi-user.target"
+      }
+    }
   }
 ]
+
 
 include_recipe "qemu-app::_libvirt_coreos"
 include_recipe "qemu-app::_deploy_coreos"

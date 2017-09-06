@@ -14,6 +14,7 @@ node.default['kube']['images']['openvpn'] = "randomcoww/k8s-openvpn:latest"
 node.default['kube']['images']['sshd'] = "randomcoww/k8s-sshd:latest"
 node.default['kube']['images']['env_writer'] = "randomcoww/env_writer:latest"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:latest"
+node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 
 
 ##
@@ -25,7 +26,7 @@ node.default['kubernetes']['version'] = '1.7.4'
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
-node.default['kubernetes']['master_ip'] = node['environment_v2']['set']['kube_master']['vip_lan']
+node.default['kubernetes']['master_ip'] = node['environment_v2']['set']['kube-master']['vip_lan']
 
 node.default['kubernetes']['insecure_port'] = 8080
 node.default['kubernetes']['secure_port'] = 443

@@ -1,7 +1,7 @@
 current_host = node['qemu']['current_config']['hostname']
 interface = node['environment_v2']['host'][current_host]['if_lan']
 
-node.default['qemu']['current_config']['networking'][name] = {
+node.default['qemu']['current_config']['networking'][interface] = {
   "Match" => {
     "Name" => interface
   },
@@ -17,5 +17,6 @@ node.default['qemu']['current_config']['networking'][name] = {
   },
   "Route" => {
     "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
+    "Metric" => 2048
   }
 }

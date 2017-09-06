@@ -10,10 +10,10 @@ node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
 node.default['environment_v2']['subnet']['vpn_dhcp_pool'] = "192.168.30.32/27"
 
 node.default['environment_v2']['domain']['top'] = 'lan'
-node.default['environment_v2']['domain']['host_lan'] = 'h.l'
-node.default['environment_v2']['domain']['vip_lan'] = 'v.l'
-node.default['environment_v2']['domain']['host_store'] = 'h.s'
-node.default['environment_v2']['domain']['vip_store'] = 'v.s'
+node.default['environment_v2']['domain']['host_lan'] = 'hl'
+node.default['environment_v2']['domain']['vip_lan'] = 'vl'
+node.default['environment_v2']['domain']['host_store'] = 'hs'
+node.default['environment_v2']['domain']['vip_store'] = 'vs'
 
 
 node.default['environment_v2']['set']['dns'] = {
@@ -31,21 +31,21 @@ node.default['environment_v2']['set']['kea'] = {
   ]
 }
 
-node.default['environment_v2']['set']['etcd_flannel'] = {
+node.default['environment_v2']['set']['etcd-flannel'] = {
   'hosts' => [
     'coreos-kea1',
     'coreos-kea2'
   ]
 }
 
-node.default['environment_v2']['set']['etcd_kube'] = {
+node.default['environment_v2']['set']['etcd-kube'] = {
   'hosts' => [
     'coreos-kube-master1',
     'coreos-kube-master2'
   ]
 }
 
-node.default['environment_v2']['set']['kube_master'] = {
+node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'coreos-kube-master1',
     'coreos-kube-master2'
@@ -53,19 +53,35 @@ node.default['environment_v2']['set']['kube_master'] = {
   'vip_lan' => "192.168.62.210"
 }
 
-
-
-
-
-
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'coreos-kube-master1',
+    'coreos-kube-master2'
+  ],
+  'vip_lan' => "192.168.62.210"
+}
 
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'coreos-gateway1',
+    'coreos-gateway2'
   ],
   'vip_lan' => "192.168.62.240"
 }
+
+
+
+
+
+
+
+# node.default['environment_v2']['set']['gateway'] = {
+#   'hosts' => [
+#     'gateway1',
+#     'gateway2'
+#   ],
+#   'vip_lan' => "192.168.62.240"
+# }
 
 node.default['environment_v2']['set']['gluster'] = {
   'hosts' => [
@@ -76,41 +92,41 @@ node.default['environment_v2']['set']['gluster'] = {
   'vip_store' => "192.168.126.250"
 }
 
-node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
-  'hosts' => [
-    'vm1',
-    'vm2'
-  ]
-}
+# node.default['environment_v2']['set']['kea-mysql-mgmd'] = {
+#   'hosts' => [
+#     'vm1',
+#     'vm2'
+#   ]
+# }
+#
+# node.default['environment_v2']['set']['kea-mysql'] = {
+#   'hosts' => [
+#     'vm1',
+#     'vm2'
+#   ]
+# }
 
-node.default['environment_v2']['set']['kea-mysql'] = {
-  'hosts' => [
-    'vm1',
-    'vm2'
-  ]
-}
-
-node.default['environment_v2']['set']['etcd-flannel'] = {
-  'hosts' => [
-    'kubelet1',
-    'kubelet2'
-  ]
-}
-
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'kube-node1',
-    'kube-node2'
-  ],
-  'vip_lan' => "192.168.62.220"
-}
-
-node.default['environment_v2']['set']['etcd-kube'] = {
-  'hosts' => [
-    'kube-node1',
-    'kube-node2'
-  ]
-}
+# node.default['environment_v2']['set']['etcd-flannel'] = {
+#   'hosts' => [
+#     'kubelet1',
+#     'kubelet2'
+#   ]
+# }
+#
+# node.default['environment_v2']['set']['haproxy'] = {
+#   'hosts' => [
+#     'kube-node1',
+#     'kube-node2'
+#   ],
+#   'vip_lan' => "192.168.62.220"
+# }
+#
+# node.default['environment_v2']['set']['etcd-kube'] = {
+#   'hosts' => [
+#     'kube-node1',
+#     'kube-node2'
+#   ]
+# }
 
 
 node.default['environment_v2']['host']['coreos-dns1'] = {
@@ -149,60 +165,72 @@ node.default['environment_v2']['host']['coreos-kube-master2'] = {
   'if_store' => 'ens3',
 }
 
+node.default['environment_v2']['host']['coreos-gateway1'] = {
+  'ip_lan' => "192.168.62.217",
+  'if_lan' => 'ens2',
+  'if_wan' => 'ens3',
+}
+
+node.default['environment_v2']['host']['coreos-gateway2'] = {
+  'ip_lan' => "192.168.62.218",
+  'if_lan' => 'ens2',
+  'if_wan' => 'ens3',
+}
+
 
 ##
 ## hosts
 ##
 
-node.default['environment_v2']['host']['gateway1'] = {
-  'ip_lan' => "192.168.62.241",
-  'mac_wan' => "52:54:00:63:6e:b0",
-  'if_lan' => 'eth0',
-  'if_wan' => 'eth1',
-}
+# node.default['environment_v2']['host']['gateway1'] = {
+#   'ip_lan' => "192.168.62.241",
+#   'mac_wan' => "52:54:00:63:6e:b0",
+#   'if_lan' => 'eth0',
+#   'if_wan' => 'eth1',
+# }
+#
+# node.default['environment_v2']['host']['gateway2'] = {
+#   'ip_lan' => "192.168.62.242",
+#   'mac_wan' => "52:54:00:63:6e:b1",
+#   'if_lan' => 'eth0',
+#   'if_wan' => 'eth1',
+# }
+#
+# node.default['environment_v2']['host']['dns1'] = {
+#   'ip_lan' => "192.168.62.221",
+#   'if_lan' => 'eth0',
+# }
+#
+# node.default['environment_v2']['host']['dns2'] = {
+#   'ip_lan' => "192.168.62.222",
+#   'if_lan' => 'eth0',
+# }
+#
+# node.default['environment_v2']['host']['kubelet1'] = {
+#   'ip_lan' => "192.168.62.231",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1',
+# }
+#
+# node.default['environment_v2']['host']['kubelet2'] = {
+#   'ip_lan' => "192.168.62.232",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1',
+# }
 
-node.default['environment_v2']['host']['gateway2'] = {
-  'ip_lan' => "192.168.62.242",
-  'mac_wan' => "52:54:00:63:6e:b1",
-  'if_lan' => 'eth0',
-  'if_wan' => 'eth1',
-}
-
-node.default['environment_v2']['host']['dns1'] = {
-  'ip_lan' => "192.168.62.221",
-  'if_lan' => 'eth0',
-}
-
-node.default['environment_v2']['host']['dns2'] = {
-  'ip_lan' => "192.168.62.222",
-  'if_lan' => 'eth0',
-}
-
-node.default['environment_v2']['host']['kubelet1'] = {
-  'ip_lan' => "192.168.62.231",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-}
-
-node.default['environment_v2']['host']['kubelet2'] = {
-  'ip_lan' => "192.168.62.232",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-}
-
-node.default['environment_v2']['host']['kube-node1'] = {
-  'ip_lan' => "192.168.62.233",
-  'ip_store' => "192.168.126.233",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1'
-}
-
-node.default['environment_v2']['host']['kube-node2'] = {
-  'ip_lan' => "192.168.62.234",
-  'ip_store' => "192.168.126.234",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1'
-}
+# node.default['environment_v2']['host']['kube-node1'] = {
+#   'ip_lan' => "192.168.62.233",
+#   'ip_store' => "192.168.126.233",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1'
+# }
+#
+# node.default['environment_v2']['host']['kube-node2'] = {
+#   'ip_lan' => "192.168.62.234",
+#   'ip_store' => "192.168.126.234",
+#   'if_lan' => 'eth0',
+#   'if_store' => 'eth1'
+# }
 
 
 ##
@@ -210,16 +238,16 @@ node.default['environment_v2']['host']['kube-node2'] = {
 ##
 
 node.default['environment_v2']['host']['unifi'] = {
-  'ip_lan' => "192.168.62.217",
+  'ip_lan' => "192.168.62.98",
 }
 
-node.default['environment_v2']['host']['test'] = {
-  'ip_lan' => "192.168.62.227",
-}
-
-node.default['environment_v2']['host']['coreos'] = {
-  'ip_lan' => "192.168.62.228",
-}
+# node.default['environment_v2']['host']['test'] = {
+#   'ip_lan' => "192.168.62.227",
+# }
+#
+# node.default['environment_v2']['host']['coreos'] = {
+#   'ip_lan' => "192.168.62.228",
+# }
 
 node.default['environment_v2']['host']['gamestream'] = {
   'ip_lan' => '192.168.63.99',

@@ -10,4 +10,4 @@ node.default['qemu']['current_config']['libvirt_networks'] = [
 
 include_recipe "qemu-app::_if_lan_static"
 include_recipe "qemu-app::_if_wan_dhcp"
-include_recipe "qemu-app::template_coreos_kube_worker"
+include_recipe "qemu-app::template_coreos_gateway"

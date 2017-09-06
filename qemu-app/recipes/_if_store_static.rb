@@ -1,7 +1,7 @@
 current_host = node['qemu']['current_config']['hostname']
 interface = node['environment_v2']['host'][current_host]['if_store']
 
-node.default['qemu']['current_config']['networking'][name] = {
+node.default['qemu']['current_config']['networking'][interface] = {
   "Match" => {
     "Name" => interface
   },

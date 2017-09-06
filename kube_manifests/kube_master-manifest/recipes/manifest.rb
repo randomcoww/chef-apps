@@ -252,9 +252,6 @@ haproxy_manifest = {
 
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 
-
-
-
 node['kube_manifests']['kube_master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
@@ -285,7 +282,7 @@ node['kube_manifests']['kube_master']['hosts'].each do |host|
           }
         ],
         'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['kube_master']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+          "#{node['environment_v2']['set']['kube-master']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
         ]
       }
     ]

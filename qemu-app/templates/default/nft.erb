@@ -1,0 +1,70 @@
+table ip filter {
+	chain input {
+		type filter hook input priority 0; policy drop;
+		ct state {established, related} accept;
+		ct state invalid drop;
+
+		iifname "lo" accept;
+		iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+		ip protocol icmp accept;
+		# udp sport bootps udp dport bootpc accept;
+
+		## internal ssh
+		iifname "<%= @current_host['if_lan'] %>" tcp dport ssh accept;
+
+		## external ssh
+		# tcp dport 2222 accept;
+
+		## external vpn
+		# iifname "<%= @current_host['if_wan'] %>" udp dport 1194 accept;
+
+		## internal multicast
+		iifname "<%= @current_host['if_lan'] %>" pkttype multicast accept;
+	}
+
+	chain output {
+		type filter hook output priority 100; policy accept;
+	}
+
+	chain forward {
+		type filter hook forward priority 0; policy drop;
+
+		iifname "<%= @current_host['if_lan'] %>" oifname "<%= @current_host['if_wan'] %>" accept;
+		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ct state {established, related} accept;
+
+		## ssh
+		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @sets['haproxy']['vip_lan'] %> tcp dport 2222 ct state new accept;
+
+		## moonlight
+		# iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @hosts['gamestream']['ip_lan'] %> tcp dport {47984, 47989} ct state new accept;
+		# iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @hosts['gamestream']['ip_lan'] %> udp dport {47998, 47999, 48000, 48010} ct state new accept;
+	}
+}
+
+table ip nat {
+	chain prerouting {
+		type nat hook prerouting priority 0; policy accept;
+
+		## ssh
+		iifname "<%= @current_host['if_wan'] %>" tcp dport 2222 dnat <%= @sets['haproxy']['vip_lan'] %>:2222;
+		# iifname "<%= @current_host['if_wan'] %>" tcp dport 22 redirect to 2222;
+
+		## moonlight
+		# iifname "<%= @current_host['if_wan'] %>" tcp dport {47984, 47989} dnat <%= @hosts['gamestream']['ip_lan'] %>;
+		# iifname "<%= @current_host['if_wan'] %>" udp dport {47998, 47999, 48000, 48010} dnat <%= @hosts['gamestream']['ip_lan'] %>;
+	}
+
+	chain input {
+		type nat hook input priority 0; policy accept;
+	}
+
+	chain output {
+		type nat hook output priority 0; policy accept;
+	}
+
+	chain postrouting {
+		type nat hook postrouting priority 100; policy accept;
+		oifname "<%= @current_host['if_wan'] %>" masquerade;
+	}
+}
