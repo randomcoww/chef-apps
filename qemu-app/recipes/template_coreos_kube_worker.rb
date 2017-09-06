@@ -49,29 +49,13 @@ node.default['qemu']['current_config']['ignition_files'] = [
   }
 ]
 
-node.default['qemu']['current_config']['ignition_networkd'] = [
+node.default['qemu']['current_config']['networking'] ||= []
+node.default['qemu']['current_config']['ignition_networkd'] = node['qemu']['current_config']['networking'].map { |name, contents|
   {
-    "name" => node['environment_v2']['host'][current_host]['if_lan'],
-    "contents" => {
-      "Match" => {
-        "Name" => node['environment_v2']['host'][current_host]['if_lan']
-      },
-      "Network" => {
-        "LinkLocalAddressing" => "no",
-        "DHCP" => "no",
-        "DNS" => (node['environment_v2']['set']['dns']['hosts'].map { |host|
-          node['environment_v2']['host'][host]['ip_lan']
-        } + [ '8.8.8.8' ])
-      },
-      "Address" => {
-        "Address" => "#{node['environment_v2']['host'][current_host]['ip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-      },
-      "Route" => {
-        "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
-      }
-    }
+    "name" => name,
+    "contents" => contents
   }
-]
+}
 
 node.default['qemu']['current_config']['ignition_systemd'] = [
   {
@@ -103,6 +87,7 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
           "--network-plugin=${NETWORK_PLUGIN}",
           "--container-runtime=docker",
           "--allow-privileged=true",
+          "--register-schedulable=false",
           "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{current_host}",
           "--hostname-override=#{node['environment_v2']['host'][current_host]['ip_lan']}",
           "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",

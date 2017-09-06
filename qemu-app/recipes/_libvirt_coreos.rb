@@ -130,29 +130,14 @@ node.default['qemu']['current_config']['libvirt_coreos'] = {
           }
         }
       ],
-      "interface"=>[
+      "interface"=>node['qemu']['current_config']['libvirt_networks'].map { |n|
         {
           "#attributes"=>{
             "type"=>"network"
           },
           "source"=>{
             "#attributes"=>{
-              "network"=>node['qemu']['libvirt_network_lan']
-            }
-          },
-          "model"=>{
-            "#attributes"=>{
-              "type"=>"virtio-net"
-            }
-          }
-        },
-        {
-          "#attributes"=>{
-            "type"=>"network"
-          },
-          "source"=>{
-            "#attributes"=>{
-              "network"=>node['qemu']['libvirt_network_store']
+              "network"=>n
             }
           },
           "model"=>{
@@ -161,7 +146,7 @@ node.default['qemu']['current_config']['libvirt_coreos'] = {
             }
           }
         }
-      ],
+      },
       "serial"=>{
         "#attributes"=>{
           "type"=>"pty"
