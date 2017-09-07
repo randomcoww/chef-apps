@@ -1,4 +1,4 @@
-node.default['kube_manifests']['kube_master']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
+node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
     'user' => 'haproxy',
     'group' => 'haproxy',
@@ -34,7 +34,7 @@ node.default['kube_manifests']['kube_master']['haproxy_config'] = HaproxyHelper:
     'maxconn' => 2000
   },
   'backend transmission' => {
-    'server' => node['environment_v2']['set']['haproxy']['hosts'].map { |e|
+    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
         "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30063 check"
       }
   },
@@ -44,7 +44,7 @@ node.default['kube_manifests']['kube_master']['haproxy_config'] = HaproxyHelper:
     'maxconn' => 2000
   },
   'backend sshd' => {
-    'server' => node['environment_v2']['set']['haproxy']['hosts'].map { |e|
+    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
         "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:32222 check"
       }
   },
@@ -54,7 +54,7 @@ node.default['kube_manifests']['kube_master']['haproxy_config'] = HaproxyHelper:
     'maxconn' => 2000
   },
   'backend mpd_control' => {
-    'server' => node['environment_v2']['set']['haproxy']['hosts'].map { |e|
+    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
         "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30061 check"
       }
   },
@@ -64,7 +64,7 @@ node.default['kube_manifests']['kube_master']['haproxy_config'] = HaproxyHelper:
     'maxconn' => 2000
   },
   'backend mpd_stream' => {
-    'server' => node['environment_v2']['set']['haproxy']['hosts'].map { |e|
+    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
         "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30062 check"
       }
   }

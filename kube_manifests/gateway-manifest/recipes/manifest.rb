@@ -1,5 +1,29 @@
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 
+haproxy_manifest = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    "name" => "haproxy"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "containers" => [
+      {
+        "name" => "haproxy",
+        "image" => node['kube']['images']['haproxy'],
+        "env" => [
+          {
+            "name" => "CONFIG",
+            "value" => node['kube_manifests']['gateway']['haproxy_config']
+          }
+        ]
+      }
+    ]
+  }
+}
+
 
 node['kube_manifests']['gateway']['hosts'].each do |host|
 
@@ -65,4 +89,5 @@ node['kube_manifests']['gateway']['hosts'].each do |host|
   }
 
   node.default['kubernetes']['static_pods'][host]['gateway.yaml'] = gateway_manifest
+  node.default['kubernetes']['static_pods'][host]['haproxy_manifest.yaml'] = haproxy_manifest
 end

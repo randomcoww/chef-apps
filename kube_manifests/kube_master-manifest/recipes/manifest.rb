@@ -225,99 +225,72 @@ kube_apiserver_manifest = {
   }
 }
 
-haproxy_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "haproxy"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "haproxy",
-        "image" => node['kube']['images']['haproxy'],
-        "env" => [
-          {
-            "name" => "CONFIG",
-            "value" => node['kube_manifests']['kube_master']['haproxy_config']
-          }
-        ]
-      }
-    ]
-  }
+
+etcd_initial_cluster = node['kube_manifests']['kube_master']['hosts'].map { |host|
+  "#{host}=http://#{node['environment_v2']['host'][host]['ip_lan']}:2380"
 }
 
-
-keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
-
 node['kube_manifests']['kube_master']['hosts'].each do |host|
-  node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
 
-  node.default['kubernetes']['static_pods'][host]['haproxy_manifest.yaml'] = haproxy_manifest
+  ip = node['environment_v2']['host'][host]['ip_lan']
+  etcd_environment = {
+    "ETCD_NAME" => host,
+    "ETCD_LISTEN_PEER_URLS" => "http://#{ip}:2380",
+    "ETCD_LISTEN_CLIENT_URLS" => [ip, '127.0.0.1'].map { |e|
+        "http://#{e}:2379"
+      }.join(','),
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{ip}:2380",
+    "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster.join(','),
+    "ETCD_INITIAL_CLUSTER_STATE" => "new",
+    # "ETCD_INITIAL_CLUSTER_STATE" => "existing",
+    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-kube",
+    "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{ip}:2379"
+  }
 
-
-  keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
-    'vrrp_sync_group VG_haproxy' => [
-      {
-        'group' => [
-          'VI_haproxy'
-        ]
-      }
-    ],
-    'vrrp_instance VI_haproxy' => [
-      {
-        'state' => 'BACKUP',
-        'virtual_router_id' => 82,
-        'interface' => node['environment_v2']['host'][host]['if_lan'],
-        'priority' => 100,
-        'authentication' => [
-          {
-            'auth_type' => 'AH',
-            'auth_pass' => keepalived_bag.get_or_create('VI_haproxy_v2', SecureRandom.base64(6))
-          }
-        ],
-        'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['kube-master']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-        ]
-      }
-    ]
-  })
-
-  keepalived_manifest = {
-    "apiVersion" => "v1",
+  etcd_manifest = {
     "kind" => "Pod",
+    "apiVersion" => "v1",
     "metadata" => {
-      "name" => "keepalived"
+      "namespace" => "kube-system",
+      "name" => "etcd"
     },
     "spec" => {
-      "restartPolicy" => "Always",
       "hostNetwork" => true,
+      "restartPolicy" => 'Always',
       "containers" => [
         {
-          "name" => "keepalived",
-          "image" => node['kube']['images']['keepalived'],
-          "securityContext" => {
-            "capabilities" => {
-              "add" => [
-                "NET_ADMIN"
-              ]
+          "name" => "etcd-kube",
+          "image" => node['kube']['images']['etcd'],
+          "command" => [
+            "/usr/local/bin/etcd",
+            "--data-dir=/var/lib/etcd"
+          ],
+          "env" => etcd_environment.map { |k, v|
+            {
+              "name" => k,
+              "value" => v
             }
           },
-          "env" => [
+          "volumeMounts" => [
             {
-              "name" => "CONFIG",
-              "value" => keepalived_config
+              "mountPath" => "/var/lib/etcd",
+              "name" => "etcd-data"
             }
           ]
+        }
+      ],
+      "volumes" => [
+        {
+          "name" => "etcd-data",
+          "emptyDir" => {}
         }
       ]
     }
   }
 
-  node.default['kubernetes']['static_pods'][host]['keepalived_manifest.yaml'] = keepalived_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
+  node.default['kubernetes']['static_pods'][host]['etcd_manifest.yaml'] = etcd_manifest
 end

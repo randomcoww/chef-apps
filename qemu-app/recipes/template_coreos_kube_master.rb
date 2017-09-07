@@ -8,7 +8,7 @@ node.default['qemu']['current_config']['ignition_config'] = {
     "users" => [
       {
         "name" => "core",
-        "passwordHash" => "$6$c6en5k51$fJnDYVaIDbasJQNWo.ezDdX4zfW9jsVlZAQwztQbMvRVUei/iGfGzBlhxqCAWCI6kAkrQLwy2Yr6D9HImPWWU/",
+        # "passwordHash" => "$6$c6en5k51$fJnDYVaIDbasJQNWo.ezDdX4zfW9jsVlZAQwztQbMvRVUei/iGfGzBlhxqCAWCI6kAkrQLwy2Yr6D9HImPWWU/",
         "sshAuthorizedKeys" => node['environment_v2']['ssh_authorized_keys']['default']
       }
     ]
@@ -89,8 +89,9 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
           "/usr/lib/coreos/kubelet-wrapper",
           "--api-servers=http://127.0.0.1:8080",
           "--register-schedulable=true",
+          "--register-node=true",
           "--cni-conf-dir=/etc/kubernetes/cni/net.d",
-          "--network-plugin=${NETWORK_PLUGIN}",
+          # "--network-plugin=${NETWORK_PLUGIN}",
           "--container-runtime=docker",
           "--allow-privileged=true",
           "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/#{current_host}",

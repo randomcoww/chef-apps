@@ -2,6 +2,8 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
   'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
 )
 
+current_host = node['qemu']['current_config']['hostname']
+
 node.default['qemu']['current_config']['kube_ca'] = cert_generator.root_ca.to_pem
 key = cert_generator.generate_key
 
@@ -17,7 +19,7 @@ cert = cert_generator.node_cert(
     "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
   },
   {
-    'IP.1' => node['environment_v2']['host'][node['qemu']['current_config']['hostname']]['ip_lan']
+    'IP.1' => node['environment_v2']['host'][current_host]['ip_lan']
   }
 )
 
@@ -32,7 +34,7 @@ node.default['kube_worker']['kubelet']['kubeconfig'] = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['kubernetes']['master_ip']}"
+        # "server" => "https://#{node['kubernetes']['master_ip']}"
       }
     }
   ],
@@ -67,7 +69,7 @@ node.default['kube_worker']['kube_proxy']['kubeconfig'] = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['kubernetes']['master_ip']}"
+        # "server" => "https://#{node['kubernetes']['master_ip']}"
       }
     }
   ],

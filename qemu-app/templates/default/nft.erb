@@ -34,7 +34,7 @@ table ip filter {
 		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ct state {established, related} accept;
 
 		## ssh
-		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @sets['haproxy']['vip_lan'] %> tcp dport 2222 ct state new accept;
+		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @sets['gateway']['vip_lan'] %> tcp dport 2222 ct state new accept;
 
 		## moonlight
 		# iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @hosts['gamestream']['ip_lan'] %> tcp dport {47984, 47989} ct state new accept;
@@ -47,7 +47,7 @@ table ip nat {
 		type nat hook prerouting priority 0; policy accept;
 
 		## ssh
-		iifname "<%= @current_host['if_wan'] %>" tcp dport 2222 dnat <%= @sets['haproxy']['vip_lan'] %>:2222;
+		iifname "<%= @current_host['if_wan'] %>" tcp dport 2222 dnat <%= @sets['gateway']['vip_lan'] %>:2222;
 		# iifname "<%= @current_host['if_wan'] %>" tcp dport 22 redirect to 2222;
 
 		## moonlight

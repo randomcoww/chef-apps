@@ -21,3 +21,4 @@ chef_version '>= 12.1' if respond_to?(:chef_version)
 depends          'keepalived_resource'
 depends          'environment'
 depends          'dbag'
+depends          'haproxy_resource'

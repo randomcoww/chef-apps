@@ -26,7 +26,9 @@ node.default['kubernetes']['version'] = '1.7.4'
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
-node.default['kubernetes']['master_ip'] = node['environment_v2']['set']['kube-master']['vip_lan']
+node.default['kubernetes']['master_ips'] = node['environment_v2']['set']['kube-master']['hosts'].map { |host|
+  node['environment_v2']['host'][host]['ip_lan']
+}
 
 node.default['kubernetes']['insecure_port'] = 8080
 node.default['kubernetes']['secure_port'] = 443
