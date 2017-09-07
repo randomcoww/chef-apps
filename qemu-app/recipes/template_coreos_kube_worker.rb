@@ -82,7 +82,9 @@ node.default['qemu']['current_config']['ignition_systemd'] = [
         ],
         "ExecStart" => [
           "/usr/lib/coreos/kubelet-wrapper",
-          "--api-servers=#{node['kubernetes']['master_ips'].map { |ip| "https://#{ip}" }.join(',')}",
+          "--api-servers=#{node['kubernetes']['master_hosts'].map { |host|
+              "https://#{node['environment_v2']['host'][host]['ip_lan']}"
+            }.join(',')}",
           "--register-schedulable=false",
           "--register-node=true",
           "--cni-conf-dir=/etc/kubernetes/cni/net.d",

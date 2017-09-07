@@ -1,5 +1,6 @@
 # node.default['qemu']['current_config']['hostname'] = 'host'
 current_host = node['qemu']['current_config']['hostname']
+current_ip = node['environment_v2']['host'][current_host]['ip_lan']
 
 node.default['qemu']['current_config']['ignition_config_path'] = "/data/cloud-init/#{current_host}.ign"
 
@@ -49,9 +50,10 @@ node.default['qemu']['current_config']['ignition_networkd'] = node['qemu']['curr
 
 flanneld_environment = {
   "FLANNELD_IFACE" => node['environment_v2']['host'][current_host]['ip_lan'],
-  "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd-flannel']['hosts'].map { |e|
+  "FLANNELD_ETCD_ENDPOINTS" => node['kubernetes']['etcd_hosts'].map { |e|
     "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379"
   }.join(','),
+  # "FLANNELD_ETCD_ENDPOINTS" => "http://127.0.0.1:2379",
   "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
   "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
   "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',

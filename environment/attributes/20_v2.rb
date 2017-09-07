@@ -34,20 +34,6 @@ node.default['environment_v2']['set']['kea'] = {
   ]
 }
 
-node.default['environment_v2']['set']['etcd-flannel'] = {
-  'hosts' => [
-    'coreos-kea1',
-    'coreos-kea2'
-  ]
-}
-
-node.default['environment_v2']['set']['etcd-kube'] = {
-  'hosts' => [
-    'coreos-kube-master1',
-    'coreos-kube-master2'
-  ]
-}
-
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'coreos-kube-master1',
@@ -61,6 +47,14 @@ node.default['environment_v2']['set']['gateway'] = {
     'coreos-gateway2'
   ],
   'vip_lan' => "192.168.62.240"
+}
+
+node.default['environment_v2']['set']['etcd'] = {
+  'hosts' => [
+    'coreos-etcd1',
+    'coreos-etcd2',
+    'coreos-etcd3',
+  ]
 }
 
 node.default['environment_v2']['set']['gluster'] = {
@@ -123,6 +117,21 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
   'ip_lan' => "192.168.62.218",
   'if_lan' => 'ens2',
   'if_wan' => 'ens3',
+}
+
+node.default['environment_v2']['host']['coreos-etcd1'] = {
+  'ip_lan' => "192.168.62.219",
+  'if_lan' => 'ens2',
+}
+
+node.default['environment_v2']['host']['coreos-etcd2'] = {
+  'ip_lan' => "192.168.62.220",
+  'if_lan' => 'ens2',
+}
+
+node.default['environment_v2']['host']['coreos-etcd3'] = {
+  'ip_lan' => "192.168.62.221",
+  'if_lan' => 'ens2',
 }
 
 
