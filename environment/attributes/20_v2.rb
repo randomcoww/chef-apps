@@ -73,65 +73,72 @@ node.default['environment_v2']['set']['gluster'] = {
 
 node.default['environment_v2']['host']['coreos-dns1'] = {
   'ip_lan' => "192.168.62.211",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-dns2'] = {
   'ip_lan' => "192.168.62.212",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-kea1'] = {
   'ip_lan' => "192.168.62.213",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-kea2'] = {
   'ip_lan' => "192.168.62.214",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
-}
-
-node.default['environment_v2']['host']['coreos-kube-master1'] = {
-  'ip_lan' => "192.168.62.215",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
-}
-
-node.default['environment_v2']['host']['coreos-kube-master2'] = {
-  'ip_lan' => "192.168.62.216",
-  'if_lan' => 'ens2',
-  'if_store' => 'ens3',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-gateway1'] = {
   'ip_lan' => "192.168.62.217",
+  'mac_wan' => "52:54:00:63:6e:b0",
   'if_lan' => 'ens2',
   'if_wan' => 'ens3',
 }
 
 node.default['environment_v2']['host']['coreos-gateway2'] = {
   'ip_lan' => "192.168.62.218",
+  'mac_wan' => "52:54:00:63:6e:b1",
   'if_lan' => 'ens2',
   'if_wan' => 'ens3',
 }
 
+node.default['environment_v2']['host']['coreos-kube-master1'] = {
+  'ip_lan' => "192.168.62.219",
+  'ip_lan' => "192.168.126.219",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
+}
+
+node.default['environment_v2']['host']['coreos-kube-master2'] = {
+  'ip_lan' => "192.168.62.220",
+  'ip_lan' => "192.168.126.220",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
+}
+
+node.default['environment_v2']['host']['coreos-kube-master2'] = {
+  'ip_lan' => "192.168.62.221",
+  'ip_lan' => "192.168.126.221",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
+}
+
 node.default['environment_v2']['host']['coreos-etcd1'] = {
   'ip_lan' => "192.168.62.219",
-  'if_lan' => 'ens2',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-etcd2'] = {
   'ip_lan' => "192.168.62.220",
-  'if_lan' => 'ens2',
+  'if_lan' => 'eth0',
 }
 
 node.default['environment_v2']['host']['coreos-etcd3'] = {
   'ip_lan' => "192.168.62.221",
-  'if_lan' => 'ens2',
+  'if_lan' => 'eth0',
 }
 
 
@@ -158,9 +165,9 @@ node.default['environment_v2']['host']['vm1'] = {
   'ip_store' => '192.168.126.251',
   'if_lan' => 'host_lan',
   'if_store' => 'host_store',
-  'vf_lan' => 'eno1',
-  'vf_wan' => 'eno2',
-  'vf_store' => 'ens1',
+  # 'vf_lan' => 'eno1',
+  # 'vf_wan' => 'eno2',
+  # 'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -175,9 +182,9 @@ node.default['environment_v2']['host']['vm2'] = {
   'ip_store' => '192.168.126.252',
   'if_lan' => 'host_lan',
   'if_store' => 'host_store',
-  'vf_lan' => 'eno1',
-  'vf_wan' => 'eno2',
-  'vf_store' => 'ens1',
+  # 'vf_lan' => 'eno1',
+  # 'vf_wan' => 'eno2',
+  # 'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",

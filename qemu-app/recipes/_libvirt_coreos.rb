@@ -130,23 +130,7 @@ node.default['qemu']['current_config']['libvirt_coreos'] = {
           }
         }
       ],
-      "interface"=>node['qemu']['current_config']['libvirt_networks'].map { |n|
-        {
-          "#attributes"=>{
-            "type"=>"network"
-          },
-          "source"=>{
-            "#attributes"=>{
-              "network"=>n
-            }
-          },
-          "model"=>{
-            "#attributes"=>{
-              "type"=>"virtio-net"
-            }
-          }
-        }
-      },
+      "interface"=>node['qemu']['current_config']['libvirt_networks'].values,
       "serial"=>{
         "#attributes"=>{
           "type"=>"pty"
