@@ -234,7 +234,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
             # "--network-plugin=${NETWORK_PLUGIN}",
             "--container-runtime=docker",
             "--allow-privileged=true",
-            # "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/manifests/#{host}",
+            "--manifest-url=http://#{node['environment_v2']['current_host']['ip_lan']}:8888/manifests/#{host}",
             "--hostname-override=#{ip_lan}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
