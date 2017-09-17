@@ -249,4 +249,5 @@ node.default['environment_v2']['host']['chromebook'] = {
 
 
 ## load current host under 'current_host'
-node.default['environment_v2']['current_host'] = node['environment_v2']['host'][node['hostname']]
+# node.default['environment_v2']['current_host'] = node['environment_v2']['host'][node['hostname']]
+node.default['environment_v2']['current_host'] = node['environment_v2']['host'][ENV['NODE_NAME']]
