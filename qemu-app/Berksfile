@@ -5,5 +5,3 @@ metadata
 cookbook "qemu", github: "randomcoww/chef-qemu"
 cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
 cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
-cookbook "dbag", github: "randomcoww/chef-dbag"
-cookbook "openssl_cert", github: "randomcoww/chef-openssl_cert"
