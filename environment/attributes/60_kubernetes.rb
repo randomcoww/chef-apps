@@ -50,8 +50,9 @@ node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['srv_pat
 
 
 ## pods
-node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
-node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
+# node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
+node.default['kubernetes']['manifests_path'] = '/config/manifests'
+# node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
 
 
 ## kubernetes download
