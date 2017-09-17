@@ -30,8 +30,10 @@ node.default['environment_v2']['set']['dns'] = {
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
-    'coreos-kea1',
-    'coreos-kea2'
+    # 'coreos-kea1',
+    # 'coreos-kea2'
+    'coreos-dns1',
+    'coreos-dns2'
   ]
 }
 
@@ -125,38 +127,6 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-kube-master1'] = {
-  'ip_lan' => "192.168.62.219",
-  'if_lan' => 'eth0',
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kube-master2'] = {
-  'ip_lan' => "192.168.62.220",
-  'if_lan' => 'eth0',
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kube-worker1'] = {
-  'ip_lan' => "192.168.62.221",
-  'ip_store' => "192.168.126.221",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kube-worker2'] = {
-  'ip_lan' => "192.168.62.222",
-  'ip_store' => "192.168.126.222",
-  'if_lan' => 'eth0',
-  'if_store' => 'eth1',
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
 node.default['environment_v2']['host']['coreos-etcd1'] = {
   'ip_lan' => "192.168.62.219",
   'if_lan' => 'eth0',
@@ -178,13 +148,45 @@ node.default['environment_v2']['host']['coreos-etcd3'] = {
   'vcpu' => 2
 }
 
+node.default['environment_v2']['host']['coreos-kube-master1'] = {
+  'ip_lan' => "192.168.62.222",
+  'if_lan' => 'eth0',
+  'memory' => 2048,
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['coreos-kube-master2'] = {
+  'ip_lan' => "192.168.62.223",
+  'if_lan' => 'eth0',
+  'memory' => 2048,
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['coreos-kube-worker1'] = {
+  'ip_lan' => "192.168.62.224",
+  'ip_store' => "192.168.126.224",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
+  'memory' => 2048,
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['coreos-kube-worker2'] = {
+  'ip_lan' => "192.168.62.225",
+  'ip_store' => "192.168.126.225",
+  'if_lan' => 'eth0',
+  'if_store' => 'eth1',
+  'memory' => 2048,
+  'vcpu' => 2
+}
+
 
 ##
 ## one off
 ##
 
 node.default['environment_v2']['host']['unifi'] = {
-  'ip_lan' => "192.168.62.98",
+  'ip_lan' => "192.168.62.100",
 }
 
 node.default['environment_v2']['host']['gamestream'] = {

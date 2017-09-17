@@ -230,7 +230,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
               }.join(',')}",
             "--register-schedulable=false",
             "--register-node=true",
-            # "--cni-conf-dir=/etc/kubernetes/cni/net.d",
+            "--cni-conf-dir=/etc/kubernetes/cni/net.d",
             # "--network-plugin=${NETWORK_PLUGIN}",
             "--container-runtime=docker",
             "--allow-privileged=true",

@@ -21,7 +21,7 @@ node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.7.4'
+node.default['kubernetes']['version'] = '1.7.6'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'

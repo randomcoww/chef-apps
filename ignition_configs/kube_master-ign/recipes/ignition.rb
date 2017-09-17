@@ -113,9 +113,9 @@ node['ignition']['kube_master']['hosts'].each do |host|
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
             "--api-servers=http://127.0.0.1:8080",
-            "--register-schedulable=true",
+            "--register-schedulable=false",
             "--register-node=true",
-            # "--cni-conf-dir=/etc/kubernetes/cni/net.d",
+            "--cni-conf-dir=/etc/kubernetes/cni/net.d",
             # "--network-plugin=${NETWORK_PLUGIN}",
             "--container-runtime=docker",
             "--allow-privileged=true",
