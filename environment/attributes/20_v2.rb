@@ -41,6 +41,13 @@ node.default['environment_v2']['set']['kube-master'] = {
   ]
 }
 
+node.default['environment_v2']['set']['kube-worker'] = {
+  'hosts' => [
+    'coreos-kube-worker1',
+    'coreos-kube-worker2'
+  ]
+}
+
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
     'coreos-gateway1',
@@ -107,21 +114,24 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
 
 node.default['environment_v2']['host']['coreos-kube-master1'] = {
   'ip_lan' => "192.168.62.219",
-  'ip_lan' => "192.168.126.219",
   'if_lan' => 'eth0',
-  'if_store' => 'eth1',
 }
 
 node.default['environment_v2']['host']['coreos-kube-master2'] = {
   'ip_lan' => "192.168.62.220",
-  'ip_lan' => "192.168.126.220",
+  'if_lan' => 'eth0',
+}
+
+node.default['environment_v2']['host']['coreos-kube-worker1'] = {
+  'ip_lan' => "192.168.62.221",
+  'ip_store' => "192.168.126.221",
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
 }
 
-node.default['environment_v2']['host']['coreos-kube-master2'] = {
-  'ip_lan' => "192.168.62.221",
-  'ip_lan' => "192.168.126.221",
+node.default['environment_v2']['host']['coreos-kube-worker2'] = {
+  'ip_lan' => "192.168.62.222",
+  'ip_store' => "192.168.126.222",
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
 }
