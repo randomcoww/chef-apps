@@ -1,3 +1,7 @@
+host_ips = node['kube_manifests']['kea']['hosts'].map { |host|
+  node['environment_v2']['host'][host]['ip_lan']
+}
+
 ndbd_manifest = {
   "apiVersion" => "v1",
   "kind" => "Pod",
