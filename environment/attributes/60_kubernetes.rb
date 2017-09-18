@@ -81,3 +81,10 @@ node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkub
 node.default['kubernetes']['kubelet']['kubeconfig_path'] = '/var/lib/kubelet/kubeconfig'
 node.default['kubernetes']['kube_proxy']['kubeconfig_path'] = '/var/lib/kube_proxy/kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'
+
+
+node.default['kube_manifests']['dns']['hosts'] = node['environment_v2']['set']['dns']['hosts']
+node.default['kube_manifests']['gateway']['hosts'] = node['environment_v2']['set']['gateway']['hosts']
+node.default['kube_manifests']['kea']['hosts'] = node['environment_v2']['set']['kea']['hosts']
+node.default['kube_manifests']['kube_master']['hosts'] = node['environment_v2']['set']['kube-master']['hosts']
+node.default['kube_manifests']['kube_worker']['hosts'] = node['environment_v2']['set']['kube-worker']['hosts']

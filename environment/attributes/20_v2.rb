@@ -25,7 +25,6 @@ node.default['environment_v2']['set']['dns'] = {
     'coreos-dns1',
     'coreos-dns2'
   ]
-
 }
 
 node.default['environment_v2']['set']['kea'] = {
@@ -83,20 +82,6 @@ node.default['environment_v2']['host']['coreos-dns2'] = {
   'memory' => 2048,
   'vcpu' => 2
 }
-
-# node.default['environment_v2']['host']['coreos-kea1'] = {
-#   'ip_lan' => "192.168.62.213",
-#   'if_lan' => 'eth0',
-#   'memory' => 2048,
-#   'vcpu' => 2
-# }
-#
-# node.default['environment_v2']['host']['coreos-kea2'] = {
-#   'ip_lan' => "192.168.62.214",
-#   'if_lan' => 'eth0',
-#   'memory' => 2048,
-#   'vcpu' => 2
-# }
 
 node.default['environment_v2']['host']['coreos-gateway1'] = {
   'ip_lan' => "192.168.62.217",
