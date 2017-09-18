@@ -1,7 +1,0 @@
-source "https://supermarket.chef.io"
-
-metadata
-
-cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
-cookbook "dbag", github: "randomcoww/chef-dbag"
-cookbook "keepalived_resource", github: "randomcoww/chef-keepalived_resource"

@@ -1,8 +1,0 @@
-source "https://supermarket.chef.io"
-
-metadata
-
-cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
-cookbook "mysql_credentials", github: "randomcoww/chef-apps", rel: "mysql_credentials"
-cookbook "mysql_cluster", github: "randomcoww/chef-mysql_cluster"
-cookbook "dbag", github: "randomcoww/chef-dbag"
