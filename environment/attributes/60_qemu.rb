@@ -17,6 +17,7 @@ node.default['qemu']['vm1']['guests'] = [
   'coreos-dns1', 'coreos-dns2',
   'coreos-gateway1', 'coreos-gateway2',
   'coreos-etcd1', 'coreos-etcd2', 'coreos-etcd3',
-  'coreos-kube-master1', 'coreos-kube-master2',
+  'coreos-kube-master1',
+  'coreos-kube-master2',
   'coreos-kube-worker1', 'coreos-kube-worker2'
 ]

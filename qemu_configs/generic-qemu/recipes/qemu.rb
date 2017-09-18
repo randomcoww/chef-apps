@@ -17,7 +17,7 @@ node['qemu']['generic']['hosts'].each do |host, config|
       },
       "source"=>{
         "#attributes"=>{
-          "dev"=>node['environment_v2']['current_host']['if_lan'],
+          "dev"=>node['environment_v2']['node_host']['if_lan'],
           "mode"=>"bridge"
         }
       },
@@ -37,7 +37,7 @@ node['qemu']['generic']['hosts'].each do |host, config|
       },
       "source"=>{
         "#attributes"=>{
-          "dev"=>node['environment_v2']['current_host']['if_store'],
+          "dev"=>node['environment_v2']['node_host']['if_store'],
           "mode"=>"bridge"
         }
       },
