@@ -67,5 +67,15 @@ node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::Con
     'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
         "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30062 check"
       }
-  }
+  },
+  'frontend kube_master' => {
+    'default_backend' => 'kube_master',
+    'bind' => "*:443",
+    'maxconn' => 2000
+  },
+  'backend kube_master' => {
+    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
+        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:443 check"
+      }
+  },
 })
