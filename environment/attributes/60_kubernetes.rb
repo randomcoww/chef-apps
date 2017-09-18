@@ -80,3 +80,4 @@ node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkub
 
 node.default['kubernetes']['kubelet']['kubeconfig_path'] = '/var/lib/kubelet/kubeconfig'
 node.default['kubernetes']['kube_proxy']['kubeconfig_path'] = '/var/lib/kube_proxy/kubeconfig'
+node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'

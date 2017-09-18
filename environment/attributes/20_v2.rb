@@ -30,8 +30,6 @@ node.default['environment_v2']['set']['dns'] = {
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
-    # 'coreos-kea1',
-    # 'coreos-kea2'
     'coreos-dns1',
     'coreos-dns2'
   ]
@@ -67,15 +65,6 @@ node.default['environment_v2']['set']['etcd'] = {
   ]
 }
 
-node.default['environment_v2']['set']['gluster'] = {
-  'hosts' => [
-    'vm1',
-    'vm2'
-  ],
-  'vip_lan' => "192.168.62.250",
-  'vip_store' => "192.168.126.250"
-}
-
 
 ##
 ## hosts
@@ -95,19 +84,19 @@ node.default['environment_v2']['host']['coreos-dns2'] = {
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-kea1'] = {
-  'ip_lan' => "192.168.62.213",
-  'if_lan' => 'eth0',
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kea2'] = {
-  'ip_lan' => "192.168.62.214",
-  'if_lan' => 'eth0',
-  'memory' => 2048,
-  'vcpu' => 2
-}
+# node.default['environment_v2']['host']['coreos-kea1'] = {
+#   'ip_lan' => "192.168.62.213",
+#   'if_lan' => 'eth0',
+#   'memory' => 2048,
+#   'vcpu' => 2
+# }
+#
+# node.default['environment_v2']['host']['coreos-kea2'] = {
+#   'ip_lan' => "192.168.62.214",
+#   'if_lan' => 'eth0',
+#   'memory' => 2048,
+#   'vcpu' => 2
+# }
 
 node.default['environment_v2']['host']['coreos-gateway1'] = {
   'ip_lan' => "192.168.62.217",
@@ -167,7 +156,7 @@ node.default['environment_v2']['host']['coreos-kube-worker1'] = {
   'ip_store' => "192.168.126.224",
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
-  'memory' => 2048,
+  'memory' => 4096,
   'vcpu' => 2
 }
 
@@ -176,7 +165,7 @@ node.default['environment_v2']['host']['coreos-kube-worker2'] = {
   'ip_store' => "192.168.126.225",
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
-  'memory' => 2048,
+  'memory' => 4096,
   'vcpu' => 2
 }
 
@@ -204,9 +193,6 @@ node.default['environment_v2']['host']['vm1'] = {
   'ip_store' => '192.168.126.251',
   'if_lan' => 'host_lan',
   'if_store' => 'host_store',
-  # 'vf_lan' => 'eno1',
-  # 'vf_wan' => 'eno2',
-  # 'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -221,9 +207,6 @@ node.default['environment_v2']['host']['vm2'] = {
   'ip_store' => '192.168.126.252',
   'if_lan' => 'host_lan',
   'if_store' => 'host_store',
-  # 'vf_lan' => 'eno1',
-  # 'vf_wan' => 'eno2',
-  # 'vf_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
