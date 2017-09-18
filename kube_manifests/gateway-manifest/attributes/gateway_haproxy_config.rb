@@ -1,6 +1,6 @@
 services = {}
 
-node['environment_v2']['service'].map { |name, config|
+node['environment_v2']['service'].each do |name, config|
   services["frontend #{name}"] = {
     'default_backend' => name,
     'bind' => "*:#{config['bind']}",
@@ -17,7 +17,7 @@ node['environment_v2']['service'].map { |name, config|
   services["backend #{name}"] = {
     "server" => backend
   }
-}
+end
 
 node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
