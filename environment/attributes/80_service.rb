@@ -27,8 +27,8 @@ node.default['environment_v2']['service']['mpd_stream'] = {
 }
 
 node.default['environment_v2']['service']['kube_master'] = {
-  "bind" => 443,
+  "bind" => node['kubernetes']['secure_port'],
   "sets" => {
-    "kube-master" => 443
+    "kube-master" => node['kubernetes']['secure_port']
   }
 }
