@@ -1,3 +1,24 @@
+services = {}
+
+node['environment_v2']['service'].map { |name, config|
+  services["frontend #{name}"] = {
+    'default_backend' => name,
+    'bind' => "*:#{config['bind']}",
+    'maxconn' => 2000
+  }
+
+  backend = []
+  config['sets'].each do |set, port|
+    node['environment_v2']['set'][set]['hosts'].each do |host|
+      backend << "#{host} #{node['environment_v2']['host'][host]['ip_lan']}:#{port} check"
+    end
+  end
+
+  services["backend #{name}"] = {
+    "server" => backend
+  }
+}
+
 node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
     'user' => 'haproxy',
@@ -27,55 +48,5 @@ node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::Con
       'redispatch'
     ],
     'stats' => 'uri /haproxy-status'
-  },
-  'frontend transmission' => {
-    'default_backend' => 'transmission',
-    'bind' => "*:9091",
-    'maxconn' => 2000
-  },
-  'backend transmission' => {
-    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30063 check"
-      }
-  },
-  'frontend sshd' => {
-    'default_backend' => 'sshd',
-    'bind' => "*:2222",
-    'maxconn' => 2000
-  },
-  'backend sshd' => {
-    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:32222 check"
-      }
-  },
-  'frontend mpd_control' => {
-    'default_backend' => 'mpd_control',
-    'bind' => "*:6600",
-    'maxconn' => 2000
-  },
-  'backend mpd_control' => {
-    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30061 check"
-      }
-  },
-  'frontend mpd_stream' => {
-    'default_backend' => 'mpd_stream',
-    'bind' => "*:8000",
-    'maxconn' => 2000
-  },
-  'backend mpd_stream' => {
-    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:30062 check"
-      }
-  },
-  'frontend kube_master' => {
-    'default_backend' => 'kube_master',
-    'bind' => "*:443",
-    'maxconn' => 2000
-  },
-  'backend kube_master' => {
-    'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:443 check"
-      }
-  },
-})
+  }
+}.merge(services))
