@@ -22,15 +22,15 @@ end
 kubelet_kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
-  "clusters" => node['environment_v2']['set']['kube-master']['hosts'].map { |h|
+  "clusters" => [
     {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['host'][h]['ip_lan']}"
+        "server" => "https://#{node['environment_v2']['set']['gateway']['vip_lan']}"
       }
     }
-  },
+  ],
   "users" => [
     {
       "name" => "kubelet",
