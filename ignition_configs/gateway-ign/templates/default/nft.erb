@@ -10,17 +10,16 @@ table ip filter {
 		ip protocol icmp accept;
 		# udp sport bootps udp dport bootpc accept;
 
-		## internal ssh
+		## internal
 		iifname "<%= @current_host['if_lan'] %>" tcp dport ssh accept;
+		iifname "<%= @current_host['if_lan'] %>" tcp dport 443 accept;
+		iifname "<%= @current_host['if_lan'] %>" pkttype multicast accept;
 
 		## external ssh
 		# tcp dport 2222 accept;
 
 		## external vpn
 		# iifname "<%= @current_host['if_wan'] %>" udp dport 1194 accept;
-
-		## internal multicast
-		iifname "<%= @current_host['if_lan'] %>" pkttype multicast accept;
 	}
 
 	chain output {
