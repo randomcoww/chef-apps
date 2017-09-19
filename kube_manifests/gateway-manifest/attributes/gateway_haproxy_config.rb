@@ -1,6 +1,8 @@
 services = {}
 
 node['environment_v2']['service'].each do |name, config|
+  next if !config.has_key?('sets')
+
   services["frontend #{name}"] = {
     'default_backend' => name,
     'bind' => "*:#{config['bind']}",
