@@ -15,10 +15,12 @@ if guests.is_a?(Array) && !guests.empty?
 
   content = []
   node['qemu'][current_host]['guests'].each do |host|
-    content << {
-      "name" => host,
-      "contents" => node['qemu']['configs'][host]
-    }
+    if node['qemu']['configs'].has_key?(host)
+      content << {
+        "name" => host,
+        "contents" => node['qemu']['configs'][host]
+      }
+    end
   end
 
   file ::File.join(node['qemu']['config_path'], current_host) do
