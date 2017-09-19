@@ -32,3 +32,7 @@ node.default['environment_v2']['service']['kube_master'] = {
     "kube-master" => node['kubernetes']['secure_port']
   }
 }
+
+node.default['environment_v2']['service']['manifest_server'] = {
+  "bind" => 8888
+}
