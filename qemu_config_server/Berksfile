@@ -2,3 +2,5 @@
 source 'https://supermarket.chef.io'
 
 metadata
+
+cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"

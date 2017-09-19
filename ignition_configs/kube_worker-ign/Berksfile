@@ -3,6 +3,6 @@ source 'https://supermarket.chef.io'
 
 metadata
 
-cookbook "environment", github: "randomcoww/chef-apps", rel: "environment"
+cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
 cookbook "openssl_cert", github: "randomcoww/chef-openssl_cert"
 cookbook "dbag", github: "randomcoww/chef-dbag"
