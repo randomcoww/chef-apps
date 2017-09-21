@@ -4,15 +4,19 @@ table ip filter {
 		ct state {established, related} accept;
 		ct state invalid drop;
 
-		iifname "lo" accept;
+		iifname {lo, <%= @current_host['if_lan'] %>} accept;
 		iifname != "lo" ip daddr 127.0.0.1/8 drop;
 
+		## ICMP
 		ip protocol icmp accept;
-		# udp sport bootps udp dport bootpc accept;
+
+		## DHCP
+		udp sport bootps udp dport bootpc accept;
 
 		## internal
-		iifname "<%= @current_host['if_lan'] %>" tcp dport ssh accept;
-		iifname "<%= @current_host['if_lan'] %>" tcp dport 443 accept;
+		# iifname "<%= @current_host['if_lan'] %>" tcp dport ssh accept;
+		# iifname "<%= @current_host['if_lan'] %>" tcp dport 443 accept;
+		# iifname "<%= @current_host['if_lan'] %>" udp dport 53 accept;
 		iifname "<%= @current_host['if_lan'] %>" pkttype multicast accept;
 
 		## external ssh
@@ -34,10 +38,6 @@ table ip filter {
 
 		## ssh
 		iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @sets['gateway']['vip_lan'] %> tcp dport 2222 ct state new accept;
-
-		## moonlight
-		# iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @hosts['gamestream']['ip_lan'] %> tcp dport {47984, 47989} ct state new accept;
-		# iifname "<%= @current_host['if_wan'] %>" oifname "<%= @current_host['if_lan'] %>" ip daddr <%= @hosts['gamestream']['ip_lan'] %> udp dport {47998, 47999, 48000, 48010} ct state new accept;
 	}
 }
 
@@ -48,10 +48,6 @@ table ip nat {
 		## ssh
 		iifname "<%= @current_host['if_wan'] %>" tcp dport 2222 dnat <%= @sets['gateway']['vip_lan'] %>:2222;
 		# iifname "<%= @current_host['if_wan'] %>" tcp dport 22 redirect to 2222;
-
-		## moonlight
-		# iifname "<%= @current_host['if_wan'] %>" tcp dport {47984, 47989} dnat <%= @hosts['gamestream']['ip_lan'] %>;
-		# iifname "<%= @current_host['if_wan'] %>" udp dport {47998, 47999, 48000, 48010} dnat <%= @hosts['gamestream']['ip_lan'] %>;
 	}
 
 	chain input {

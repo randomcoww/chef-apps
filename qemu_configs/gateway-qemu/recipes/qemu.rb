@@ -5,17 +5,17 @@ node['qemu']['gateway']['hosts'].each do |host, config|
   mac_wan = host_config['mac_wan']
   memory = host_config['memory']
   vcpu = host_config['vcpu']
-  image_path = "#{::File.join(node['qemu']['image_path'], host)}.qcow2"
-  ignition_path = "#{::File.join(node['qemu']['ignition_path'], host)}.ign"
 
   networks = [
     {
       "#attributes"=>{
-        "type"=>"network"
+        "type"=>"direct",
+        "trustGuestRxFilters"=>"yes"
       },
       "source"=>{
         "#attributes"=>{
-          "network"=>node['qemu']['libvirt_network_lan']
+          "dev"=>node['environment_v2']['node_host']['if_lan'],
+          "mode"=>"bridge"
         }
       },
       "model"=>{
@@ -26,11 +26,13 @@ node['qemu']['gateway']['hosts'].each do |host, config|
     },
     {
       "#attributes"=>{
-        "type"=>"network"
+        "type"=>"direct",
+        "trustGuestRxFilters"=>"yes"
       },
       "source"=>{
         "#attributes"=>{
-          "network"=>node['qemu']['libvirt_network_wan']
+          "dev"=>node['environment_v2']['node_host']['if_wan'],
+          "mode"=>"bridge"
         }
       },
       "mac"=>{
@@ -46,12 +48,21 @@ node['qemu']['gateway']['hosts'].each do |host, config|
     }
   ]
 
+  cidr = node['environment_v2']['subnet']['lan'].split('/').last.to_i
+  static_ip_append = [
+    host_config['ip_lan'],
+    nil,
+    nil,
+    IPAddr.new('255.255.255.255').mask(cidr).to_s,
+    nil,
+    host_config['if_lan'],
+    'none'
+  ].join(':')
 
   node.default['qemu']['configs'][host] = LibvirtConfig::ConfigGenerator.generate_from_hash({
     "domain"=>{
       "#attributes"=>{
-        "type"=>"kvm",
-        "xmlns:qemu"=>"http://libvirt.org/schemas/domain/qemu/1.0"
+        "type"=>"kvm"
       },
       "name"=>host,
       "memory"=>{
@@ -80,19 +91,6 @@ node['qemu']['gateway']['hosts'].each do |host, config|
           }
         }
       },
-      "sysinfo"=>{
-        "#attributes"=>{
-          "type"=>"smbios"
-        },
-        "baseBoard"=>{
-          "entry"=>{
-            "#attributes"=>{
-              "name"=>"serial"
-            },
-            "#text"=>"ds=nocloud"
-          }
-        }
-      },
       "os"=>{
         "type"=>{
           "#attributes"=>{
@@ -101,14 +99,23 @@ node['qemu']['gateway']['hosts'].each do |host, config|
           },
           "#text"=>"hvm"
         },
+        "kernel"=>{
+          "#text"=>node['qemu']['pxe_kernel_path']
+        },
+        "initrd"=>{
+          "#text"=>node['qemu']['pxe_initrd_path']
+        },
+        "cmdline"=>{
+          "#text"=>[
+            "coreos.first_boot=1",
+            "console=ttyS0",
+            "coreos.config.url=http://#{node['environment_v2']['node_host']['ip_lan']}:#{node['environment_v2']['service']['manifest_server']['bind']}/ignition/#{host}",
+            "ip=#{static_ip_append}"
+          ].join(' '),
+        },
         "boot"=>{
           "#attributes"=>{
             "dev"=>"hd"
-          }
-        },
-        "smbios"=>{
-          "#attributes"=>{
-            "mode"=>"sysinfo"
           }
         }
       },
@@ -139,30 +146,6 @@ node['qemu']['gateway']['hosts'].each do |host, config|
       "on_crash"=>"restart",
       "devices"=>{
         "emulator"=>"/usr/bin/qemu-system-x86_64",
-        "disk"=>{
-          "#attributes"=>{
-            "type"=>"file",
-            "device"=>"disk"
-          },
-          "driver"=>{
-            "#attributes"=>{
-              "name"=>"qemu",
-              "type"=>"qcow2",
-              "iothread"=>"1"
-            }
-          },
-          "source"=>{
-            "#attributes"=>{
-              "file"=>image_path
-            }
-          },
-          "target"=>{
-            "#attributes"=>{
-              "dev"=>"vda",
-              "bus"=>"virtio"
-            }
-          }
-        },
         "controller"=>[
           {
             "#attributes"=>{
@@ -220,20 +203,6 @@ node['qemu']['gateway']['hosts'].each do |host, config|
             "model"=>"virtio"
           }
         }
-      },
-      "qemu:commandline"=>{
-        "qemu:arg"=>[
-          {
-            "#attributes"=>{
-              "value"=>"-fw_cfg"
-            }
-          },
-          {
-            "#attributes"=>{
-              "value"=>"name=opt/com.coreos/config,file=#{ignition_path}"
-            }
-          }
-        ]
       }
     }
   })

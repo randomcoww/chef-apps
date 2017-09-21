@@ -36,15 +36,6 @@ start_domains = {}
 
 libvirt_configs = open("http://#{config_host}:#{node['environment_v2']['service']['manifest_server']['bind']}/libvirt/#{node['hostname']}").read
 YAML.load(libvirt_configs).each do |e|
-
-  ignition_config = open("http://#{config_host}:#{node['environment_v2']['service']['manifest_server']['bind']}/ignition/#{e['name']}").read
-
-  ## ignition
-  file "#{::File.join(node['qemu']['ignition_path'], e['name'])}.ign" do
-    content ignition_config
-    action :create
-  end
-
   start_domains[e['name']] = e['contents']
 end
 
