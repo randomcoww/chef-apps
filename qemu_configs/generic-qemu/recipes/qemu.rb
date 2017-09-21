@@ -1,51 +1,51 @@
 node['qemu']['generic']['hosts'].each do |host, config|
 
   host_config = node['environment_v2']['host'][host]
-
   memory = host_config['memory']
   vcpu = host_config['vcpu']
 
+
   networks = []
 
-  if host_config.has_key?('if_lan')
-    networks << {
-      "#attributes"=>{
-        "type"=>"direct",
-        "trustGuestRxFilters"=>"yes"
-      },
-      "source"=>{
-        "#attributes"=>{
-          "dev"=>node['environment_v2']['node_host']['if_lan'],
-          "mode"=>"bridge"
+  [
+    ['if_lan', 'mac_lan'],
+    ['if_store', 'mac_store'],
+    ['if_wan', 'mac_wan']
+  ].each do |if_key, mac|
+
+    if host_config.has_key?(if_key)
+
+      mac_hash = {}
+      if host_config.has_key?(mac)
+        mac_hash = {
+          "mac"=>{
+            "#attributes"=>{
+              "address"=>host_config[mac]
+            }
+          }
         }
-      },
-      "model"=>{
+      end
+
+      networks << {
         "#attributes"=>{
-          "type"=>"virtio-net"
+          "type"=>"direct",
+          "trustGuestRxFilters"=>"yes"
+        },
+        "source"=>{
+          "#attributes"=>{
+            "dev"=>node['environment_v2']['node_host'][if_key],
+            "mode"=>"bridge"
+          }
+        },
+        "model"=>{
+          "#attributes"=>{
+            "type"=>"virtio-net"
+          }
         }
-      }
-    }
+      }.merge(mac_hash)
+    end
   end
 
-  if host_config.has_key?('if_store')
-    networks << {
-      "#attributes"=>{
-        "type"=>"direct",
-        "trustGuestRxFilters"=>"yes"
-      },
-      "source"=>{
-        "#attributes"=>{
-          "dev"=>node['environment_v2']['node_host']['if_store'],
-          "mode"=>"bridge"
-        }
-      },
-      "model"=>{
-        "#attributes"=>{
-          "type"=>"virtio-net"
-        }
-      }
-    }
-  end
 
   node.default['qemu']['configs'][host] = LibvirtConfig::ConfigGenerator.generate_from_hash({
     "domain"=>{
@@ -97,7 +97,7 @@ node['qemu']['generic']['hosts'].each do |host, config|
           "#text"=>[
             "coreos.first_boot=1",
             "console=ttyS0",
-            "coreos.config.url=http://#{node['environment_v2']['node_host']['ip_lan']}:#{node['environment_v2']['service']['manifest_server']['bind']}/ignition/#{host}",
+            "coreos.config.url=#{node['environment_v2']['url']['ignition']}/#{host}",
           ].join(' '),
         },
         "boot"=>{

@@ -34,7 +34,7 @@ include_recipe "qemu::install"
 config_host = node['environment_v2']['host'][node['hostname']]['ip_lan']
 start_domains = {}
 
-libvirt_configs = open("http://#{config_host}:#{node['environment_v2']['service']['manifest_server']['bind']}/libvirt/#{node['hostname']}").read
+libvirt_configs = open("#{node['environment_v2']['url']['libvirt']}/#{node['hostname']}").read
 YAML.load(libvirt_configs).each do |e|
   start_domains[e['name']] = e['contents']
 end
