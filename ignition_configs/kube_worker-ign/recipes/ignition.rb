@@ -228,7 +228,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
             "--api-servers=#{node['environment_v2']['set']['kube-master']['hosts'].map { |h|
                 "https://#{node['environment_v2']['host'][h]['ip_lan']}"
               }.join(',')}",
-            "--register-schedulable=false",
+            "--register-schedulable=true",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
             # "--network-plugin=${NETWORK_PLUGIN}",
