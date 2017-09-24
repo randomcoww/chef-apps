@@ -90,6 +90,18 @@ node['ignition']['kube_master']['hosts'].each do |host|
     }
   ]
 
+  flanneld_environment = {
+    "FLANNELD_IFACE" => ip_lan,
+    "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd']['hosts'].map { |h|
+      "http://#{node['environment_v2']['host'][h]['ip_lan']}:2379"
+    }.join(','),
+    # "FLANNELD_ETCD_ENDPOINTS" => "http://127.0.0.1:2379",
+    "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
+    "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
+    "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
+    "FLANNELD_IP_MASQ" => true
+  }
+
   systemd = [
     {
       "name" => "kubelet",
@@ -132,6 +144,42 @@ node['ignition']['kube_master']['hosts'].each do |host|
           "WantedBy" => "multi-user.target"
         }
       }
+    },
+    {
+      "name" => "flanneld",
+      "dropins" => [
+        {
+          "name" => "etcd-env",
+          "contents" => {
+            "Service" => {
+              "Environment" => flanneld_environment.map { |k, v|
+                "#{k}=#{v}"
+              },
+              "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name" => "docker",
+      "dropins" => [
+        {
+          "name" => "flannel",
+          "contents" => {
+            "Unit" => {
+              "Requires" => "flanneld.service",
+              "After" => "flanneld.service"
+            },
+            "Service" => {
+              "Environment" => [
+                %Q{DOCKER_OPT_BIP=""},
+                %Q{DOCKER_OPT_IPMASQ=""}
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 

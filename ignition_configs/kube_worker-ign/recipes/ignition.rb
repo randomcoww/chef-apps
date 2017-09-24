@@ -194,13 +194,6 @@ node['ignition']['kube_worker']['hosts'].each do |host|
     "FLANNELD_IP_MASQ" => true
   }
 
-  flanneld_network = {
-    "Network" => node['kubernetes']['cluster_cidr'],
-    "Backend" => {
-      "Type" => "vxlan"
-    }
-  }
-
   systemd = [
     {
       "name" => "kubelet",
@@ -261,7 +254,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
               "Environment" => flanneld_environment.map { |k, v|
                 "#{k}=#{v}"
               },
-              "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{flanneld_network.to_json}'",
+              "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
             }
           }
         }

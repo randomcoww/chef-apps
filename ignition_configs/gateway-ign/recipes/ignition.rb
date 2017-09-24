@@ -30,7 +30,8 @@ node['ignition']['gateway']['hosts'].each do |host|
     variables ({
       current_host: node['environment_v2']['host'][host],
       sets: node['environment_v2']['set'],
-      hosts: node['environment_v2']['host']
+      hosts: node['environment_v2']['host'],
+      services: node['environment_v2']['service']
     })
     action :nothing
   end.run_action(:create)
