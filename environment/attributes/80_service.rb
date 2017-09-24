@@ -33,6 +33,9 @@ node.default['environment_v2']['service']['kube_master'] = {
   }
 }
 
-node.default['environment_v2']['service']['manifest_server'] = {
-  "bind" => 8888
+node.default['environment_v2']['service']['mysql'] = {
+  "bind" => 3306,
+  "sets" => {
+    "gateway" => 3306
+  }
 }
