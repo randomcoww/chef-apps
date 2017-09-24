@@ -32,10 +32,3 @@ node.default['environment_v2']['service']['kube_master'] = {
     "kube-master" => node['kubernetes']['secure_port']
   }
 }
-
-node.default['environment_v2']['service']['mysql'] = {
-  "bind" => 3306,
-  "sets" => {
-    "gateway" => 3306
-  }
-}
