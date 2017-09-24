@@ -16,14 +16,7 @@ dns_manifest = {
             "name" => "CONFIG",
             "value" => node['kube_manifests']['dns']['unbound_config']
           }
-        ],
-        # "ports" => [
-        #   {
-        #     "protocol" => "UDP",
-        #     "containerPort" => 53,
-        #     "hostPort" => 53,
-        #   }
-        # ]
+        ]
       },
       {
         "name" => "knot",
@@ -38,50 +31,8 @@ dns_manifest = {
             "value" => node['kube_manifests']['dns']['knot_static_zone']
           }
         ]
-      },
-      # {
-      #   "name" => "openvpn",
-      #   "image" => node['kube']['images']['openvpn'],
-      #   "securityContext" => {
-      #     "capabilities" => {
-      #       "add" => [
-      #         "NET_ADMIN"
-      #       ]
-      #     }
-      #   },
-      #   # "args" => [
-      #   #   "--route 192.168.0.0 255.255.0.0 net_gateway",
-      #   # ],
-      #   "env" => [
-      #     {
-      #       "name" => "OVPN_CONFIG",
-      #       "value" => node['kube_manifests']['dns']['openvpn_config']
-      #     },
-      #     {
-      #       "name" => "OVPN_AUTH_USER_PASS",
-      #       "value" => node['kube_manifests']['dns']['openvpn_auth_user_pass']
-      #     },
-      #     {
-      #       "name" => "OVPN_CA",
-      #       "value" => node['kube_manifests']['dns']['openvpn_ca']
-      #     }
-      #   ],
-      #   "volumeMounts" => [
-      #     {
-      #       "mountPath" => '/dev/net/tun',
-      #       "name" => "nettun"
-      #     }
-      #   ]
-      # }
-    ],
-    # "volumes" => [
-    #   {
-    #     "name" => "nettun",
-    #     "hostPath" => {
-    #       "path" => '/dev/net/tun'
-    #     }
-    #   }
-    # ]
+      }
+    ]
   }
 }
 

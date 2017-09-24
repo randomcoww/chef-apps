@@ -118,7 +118,7 @@ kea_manifest = {
       #   "env" => [
       #     {
       #       "name" => "CONFIG",
-      #       "value" => JSON.pretty_generate(node['kubelet']['ddns']['config'])
+      #       "value" => JSON.pretty_generate(node['kube_manifests']['kea']['dhcp_ddns_config'])
       #     }
       #   ]
       # }

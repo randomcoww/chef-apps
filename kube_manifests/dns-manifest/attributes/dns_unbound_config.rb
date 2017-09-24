@@ -7,8 +7,6 @@ node.default['kube_manifests']['dns']['unbound_config'] = NsdResourceHelper::Con
     'do-udp' => true,
     'do-tcp' => true,
     'access-control' => [
-      # "127.0.0.0/8 allow",
-      # "#{node['environment_v2']['subnet']['lan']} allow",
       '0.0.0.0/0 allow'
     ],
     "do-not-query-localhost" => false,
