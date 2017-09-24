@@ -41,6 +41,12 @@ node.default['kubernetes']['service_ip_range'] = '10.3.0.0/24'
 node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 
+node.default['kubernetes']['flanneld_network'] = {
+  "Network" => node['kubernetes']['cluster_cidr'],
+  "Backend" => {
+    "Type" => "vxlan"
+  }
+}
 
 node.default['kubernetes']['srv_path'] = '/srv/kubernetes'
 ## cert and auth
