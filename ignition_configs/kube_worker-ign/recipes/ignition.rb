@@ -152,16 +152,14 @@ node['ignition']['kube_worker']['hosts'].each do |host|
         },
         "Network" => {
           "LinkLocalAddressing" => "no",
-          "DHCP" => "no",
-          "DNS" => (node['environment_v2']['set']['dns']['hosts'].map { |h|
-            node['environment_v2']['host'][h]['ip_lan']
-          } + [ '8.8.8.8' ])
+          "DHCP" => "yes",
         },
         "Address" => {
           "Address" => "#{ip_lan}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
         },
-        "Route" => {
-          "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
+        "DHCP" => {
+          "UseDNS" => "true",
+          "RouteMetric" => 500
         }
       }
     },
