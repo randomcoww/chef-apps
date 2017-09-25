@@ -1,4 +1,29 @@
-node.default['kube_manifests']['kea']['lan_reservations'] = {}
+host_lan_reservations = []
+host_store_reservations = []
+
+node['environment_v2']['host'].each do |hostname, d|
+
+  if d.has_key?('mac_lan') &&
+    d.has_key?('ip_lan')
+
+    host_lan_reservations << {
+      'hw-address' => d['mac_lan'],
+      'ip-address' => d['ip_lan'],
+      'hostname' => hostname
+    }
+  end
+
+  if d.has_key?('mac_store') &&
+    d.has_key?('ip_store')
+
+    host_lan_reservations << {
+      'hw-address' => d['mac_store'],
+      'ip-address' => d['ip_store'],
+      'hostname' => hostname
+    }
+  end
+end
+
 
 node.default['kube_manifests']['kea']['dhcp4_config'] = {
   "Dhcp4" => {
@@ -38,20 +63,16 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
            "pool" => node['environment_v2']['subnet']['lan_dhcp_pool']
           }
         ],
-        "reservations" => node['kube_manifests']['kea']['lan_reservations'].map { |k, v|
-          {
-            "hw-address" => k,
-            "ip-address" => v
-          }
-        }
+        "reservations" => host_lan_reservations
       },
       {
-        "subnet" => node['environment_v2']['subnet']['vpn'],
+        "subnet" => node['environment_v2']['subnet']['store'],
         "pools" => [
           {
-           "pool" => node['environment_v2']['subnet']['vpn_dhcp_pool']
+           "pool" => node['environment_v2']['subnet']['store_dhcp_pool']
           }
-        ]
+        ],
+        "reservations" => host_store_reservations
       }
     ],
     "dhcp-ddns" => {
