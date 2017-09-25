@@ -170,6 +170,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
               "After" => "flanneld.service"
             },
             "Service" => {
+              "LimitMEMLOCK" => "infinity",
               "Environment" => [
                 %Q{DOCKER_OPT_BIP=""},
                 %Q{DOCKER_OPT_IPMASQ=""}
