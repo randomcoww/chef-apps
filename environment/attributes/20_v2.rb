@@ -69,34 +69,20 @@ node.default['environment_v2']['set']['etcd'] = {
 ## hosts
 ##
 
-node.default['environment_v2']['host']['coreos-dns1'] = {
-  'ip_lan' => "192.168.62.211",
-  'if_lan' => 'eth0',
-  'memory' => 8192,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-dns2'] = {
-  'ip_lan' => "192.168.62.212",
-  'if_lan' => 'eth0',
-  'memory' => 8192,
-  'vcpu' => 2
-}
-
 node.default['environment_v2']['host']['coreos-gateway1'] = {
   'ip_lan' => "192.168.62.217",
-  'mac_wan' => "52:54:00:63:6e:b0",
   'if_lan' => 'eth0',
   'if_wan' => 'eth1',
+  'mac_wan' => "52:54:00:63:6e:b0",
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-gateway2'] = {
   'ip_lan' => "192.168.62.218",
-  'mac_wan' => "52:54:00:63:6e:b1",
   'if_lan' => 'eth0',
   'if_wan' => 'eth1',
+  'mac_wan' => "52:54:00:63:6e:b1",
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -104,6 +90,7 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
 node.default['environment_v2']['host']['coreos-etcd1'] = {
   'ip_lan' => "192.168.62.219",
   'if_lan' => 'eth0',
+  'mac_lan' => '52:54:00:d2:cc:01',
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -111,6 +98,7 @@ node.default['environment_v2']['host']['coreos-etcd1'] = {
 node.default['environment_v2']['host']['coreos-etcd2'] = {
   'ip_lan' => "192.168.62.220",
   'if_lan' => 'eth0',
+  'mac_lan' => '52:54:00:d2:cc:02',
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -118,6 +106,7 @@ node.default['environment_v2']['host']['coreos-etcd2'] = {
 node.default['environment_v2']['host']['coreos-etcd3'] = {
   'ip_lan' => "192.168.62.221",
   'if_lan' => 'eth0',
+  'mac_lan' => '52:54:00:d2:cc:03',
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -125,6 +114,7 @@ node.default['environment_v2']['host']['coreos-etcd3'] = {
 node.default['environment_v2']['host']['coreos-kube-master1'] = {
   'ip_lan' => "192.168.62.222",
   'if_lan' => 'eth0',
+  'mac_lan' => '52:54:00:d2:cc:04',
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -132,6 +122,7 @@ node.default['environment_v2']['host']['coreos-kube-master1'] = {
 node.default['environment_v2']['host']['coreos-kube-master2'] = {
   'ip_lan' => "192.168.62.223",
   'if_lan' => 'eth0',
+  'mac_lan' => '52:54:00:d2:cc:05',
   'memory' => 8192,
   'vcpu' => 2
 }
@@ -139,6 +130,7 @@ node.default['environment_v2']['host']['coreos-kube-master2'] = {
 node.default['environment_v2']['host']['coreos-kube-worker1'] = {
   'ip_lan' => "192.168.62.224",
   'ip_store' => "192.168.126.224",
+  'mac_lan' => '52:54:00:d2:cc:06',
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
   'memory' => 8192,
@@ -148,6 +140,7 @@ node.default['environment_v2']['host']['coreos-kube-worker1'] = {
 node.default['environment_v2']['host']['coreos-kube-worker2'] = {
   'ip_lan' => "192.168.62.225",
   'ip_store' => "192.168.126.225",
+  'mac_lan' => '52:54:00:d2:cc:07',
   'if_lan' => 'eth0',
   'if_store' => 'eth1',
   'memory' => 8192,
