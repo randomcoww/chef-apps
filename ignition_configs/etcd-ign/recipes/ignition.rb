@@ -67,7 +67,7 @@ node['ignition']['etcd']['hosts'].each do |host|
                     }.join(',')}",
                   "--initial-advertise-peer-urls=http://#{ip_lan}:2380",
                   "--initial-cluster=#{etcd_initial_cluster.join(',')}",
-                  "--initial-cluster-state=new",
+                  "--initial-cluster-state=existing",
                   "--initial-cluster-token=etcd-1",
                   "--advertise-client-urls=http://#{ip_lan}:2379"
                 ].join(' ')}"}
