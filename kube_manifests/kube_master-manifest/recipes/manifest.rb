@@ -162,9 +162,7 @@ kube_apiserver_manifest = {
           # "--address=127.0.0.1",
           "--secure-port=#{node['kubernetes']['secure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=#{node['kubernetes']['etcd_hosts'].map { |e|
-              "http://#{node['environment_v2']['host'][e]['ip_lan']}:2379"
-            }.join(',')}",
+          "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
           "--tls-cert-file=#{node['kubernetes']['cert_path']}",
           "--tls-private-key-file=#{node['kubernetes']['key_path']}",
           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",

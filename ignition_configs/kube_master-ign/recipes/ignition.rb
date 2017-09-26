@@ -39,7 +39,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
       'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
       'IP.1' => node['kubernetes']['cluster_service_ip'],
       'IP.2' => ip_lan,
-      'IP.3' => node['environment_v2']['set']['gateway']['vip_lan']
+      'IP.3' => node['environment_v2']['set']['haproxy']['vip_lan']
     }
   )
 
@@ -90,10 +90,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
 
   flanneld_environment = {
     "FLANNELD_IFACE" => ip_lan,
-    "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd']['hosts'].map { |h|
-      "http://#{node['environment_v2']['host'][h]['ip_lan']}:2379"
-    }.join(','),
-    # "FLANNELD_ETCD_ENDPOINTS" => "http://127.0.0.1:2379",
+    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
     "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
     "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
     "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
@@ -170,7 +167,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
               "After" => "flanneld.service"
             },
             "Service" => {
-              "LimitMEMLOCK" => "infinity",
+              "LimitNOFILE" => "infinity",
               "Environment" => [
                 %Q{DOCKER_OPT_BIP=""},
                 %Q{DOCKER_OPT_IPMASQ=""}

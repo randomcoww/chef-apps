@@ -18,7 +18,7 @@ sysctl_config = [
 ].join($/)
 
 
-node['ignition']['gateway']['hosts'].each do |host|
+node['ignition']['gateway']['hosts'].uniq.each do |host|
 
   ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']

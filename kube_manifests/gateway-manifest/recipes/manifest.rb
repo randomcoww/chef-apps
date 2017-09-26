@@ -25,7 +25,7 @@ haproxy_manifest = {
 }
 
 
-node['kube_manifests']['gateway']['hosts'].each do |host|
+node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
 
   keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
     'vrrp_sync_group VG_gateway' => [
@@ -51,7 +51,7 @@ node['kube_manifests']['gateway']['hosts'].each do |host|
           }
         ],
         'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+          "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
         ]
       }
     ]

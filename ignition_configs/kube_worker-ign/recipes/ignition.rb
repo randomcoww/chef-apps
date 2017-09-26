@@ -182,10 +182,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
 
   flanneld_environment = {
     "FLANNELD_IFACE" => ip_lan,
-    "FLANNELD_ETCD_ENDPOINTS" => node['environment_v2']['set']['etcd']['hosts'].map { |h|
-      "http://#{node['environment_v2']['host'][h]['ip_lan']}:2379"
-    }.join(','),
-    # "FLANNELD_ETCD_ENDPOINTS" => "http://127.0.0.1:2379",
+    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
     "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
     "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
     "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
@@ -216,9 +213,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=#{node['environment_v2']['set']['kube-master']['hosts'].map { |h|
-                "https://#{node['environment_v2']['host'][h]['ip_lan']}"
-              }.join(',')}",
+            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube_master']['bind']}",
             "--register-schedulable=true",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
@@ -269,7 +264,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
               "After" => "flanneld.service"
             },
             "Service" => {
-              "LimitMEMLOCK" => "infinity",
+              "LimitNOFILE" => "infinity",
               "Environment" => [
                 %Q{DOCKER_OPT_BIP=""},
                 %Q{DOCKER_OPT_IPMASQ=""}

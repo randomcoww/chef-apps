@@ -16,7 +16,7 @@ kube_proxy_manifest = {
         "command": [
           "/hyperkube",
           "proxy",
-          "--master=https://#{node['environment_v2']['set']['gateway']['vip_lan']}",
+          "--master=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}",
           "--kubeconfig=#{node['kubernetes']['kube_proxy']['kubeconfig_path']}"
         ],
         "securityContext": {

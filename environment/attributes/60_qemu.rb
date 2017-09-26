@@ -4,6 +4,7 @@ node.default['qemu']['pxe_kernel_path'] = '/data/kvm/coreos_production_pxe.vmlin
 node.default['qemu']['pxe_initrd_path'] = '/data/kvm/coreos_production_pxe_image.cpio.gz'
 
 node.default['qemu']['generic']['hosts'] = node['environment_v2']['set']['gateway']['hosts'] +
+  node['environment_v2']['set']['haproxy']['hosts'] +
   node['environment_v2']['set']['kube-master']['hosts'] +
   node['environment_v2']['set']['kube-worker']['hosts'] +
   node['environment_v2']['set']['etcd']['hosts']

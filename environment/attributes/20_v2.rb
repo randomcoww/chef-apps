@@ -27,6 +27,14 @@ node.default['environment_v2']['set']['gateway'] = {
   'vip_lan' => "192.168.62.240"
 }
 
+node.default['environment_v2']['set']['haproxy'] = {
+  'hosts' => [
+    'coreos-gateway1',
+    'coreos-gateway2'
+  ],
+  'vip_lan' => "192.168.62.240"
+}
+
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
     'coreos-gateway1',
@@ -59,7 +67,7 @@ node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'coreos-etcd1',
     'coreos-etcd2',
-    'coreos-etcd3',
+    # 'coreos-etcd3',
   ]
 }
 

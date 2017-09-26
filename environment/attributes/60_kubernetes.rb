@@ -27,8 +27,8 @@ node.default['kubernetes']['version'] = '1.7.6'
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
 
-node.default['kubernetes']['master_hosts'] = node['environment_v2']['set']['kube-master']['hosts']
-node.default['kubernetes']['etcd_hosts'] = node['environment_v2']['set']['etcd']['hosts']
+# node.default['kubernetes']['master_hosts'] = node['environment_v2']['set']['kube-master']['hosts']
+# node.default['kubernetes']['etcd_hosts'] = node['environment_v2']['set']['etcd']['hosts']
 
 node.default['kubernetes']['insecure_port'] = 8080
 node.default['kubernetes']['secure_port'] = 443
@@ -90,7 +90,9 @@ node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kub
 
 
 node.default['kube_manifests']['dns']['hosts'] = node['environment_v2']['set']['dns']['hosts']
-node.default['kube_manifests']['gateway']['hosts'] = node['environment_v2']['set']['gateway']['hosts']
+node.default['kube_manifests']['gateway']['hosts'] = node['environment_v2']['set']['gateway']['hosts'] +
+  node['environment_v2']['set']['haproxy']['hosts']
+
 node.default['kube_manifests']['kea']['hosts'] = node['environment_v2']['set']['kea']['hosts']
 node.default['kube_manifests']['kube_master']['hosts'] = node['environment_v2']['set']['kube-master']['hosts']
 node.default['kube_manifests']['kube_worker']['hosts'] = node['environment_v2']['set']['kube-worker']['hosts']

@@ -27,7 +27,7 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['gateway']['vip_lan']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}"
       }
     }
   ],
