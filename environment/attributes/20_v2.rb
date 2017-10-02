@@ -66,8 +66,7 @@ node.default['environment_v2']['set']['kube-worker'] = {
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'coreos-etcd1',
-    'coreos-etcd2',
-    # 'coreos-etcd3',
+    'coreos-etcd2'
   ]
 }
 
@@ -103,13 +102,6 @@ node.default['environment_v2']['host']['coreos-etcd1'] = {
 
 node.default['environment_v2']['host']['coreos-etcd2'] = {
   'ip_lan' => "192.168.62.220",
-  'if_lan' => 'eth0',
-  'memory' => 8192,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-etcd3'] = {
-  'ip_lan' => "192.168.62.221",
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 2
@@ -156,8 +148,8 @@ node.default['environment_v2']['host']['unifi'] = {
   'ip_lan' => "192.168.62.100",
 }
 
-node.default['environment_v2']['host']['gamestream'] = {
-  'ip_lan' => '192.168.63.99',
+node.default['environment_v2']['host']['coreos-test'] = {
+  'ip_lan' => "192.168.62.101",
 }
 
 
