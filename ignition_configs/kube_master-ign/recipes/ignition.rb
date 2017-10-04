@@ -37,8 +37,12 @@ node['ignition']['kube_master']['hosts'].each do |host|
       'DNS.2' => 'kubernetes.default',
       'DNS.3' => 'kubernetes.default.svc',
       'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
+      'DNS.5' => [
+        '*',
+        node['environment_v2']['domain']['host_lan'],
+        node['environment_v2']['domain']['top']
+      ].join('.'),
       'IP.1' => node['kubernetes']['cluster_service_ip'],
-      'IP.2' => ip_lan,
       'IP.3' => node['environment_v2']['set']['haproxy']['vip_lan']
     }
   )
@@ -63,6 +67,11 @@ node['ignition']['kube_master']['hosts'].each do |host|
       "path" => node['kubernetes']['ca_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
+    },
+    {
+      "path" => "/opt/bin/setup-network-environment",
+      "mode" => 493,
+      "contents" => node['environment_v2']['url']['setup_network_environment']
     }
   ]
 
@@ -89,7 +98,6 @@ node['ignition']['kube_master']['hosts'].each do |host|
   ]
 
   flanneld_environment = {
-    "FLANNELD_IFACE" => ip_lan,
     "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
     "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
     "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
@@ -101,7 +109,12 @@ node['ignition']['kube_master']['hosts'].each do |host|
     {
       "name" => "kubelet",
       "contents" => {
+        "Unit" => {
+          "Requires" => "setup-network-environment.service",
+          "After" => "setup-network-environment.service"
+        },
         "Service" => {
+          "EnvironmentFile" => "/etc/network-environment",
           "Environment" => [
             "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
             %Q{RKT_RUN_ARGS="#{[
@@ -127,7 +140,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            "--hostname-override=#{ip_lan}",
+            "--hostname-override=${DEFAULT_IPV4}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}"
           ].join(' '),
@@ -176,6 +189,20 @@ node['ignition']['kube_master']['hosts'].each do |host|
           }
         }
       ]
+    },
+    {
+      "name" => "setup-network-environment",
+      "contents" => {
+        "Unit" => {
+          "Requires" => "network-online.target",
+          "After" => "network-online.target"
+        },
+        "Service" => {
+          "Type" => "oneshot",
+          "ExecStart" => "/opt/bin/setup-network-environment",
+          "RemainAfterExit" => "yes"
+        }
+      }
     }
   ]
 
