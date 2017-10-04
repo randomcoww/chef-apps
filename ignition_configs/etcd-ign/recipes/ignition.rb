@@ -21,6 +21,11 @@ node['ignition']['etcd']['hosts'].each do |host|
       "path" => "/etc/hostname",
       "mode" => 420,
       "contents" => "data:,#{host}"
+    },
+    {
+      "path" => "/opt/bin/setup-network-environment",
+      "mode" => 493,
+      "contents" => node['environment_v2']['url']['setup_network_environment']
     }
   ]
 
@@ -57,25 +62,42 @@ node['ignition']['etcd']['hosts'].each do |host|
         {
           "name" => "etcd-env",
           "contents" => {
+            "Unit" => {
+              "Requires" => "setup-network-environment.service",
+              "After" => "setup-network-environment.service"
+            },
             "Service" => {
               "Environment" => [
                 %Q{ETCD_OPTS="#{[
                   "--name=#{host}",
-                  "--listen-peer-urls=http://#{ip_lan}:2380",
-                  "--listen-client-urls=#{[ip_lan, '127.0.0.1'].map { |e|
-                      "http://#{e}:2379"
-                    }.join(',')}",
-                  "--initial-advertise-peer-urls=http://#{ip_lan}:2380",
-                  "--initial-cluster=#{etcd_initial_cluster.join(',')}",
-                  "--initial-cluster-state=existing",
-                  "--initial-cluster-token=etcd-1",
-                  "--advertise-client-urls=http://#{ip_lan}:2379"
+                  "--initial-advertise-peer-urls=http://${DEFAULT_IPV4}:2380",
+                  "--listen-peer-urls=http://${DEFAULT_IPV4}:2380",
+                  "--listen-client-urls=http://${DEFAULT_IPV4}:2379,http://127.0.0.1:2379",
+                  "--advertise-client-urls=http://${DEFAULT_IPV4}:2379",
+                  "--discovery=#{node['environment_v2']['url']['etcd_discovery']}",
+                  # "--initial-cluster=#{etcd_initial_cluster.join(',')}",
+                  # "--initial-cluster-state=existing",
+                  # "--initial-cluster-token=etcd-1"
                 ].join(' ')}"}
               ]
             }
           }
         }
       ]
+    },
+    {
+      "name" => "setup-network-environment",
+      "contents" => {
+        "Unit" => {
+          "Requires" => "network-online.target",
+          "After" => "network-online.target"
+        },
+        "Service" => {
+          "Type" => "oneshot",
+          "ExecStart" => "/opt/bin/setup-network-environment",
+          "RemainAfterExit" => "yes"
+        }
+      }
     }
   ]
 

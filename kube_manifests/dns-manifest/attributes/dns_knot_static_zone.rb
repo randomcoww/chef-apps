@@ -37,6 +37,33 @@ node['environment_v2']['set'].each do |set, d|
 end
 
 
+## etcd discovery records
+srv_records = []
+
+if node['environment_v2']['set'].has_key?('etcd')
+  node['environment_v2']['set']['etcd']['hosts'].each do |hostname|
+
+    srv_records << {
+      name: ['_etcd-server', '_tcp', node['environment_v2']['domain']['host_lan']].join('.'),
+      ttl: 300,
+      priority: 0,
+      weight: 0,
+      port: 2380,
+      host: [hostname, node['environment_v2']['domain']['host_lan']].join('.')
+    }
+
+    srv_records << {
+      name: ['_etcd-client', '_tcp', node['environment_v2']['domain']['host_lan']].join('.'),
+      ttl: 300,
+      priority: 0,
+      weight: 0,
+      port: 2379,
+      host: [hostname, node['environment_v2']['domain']['host_lan']].join('.')
+    }
+  end
+end
+
+
 node.default['kube_manifests']['dns']['knot_static_zone'] = DnsZoneHelper::ConfigGenerator.generate_from_hash({
   'soa' => {
     name: "#{node['environment_v2']['domain']['top']}.",
@@ -54,5 +81,6 @@ node.default['kube_manifests']['dns']['knot_static_zone'] = DnsZoneHelper::Confi
     ttl: 300,
     host: "ns.#{node['environment_v2']['domain']['top']}."
   },
-  'a' => a_records
+  'a' => a_records,
+  'srv' => srv_records
 })
