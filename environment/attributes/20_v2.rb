@@ -122,19 +122,13 @@ node.default['environment_v2']['host']['coreos-kube-master2'] = {
 }
 
 node.default['environment_v2']['host']['coreos-kube-worker1'] = {
-  'ip_lan' => "192.168.62.224",
-  'ip_store' => "192.168.126.224",
   'if_lan' => 'eth0',
-  'if_store' => 'eth1',
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-kube-worker2'] = {
-  'ip_lan' => "192.168.62.225",
-  'ip_store' => "192.168.126.225",
   'if_lan' => 'eth0',
-  'if_store' => 'eth1',
   'memory' => 8192,
   'vcpu' => 2
 }
