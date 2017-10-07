@@ -77,7 +77,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
 
   networkd = [
     {
-      "name" => if_lan,
+      "name" => "#{if_lan}.network",
       "contents" => {
         "Match" => {
           "Name" => if_lan
@@ -107,7 +107,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
 
   systemd = [
     {
-      "name" => "kubelet",
+      "name" => "kubelet.service",
       "contents" => {
         "Unit" => {
           "Requires" => "setup-network-environment.service",
@@ -154,14 +154,14 @@ node['ignition']['kube_master']['hosts'].each do |host|
       }
     },
     {
-      "name" => "flanneld",
+      "name" => "flanneld.service",
       "dropins" => [
         {
-          "name" => "etcd-env",
+          "name" => "etcd-env.conf",
           "contents" => {
             "Service" => {
-              "Environment" => flanneld_environment.map { |k, v|
-                "#{k}=#{v}"
+              "Environment" => flanneld_environment.map { |e|
+                e.join('=')
               },
               "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
             }
@@ -170,10 +170,10 @@ node['ignition']['kube_master']['hosts'].each do |host|
       ]
     },
     {
-      "name" => "docker",
+      "name" => "docker.service",
       "dropins" => [
         {
-          "name" => "flannel",
+          "name" => "flannel.conf",
           "contents" => {
             "Unit" => {
               "Requires" => "flanneld.service",
@@ -191,7 +191,7 @@ node['ignition']['kube_master']['hosts'].each do |host|
       ]
     },
     {
-      "name" => "setup-network-environment",
+      "name" => "setup-network-environment.service",
       "contents" => {
         "Unit" => {
           "Requires" => "network-online.target",

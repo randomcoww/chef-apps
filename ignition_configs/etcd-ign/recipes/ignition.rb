@@ -20,7 +20,6 @@ node['ignition']['etcd']['hosts'].each do |host|
 
   ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']
-  host_record = [host, domain].join('.')
 
   files = [
     {
@@ -32,7 +31,7 @@ node['ignition']['etcd']['hosts'].each do |host|
 
   networkd = [
     {
-      "name" => if_lan,
+      "name" => "#{if_lan}.network",
       "contents" => {
         "Match" => {
           "Name" => if_lan
@@ -52,29 +51,52 @@ node['ignition']['etcd']['hosts'].each do |host|
     }
   ]
 
+  etcd_environment = {
+    "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
+    "ETCD_DISCOVERY_SRV" => domain,
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{ip_lan}:2380",
+    "ETCD_LISTEN_PEER_URLS" => "http://#{ip_lan}:2380",
+    "ETCD_LISTEN_CLIENT_URLS" => "http://#{ip_lan}:2379,http://127.0.0.1:2379",
+    "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{ip_lan}:2379",
+    "ETCD_INITIAL_CLUSTER_STATE" => "existing",
+    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1"
+  }
+
   systemd = [
     {
-      "name" => "etcd-member",
+      "name" => "etcd-member.service",
       "dropins" => [
         {
-          "name" => "etcd-env",
+          "name" => "etcd-env.conf",
           "contents" => {
+            "Unit" => {
+              "Requires" => "var-lib-etcd.mount",
+              "After" => "var-lib-etcd.mount"
+            },
             "Service" => {
-              "Environment" => [
-                %Q{ETCD_OPTS="#{[
-                  "--discovery-srv=#{domain}",
-                  "--initial-advertise-peer-urls=http://#{host_record}:2380",
-                  "--listen-peer-urls=http://#{host_record}:2380",
-                  "--listen-client-urls=http://#{host_record}:2379,http://127.0.0.1:2379",
-                  "--advertise-client-urls=http://#{host_record}:2379",
-                  "--initial-cluster-state=new",
-                  "--initial-cluster-token=etcd-1"
-                ].join(' ')}"}
-              ]
+              "Environment" => etcd_environment.map { |e|
+                e.join('=')
+              }
             }
           }
         }
       ]
+    },
+    {
+      "name" => "var-lib-etcd.mount",
+      "contents" => {
+        "Unit" => {
+          "After" => "network.target"
+        },
+        "Mount" => {
+          "What" => "#{node['environment_v2']['node_host']['ip_lan']}:/data/pv",
+          "Where" => "/var/lib/etcd",
+          "Type" => "nfs"
+        },
+        "Install" => {
+          "WantedBy" => "machines.target"
+        }
+      }
     }
   ]
 

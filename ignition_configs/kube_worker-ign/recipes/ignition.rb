@@ -150,7 +150,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
 
   networkd = [
     {
-      "name" => if_lan,
+      "name" => "#{if_lan}.network",
       "contents" => {
         "Match" => {
           "Name" => if_lan
@@ -177,7 +177,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
 
   systemd = [
     {
-      "name" => "kubelet",
+      "name" => "kubelet.service",
       "contents" => {
         "Unit" => {
           "Requires" => "setup-network-environment.service",
@@ -229,10 +229,10 @@ node['ignition']['kube_worker']['hosts'].each do |host|
       }
     },
     {
-      "name" => "flanneld",
+      "name" => "flanneld.service",
       "dropins" => [
         {
-          "name" => "etcd-env",
+          "name" => "etcd-env.conf",
           "contents" => {
             "Service" => {
               "Environment" => flanneld_environment.map { |k, v|
@@ -245,10 +245,10 @@ node['ignition']['kube_worker']['hosts'].each do |host|
       ]
     },
     {
-      "name" => "docker",
+      "name" => "docker.service",
       "dropins" => [
         {
-          "name" => "flannel",
+          "name" => "flannel.conf",
           "contents" => {
             "Unit" => {
               "Requires" => "flanneld.service",
@@ -266,7 +266,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
       ]
     },
     {
-      "name" => "setup-network-environment",
+      "name" => "setup-network-environment.service",
       "contents" => {
         "Unit" => {
           "Requires" => "network-online.target",

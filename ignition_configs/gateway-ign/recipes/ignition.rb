@@ -59,7 +59,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
 
   networkd = [
     {
-      "name" => if_lan,
+      "name" => "#{if_lan}.network",
       "contents" => {
         "Match" => {
           "Name" => if_lan
@@ -78,7 +78,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
       }
     },
     {
-      "name" => if_wan,
+      "name" => "#{if_wan}.network",
       "contents" => {
         "Match" => {
           "Name" => if_wan
@@ -86,9 +86,10 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
         "Network" => {
           "LinkLocalAddressing" => "no",
           "DHCP" => "yes",
-          "DNS" => (node['environment_v2']['set']['dns']['hosts'].map { |h|
-            node['environment_v2']['host'][h]['ip_lan']
-          } + [ '8.8.8.8' ])
+          "DNS" => [
+            node['environment_v2']['set']['haproxy']['vip_lan'],
+            '8.8.8.8'
+          ]
         },
         "DHCP" => {
           "UseDNS" => "false",
@@ -107,7 +108,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
 
   systemd = [
     {
-      "name" => "kubelet",
+      "name" => "kubelet.service",
       "contents" => {
         "Service" => {
           "Environment" => [
@@ -150,10 +151,10 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
       }
     },
     {
-      "name" => "docker",
+      "name" => "docker.service",
       "dropins" => [
         {
-          "name" => "iptables",
+          "name" => "iptables.conf",
           "contents" => {
             "Service" => {
               "Environment" => [
@@ -165,7 +166,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
       ]
     },
     {
-      "name" => "nftables",
+      "name" => "nftables.service",
       "contents" => {
         "Unit" => {
           "Wants" => "network-pre.target",
