@@ -120,14 +120,14 @@ node.default['environment_v2']['host']['coreos-etcd3'] = {
 node.default['environment_v2']['host']['coreos-kube-master1'] = {
   'ip_lan' => "192.168.62.222",
   'if_lan' => 'eth0',
-  'memory' => 8192,
+  'memory' => 4096,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-kube-master2'] = {
   'ip_lan' => "192.168.62.223",
   'if_lan' => 'eth0',
-  'memory' => 8192,
+  'memory' => 4096,
   'vcpu' => 2
 }
 
