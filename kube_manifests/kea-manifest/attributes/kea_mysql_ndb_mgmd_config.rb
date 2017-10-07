@@ -3,7 +3,7 @@ node.default['kube_manifests']['kea']['mysql_ndb_mgmd_config'] = MysqlHelper::Co
     'datadir' => '/var/lib/mysql-cluster'
   },
   'ndbd default' => {
-    'NoOfReplicas' => 2,
+    'NoOfReplicas' => node['kube_manifests']['kea']['host_ips'].length,
     'DataMemory' => '256M',
     'IndexMemory' => '128M',
     'DataDir' => '/var/lib/mysql-cluster'
