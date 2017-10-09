@@ -1,7 +1,0 @@
-source "https://supermarket.chef.io"
-
-metadata
-
-cookbook "qemu", github: "randomcoww/chef-qemu"
-cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
-cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
