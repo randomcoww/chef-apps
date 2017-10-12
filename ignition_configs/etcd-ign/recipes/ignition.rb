@@ -26,11 +26,6 @@ node['ignition']['etcd']['hosts'].each do |host|
       "path" => "/etc/hostname",
       "mode" => 420,
       "contents" => "data:,#{host}"
-    },
-    {
-      "path" => "/var/lib/etcd/#{host}/member/snap/db",
-      "mode" => 493,
-      "contents" => "https://github.com/randomcoww/etcd-recovery/raw/master/#{host}/member/snap/db"
     }
   ]
 
@@ -74,10 +69,10 @@ node['ignition']['etcd']['hosts'].each do |host|
         {
           "name" => "etcd-env.conf",
           "contents" => {
-            # "Unit" => {
-            #   "Requires" => "var-lib-etcd.mount",
-            #   "After" => "var-lib-etcd.mount"
-            # },
+            "Unit" => {
+              "Requires" => "var-lib-etcd.mount",
+              "After" => "var-lib-etcd.mount"
+            },
             "Service" => {
               "Environment" => etcd_environment.map { |e|
                 e.join('=')
@@ -87,22 +82,22 @@ node['ignition']['etcd']['hosts'].each do |host|
         }
       ]
     },
-    # {
-    #   "name" => "var-lib-etcd.mount",
-    #   "contents" => {
-    #     "Unit" => {
-    #       "After" => "network.target"
-    #     },
-    #     "Mount" => {
-    #       "What" => "#{node['environment_v2']['node_host']['ip_lan']}:/data/pv",
-    #       "Where" => "/var/lib/etcd",
-    #       "Type" => "nfs"
-    #     },
-    #     "Install" => {
-    #       "WantedBy" => "machines.target"
-    #     }
-    #   }
-    # }
+    {
+      "name" => "var-lib-etcd.mount",
+      "contents" => {
+        "Unit" => {
+          "After" => "network.target"
+        },
+        "Mount" => {
+          "What" => "#{node['environment_v2']['node_host']['ip_lan']}:/data/pv",
+          "Where" => "/var/lib/etcd",
+          "Type" => "nfs"
+        },
+        "Install" => {
+          "WantedBy" => "machines.target"
+        }
+      }
+    }
   ]
 
   node.default['ignition']['configs'][host] = {
