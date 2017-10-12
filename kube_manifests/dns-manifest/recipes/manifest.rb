@@ -17,21 +17,7 @@ dns_manifest = {
             "value" => node['kube_manifests']['dns']['unbound_config']
           }
         ]
-      },
-      # {
-      #   "name" => "knot",
-      #   "image" => node['kube']['images']['knot'],
-      #   "env" => [
-      #     {
-      #       "name" => "CONFIG",
-      #       "value" => node['kube_manifests']['dns']['knot_config']
-      #     },
-      #     {
-      #       "name" => "ZONE_#{node['environment_v2']['domain']['top'].gsub('.', '_').upcase}",
-      #       "value" => node['kube_manifests']['dns']['knot_static_zone']
-      #     }
-      #   ]
-      # }
+      }
     ]
   }
 }

@@ -108,20 +108,7 @@ kea_manifest = {
             "value" => JSON.pretty_generate(node['kube_manifests']['kea']['dhcp4_config'])
           }
         ]
-      },
-      # {
-      #   "name" => "kea-dhcp-ddns",
-      #   "image" => node['kube']['images']['kea_dhcp_ddns'],
-      #   "args" => [
-      #     "kea-dhcp-ddns"
-      #   ],
-      #   "env" => [
-      #     {
-      #       "name" => "CONFIG",
-      #       "value" => JSON.pretty_generate(node['kube_manifests']['kea']['dhcp_ddns_config'])
-      #     }
-      #   ]
-      # }
+      }
     ]
   }
 }

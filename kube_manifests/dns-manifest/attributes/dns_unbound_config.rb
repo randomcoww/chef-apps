@@ -116,11 +116,5 @@ node.default['kube_manifests']['dns']['unbound_config'] = NsdResourceHelper::Con
   },
   'remote-control' => {
     'control-enable' => true
-  },
-  'stub-zone' => [
-    {
-      'name' => 'lan',
-      'stub-addr' => '127.0.0.1@53530'
-    }
-  ]
+  }
 })
