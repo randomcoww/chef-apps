@@ -1,5 +1,10 @@
 services = {}
 
+lan_domain = [
+  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['top']
+].join('.')
+
 node['environment_v2']['service'].each do |name, config|
   next if !config.has_key?('sets')
 
@@ -12,7 +17,7 @@ node['environment_v2']['service'].each do |name, config|
   backend = []
   config['sets'].each do |set, port|
     node['environment_v2']['set'][set]['hosts'].each do |host|
-      backend << "#{host} #{node['environment_v2']['host'][host]['ip_lan']}:#{port} check"
+      backend << "#{host} #{[host, lan_domain].join('.')}:#{port} check port #{port} init-addr libc,none resolvers default"
     end
   end
 
@@ -35,6 +40,10 @@ node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::Con
     ],
     'maxconn' => 1024,
     'pidfile' => '/var/run/haproxy.pid'
+  },
+  'resolvers default' => {
+    'nameserver' => "dns1 127.0.0.1:53",
+    'resolve_retries' => 3
   },
   'defaults' => {
     'timeout' => [

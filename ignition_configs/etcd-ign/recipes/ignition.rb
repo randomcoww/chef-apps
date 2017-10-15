@@ -18,8 +18,8 @@ domain = [
 
 node['ignition']['etcd']['hosts'].each do |host|
 
-  ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']
+  hostname = [host, domain].join('.')
 
   files = [
     {
@@ -40,9 +40,6 @@ node['ignition']['etcd']['hosts'].each do |host|
           "LinkLocalAddressing" => "no",
           "DHCP" => "yes",
         },
-        "Address" => {
-          "Address" => "#{ip_lan}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-        },
         "DHCP" => {
           "UseDNS" => "true",
           "RouteMetric" => 500
@@ -54,10 +51,10 @@ node['ignition']['etcd']['hosts'].each do |host|
   etcd_environment = {
     "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
     "ETCD_DISCOVERY_SRV" => domain,
-    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{ip_lan}:2380",
-    "ETCD_LISTEN_PEER_URLS" => "http://#{ip_lan}:2380",
-    "ETCD_LISTEN_CLIENT_URLS" => "http://#{ip_lan}:2379,http://127.0.0.1:2379",
-    "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{ip_lan}:2379",
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{hostname}:2380",
+    "ETCD_LISTEN_PEER_URLS" => "http://#{hostname}:2380",
+    "ETCD_LISTEN_CLIENT_URLS" => "http://#{hostname}:2379,http://127.0.0.1:2379",
+    "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{hostname}:2379",
     "ETCD_INITIAL_CLUSTER_STATE" => "existing",
     "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1"
   }

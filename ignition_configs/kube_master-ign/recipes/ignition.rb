@@ -19,7 +19,6 @@ ca = cert_generator.root_ca
 
 node['ignition']['kube_master']['hosts'].each do |host|
 
-  ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']
 
   key = cert_generator.generate_key
@@ -85,9 +84,6 @@ node['ignition']['kube_master']['hosts'].each do |host|
         "Network" => {
           "LinkLocalAddressing" => "no",
           "DHCP" => "yes",
-        },
-        "Address" => {
-          "Address" => "#{ip_lan}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
         },
         "DHCP" => {
           "UseDNS" => "true",
