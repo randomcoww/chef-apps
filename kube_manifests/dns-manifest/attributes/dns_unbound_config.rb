@@ -112,9 +112,24 @@ node.default['kube_manifests']['dns']['unbound_config'] = NsdResourceHelper::Con
     'local-data' => DnsZoneHelper::ConfigGenerator.generate_from_hash({
       'a' => a_records,
       'srv' => srv_records
-    }).map { |r| %Q{"#{r}"} }
+    }).map { |r| %Q{"#{r}"} },
+    'local-zone' => [
+      'lan nodefault',
+    ],
+    "private-domain" => [
+      "lan",
+    ],
+    "domain-insecure" => [
+      "lan",
+    ]
   },
   'remote-control' => {
     'control-enable' => true
-  }
+  },
+  'stub-zone' => [
+    {
+      'name' => 'lan',
+      'stub-addr' => '127.0.0.1@53530'
+    }
+  ]
 })

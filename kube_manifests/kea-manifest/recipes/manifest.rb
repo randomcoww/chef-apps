@@ -114,6 +114,39 @@ kea_manifest = {
 }
 
 
+resolver_manifest = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    "name" => "kea-resolver"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "containers" => [
+      {
+        "name" => "kea-resolver",
+        "image" =>node['kube']['images']['kea_resolver'],
+        "args" => [
+          "-h",
+          "127.0.0.1",
+          "-d",
+          node['mysql_credentials']['kea']['database'],
+          "-u",
+          node['mysql_credentials']['kea']['username'],
+          "-w",
+          node['mysql_credentials']['kea']['password'],
+          "-domain",
+          node['environment_v2']['domain']['top'],
+          "-listen",
+          "53530"
+        ]
+      }
+    ]
+  }
+}
+
+
 node['kube_manifests']['kea']['hosts'].each.with_index(1) do |host, index|
 
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndb-mgmd.yaml'] = {
@@ -146,4 +179,5 @@ node['kube_manifests']['kea']['hosts'].each.with_index(1) do |host, index|
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd.yaml'] = ndbd_manifest
   node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld.yaml'] = mysqld_manifest
   node.default['kubernetes']['static_pods'][host]['kea-mysql.yaml'] = kea_manifest
+  node.default['kubernetes']['static_pods'][host]['kea-resolver.yaml'] = resolver_manifest
 end
