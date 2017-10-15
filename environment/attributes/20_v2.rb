@@ -1,6 +1,5 @@
 node.default['environment_v2']['ssh_authorized_keys']['default'] = [
   'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC48pu0Cl9VJ5p40Fqb/HU2FH6W4WlxG3N4R+SikofgzhhUI1yy/nrKziunFy+82kOA1RYKnlqQfv3cOoeSt0I+Qe622UmKsJEmmOo/ynEdzb22BnLIW+t+OFDCGs9NP1vIhnBPl7rxuw1U8w+0BZf7aJ5ateNhWh/7S6ACmpiIqtPAyKSGlel1sir3zDrSL21Ds9mUNRGhaQhVwNxr/q82C1DAYRnCNr04+BWh3BnY6kREWVfbr+FvpdCSN8Z42pfWByc3ZkQZYSJPBGBhRxPc3l08WwE663pFAaQTCq1wyaWplK5FLnl8ZrnfjU0Ej87iTiN8LG46UpPOjMRqH8uN',
-  'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf4YDpCaridIv8B4LIj8zYVbRfEgDvstlFu4nllhfY9UEcoHgBHEDmCFe1+qsv3flxTm7Q5v4q6RIETS2AwzRTlSTyzcI6t8jQ16R6aoLcbU2J2kWsD/rGHAuHGtZb2950rApIfOdP4n05uW34We6ErZmlCC0R/x9JIP5QqvoJE9KaVC3v/vPG1KVsYZFxtyKVHnFwwPlzjtHp+Tq0xG7jCPG5w+fekpvcImxo8isunRkpyHQFRE0nQAlIfCmJ1LdG3PREswuinKHiW33hXqkRVCSXmF2PGLW+x9aWvcMgbguX9WGWO4Dafta2lzwN6x4QWmc6bQpO1akw3Qi5rzQN',
   'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV32iY0Sg4ZrLBg8MzUGtwteIJn4CpqxRLCRv/ayGBIbv8yRD0zR5K8mT2lh9NjST0g84W8x8MZswnurTzD/a9FyQzD9nOGCpe+PMFlOPg9oArZO0GOa74j36aRKdMou+/URi37EMc5caQPGbKzez7ylj4LKsznoeRQuIGDFE1kwatTXvH9alb/lp1jX97fcesEVc0r28MEU70lmfc9tdkF3+9gpzztDrrg0zdsuE8l9LtnbMK+SVbXASjLbkYDjBn6qP8zmv1gFOLz09N+/0C6Jsqzmxxa5KW5f6DfnYv1i3Ov+1lbN8L7709/qcVZs6kG9jsuYiyAjrsouu7jlNj'
 ]
 
@@ -97,21 +96,21 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
 
 
 node.default['environment_v2']['host']['coreos-etcd1'] = {
-  'ip_lan' => "192.168.62.219",
+  # 'ip_lan' => "192.168.62.219",
   'if_lan' => 'eth0',
   'memory' => 4096,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-etcd2'] = {
-  'ip_lan' => "192.168.62.220",
+  # 'ip_lan' => "192.168.62.220",
   'if_lan' => 'eth0',
   'memory' => 4096,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-etcd3'] = {
-  'ip_lan' => "192.168.62.221",
+  # 'ip_lan' => "192.168.62.221",
   'if_lan' => 'eth0',
   'memory' => 4096,
   'vcpu' => 2
@@ -119,14 +118,14 @@ node.default['environment_v2']['host']['coreos-etcd3'] = {
 
 
 node.default['environment_v2']['host']['coreos-kube-master1'] = {
-  'ip_lan' => "192.168.62.222",
+  # 'ip_lan' => "192.168.62.222",
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['coreos-kube-master2'] = {
-  'ip_lan' => "192.168.62.223",
+  # 'ip_lan' => "192.168.62.223",
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 2
@@ -152,10 +151,6 @@ node.default['environment_v2']['host']['coreos-kube-worker2'] = {
 
 node.default['environment_v2']['host']['unifi'] = {
   'ip_lan' => "192.168.62.100",
-}
-
-node.default['environment_v2']['host']['coreos-test'] = {
-  'ip_lan' => "192.168.62.101",
 }
 
 
