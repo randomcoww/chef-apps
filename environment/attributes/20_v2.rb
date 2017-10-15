@@ -141,15 +141,6 @@ node.default['environment_v2']['host']['coreos-kube-worker2'] = {
 
 
 ##
-## one off
-##
-
-node.default['environment_v2']['host']['unifi'] = {
-  'ip_lan' => "192.168.62.100",
-}
-
-
-##
 ## hardware
 ##
 

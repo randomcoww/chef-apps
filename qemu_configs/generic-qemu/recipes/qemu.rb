@@ -71,14 +71,14 @@ node['qemu']['generic']['hosts'].each do |host, config|
         },
         "#text"=>vcpu
       },
-      "iothreads"=>"1",
-      "iothreadids"=>{
-        "iothread"=>{
-          "#attributes"=>{
-            "id"=>"1"
-          }
-        }
-      },
+      # "iothreads"=>"1",
+      # "iothreadids"=>{
+      #   "iothread"=>{
+      #     "#attributes"=>{
+      #       "id"=>"1"
+      #     }
+      #   }
+      # },
       "os"=>{
         "type"=>{
           "#attributes"=>{
