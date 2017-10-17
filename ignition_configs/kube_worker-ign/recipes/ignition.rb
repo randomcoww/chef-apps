@@ -10,6 +10,11 @@ base = {
   }
 }
 
+domain = [
+  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['top']
+].join('.')
+
 
 cert_generator = OpenSSLHelper::CertGenerator.new(
   'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
@@ -141,11 +146,11 @@ node['ignition']['kube_worker']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(kube_proxy_kube_config.to_hash.to_yaml)}"
     },
-    {
-      "path" => "/opt/bin/setup-network-environment",
-      "mode" => 493,
-      "contents" => node['environment_v2']['url']['setup_network_environment']
-    }
+    # {
+    #   "path" => "/opt/bin/setup-network-environment",
+    #   "mode" => 493,
+    #   "contents" => node['environment_v2']['url']['setup_network_environment']
+    # }
   ]
 
   networkd = [
@@ -179,12 +184,12 @@ node['ignition']['kube_worker']['hosts'].each do |host|
     {
       "name" => "kubelet.service",
       "contents" => {
-        "Unit" => {
-          "Requires" => "setup-network-environment.service",
-          "After" => "setup-network-environment.service"
-        },
+        # "Unit" => {
+        #   "Requires" => "setup-network-environment.service",
+        #   "After" => "setup-network-environment.service"
+        # },
         "Service" => {
-          "EnvironmentFile" => "/etc/network-environment",
+          # "EnvironmentFile" => "/etc/network-environment",
           "Environment" => [
             "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
             %Q{RKT_RUN_ARGS="#{[
@@ -212,7 +217,8 @@ node['ignition']['kube_worker']['hosts'].each do |host|
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            "--hostname-override=${DEFAULT_IPV4}",
+            # "--hostname-override=${DEFAULT_IPV4}",
+            "--hostname-override=#{[host, domain].join('.')}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
@@ -265,20 +271,20 @@ node['ignition']['kube_worker']['hosts'].each do |host|
         }
       ]
     },
-    {
-      "name" => "setup-network-environment.service",
-      "contents" => {
-        "Unit" => {
-          "Requires" => "network-online.target",
-          "After" => "network-online.target"
-        },
-        "Service" => {
-          "Type" => "oneshot",
-          "ExecStart" => "/opt/bin/setup-network-environment",
-          "RemainAfterExit" => "yes"
-        }
-      }
-    }
+    # {
+    #   "name" => "setup-network-environment.service",
+    #   "contents" => {
+    #     "Unit" => {
+    #       "Requires" => "network-online.target",
+    #       "After" => "network-online.target"
+    #     },
+    #     "Service" => {
+    #       "Type" => "oneshot",
+    #       "ExecStart" => "/opt/bin/setup-network-environment",
+    #       "RemainAfterExit" => "yes"
+    #     }
+    #   }
+    # }
   ]
 
   node.default['ignition']['configs'][host] = {
