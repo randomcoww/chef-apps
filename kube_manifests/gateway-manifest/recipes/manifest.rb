@@ -24,42 +24,42 @@ haproxy_manifest = {
   }
 }
 
-kube_apiserver_manifest = {
-  "kind" => "Pod",
-  "apiVersion" => "v1",
-  "metadata" => {
-    "namespace" => "kube-system",
-    "name" => "kube-apiserver"
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "restartPolicy" => 'Always',
-    "containers" => [
-      {
-        "name" => "kube-apiserver",
-        "image" => node['kube']['images']['hyperkube'],
-        "command" => [
-          "/hyperkube",
-          "apiserver",
-          "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
-          "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-          "--allow-privileged=true"
-        ],
-        "livenessProbe" => {
-          "httpGet" => {
-            "scheme" => "HTTP",
-            "host" => "127.0.0.1",
-            "port" => node['kubernetes']['insecure_port'],
-            "path" => "/healthz"
-          },
-          "initialDelaySeconds" => 15,
-          "timeoutSeconds" => 15
-        }
-      }
-    ]
-  }
-}
+# kube_apiserver_manifest = {
+#   "kind" => "Pod",
+#   "apiVersion" => "v1",
+#   "metadata" => {
+#     "namespace" => "kube-system",
+#     "name" => "kube-apiserver"
+#   },
+#   "spec" => {
+#     "hostNetwork" => true,
+#     "restartPolicy" => 'Always',
+#     "containers" => [
+#       {
+#         "name" => "kube-apiserver",
+#         "image" => node['kube']['images']['hyperkube'],
+#         "command" => [
+#           "/hyperkube",
+#           "apiserver",
+#           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
+#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
+#           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
+#           "--allow-privileged=true"
+#         ],
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "scheme" => "HTTP",
+#             "host" => "127.0.0.1",
+#             "port" => node['kubernetes']['insecure_port'],
+#             "path" => "/healthz"
+#           },
+#           "initialDelaySeconds" => 15,
+#           "timeoutSeconds" => 15
+#         }
+#       }
+#     ]
+#   }
+# }
 
 
 node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
@@ -127,5 +127,5 @@ node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
 
   node.default['kubernetes']['static_pods'][host]['gateway.yaml'] = gateway_manifest
   node.default['kubernetes']['static_pods'][host]['haproxy_manifest.yaml'] = haproxy_manifest
-  node.default['kubernetes']['static_pods'][host]['kube_apiserver_manifest.yaml'] = kube_apiserver_manifest
+  # node.default['kubernetes']['static_pods'][host]['kube_apiserver_manifest.yaml'] = kube_apiserver_manifest
 end
