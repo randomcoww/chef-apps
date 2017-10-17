@@ -128,7 +128,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            # "--api-servers=http://127.0.0.1:8080",
+            "--api-servers=http://127.0.0.1:8080",
             "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
@@ -136,7 +136,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            # "--hostname-override=#{ip_lan}",
+            "--hostname-override=#{ip_lan}",
             # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             "--make-iptables-util-chains=false"
