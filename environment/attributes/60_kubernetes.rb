@@ -16,6 +16,7 @@ node.default['kube']['images']['env_writer'] = "randomcoww/env_writer:latest"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:latest"
 node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:latest"
+# node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
 
 
 ##

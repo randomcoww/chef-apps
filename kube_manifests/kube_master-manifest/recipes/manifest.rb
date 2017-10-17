@@ -172,18 +172,6 @@ kube_apiserver_manifest = {
           # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
           "--allow-privileged=true"
         ],
-        "ports" => [
-          {
-            "name" => "https",
-            "hostPort" => node['kubernetes']['secure_port'],
-            "containerPort" => node['kubernetes']['secure_port']
-          },
-          {
-            "name" => "local",
-            "hostPort" => node['kubernetes']['insecure_port'],
-            "containerPort" => node['kubernetes']['insecure_port']
-          }
-        ],
         "volumeMounts" => [
           {
             "name" => "srv-kubernetes",
@@ -225,10 +213,53 @@ kube_apiserver_manifest = {
   }
 }
 
+# kube_dashboard = {
+#   "kind" => "Pod",
+#   "apiVersion" => "v1",
+#   "metadata" => {
+#     "namespace" => "kube-system",
+#     "name" => "kube-dashboard"
+#   },
+#   "spec" => {
+#     "hostNetwork" => true,
+#     "restartPolicy" => 'Always',
+#     "containers" => [
+#       {
+#         "name" => "kube-dashboard",
+#         "image" => node['kube']['images']['kube_dashboard'],
+#         "args" => [
+#           "--apiserver-host=http://127.0.0.1:8080"
+#         ],
+#         "volumeMounts" => [
+#           {
+#             "name" => "tmp-volume",
+#             "mountPath" => "/tmp",
+#           }
+#         ],
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "scheme" => "HTTP",
+#             "port" => 9090,
+#             "path" => "/"
+#           },
+#           "initialDelaySeconds" => 30,
+#           "timeoutSeconds" => 30
+#         }
+#       }
+#     ],
+#     "volumes" => [
+#       {
+#         "name" => "tmp-volume",
+#         "emptyDir" => {}
+#       }
+#     ]
+#   }
+# }
 
 node['kube_manifests']['kube_master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
+  # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
 end

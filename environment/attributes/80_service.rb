@@ -39,3 +39,10 @@ node.default['environment_v2']['service']['etcd'] = {
     "etcd" => 2379
   }
 }
+
+# node.default['environment_v2']['service']['kube_dashboard'] = {
+#   "bind" => 9090,
+#   "sets" => {
+#     "kube-master" => 9090
+#   }
+# }
