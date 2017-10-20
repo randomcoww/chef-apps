@@ -173,7 +173,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
   ]
 
   flanneld_environment = {
-    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
+    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
     "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
     "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
     "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
@@ -209,7 +209,7 @@ node['ignition']['kube_worker']['hosts'].each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube_master']['bind']}",
+            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}",
             "--register-schedulable=true",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",

@@ -1,48 +1,23 @@
 node.default['environment_v2']['service']['transmission'] = {
-  "bind" => 9091,
-  "sets" => {
-    "kube-master" => 30063
-  }
+  "port" => 9091
 }
 
 node.default['environment_v2']['service']['sshd'] = {
-  "bind" => 2222,
-  "sets" => {
-    "kube-master" => 32222
-  }
+  "port" => 2222
 }
 
-node.default['environment_v2']['service']['mpd_control'] = {
-  "bind" => 6600,
-  "sets" => {
-    "kube-master" => 30061
-  }
+node.default['environment_v2']['service']['mpd-control'] = {
+  "port" => 6600
 }
 
-node.default['environment_v2']['service']['mpd_stream'] = {
-  "bind" => 8000,
-  "sets" => {
-    "kube-master" => 30062
-  }
+node.default['environment_v2']['service']['mpd-stream'] = {
+  "port" => 8000
 }
 
-node.default['environment_v2']['service']['kube_master'] = {
-  "bind" => node['kubernetes']['secure_port'],
-  "sets" => {
-    "kube-master" => node['kubernetes']['secure_port']
-  }
+node.default['environment_v2']['service']['kube-master'] = {
+  "port" => 443
 }
 
-node.default['environment_v2']['service']['etcd'] = {
-  "bind" => 2379,
-  "sets" => {
-    "etcd" => 2379
-  }
+node.default['environment_v2']['service']['etcd-client'] = {
+  "port" => 2379
 }
-
-# node.default['environment_v2']['service']['kube_dashboard'] = {
-#   "bind" => 9090,
-#   "sets" => {
-#     "kube-master" => 9090
-#   }
-# }

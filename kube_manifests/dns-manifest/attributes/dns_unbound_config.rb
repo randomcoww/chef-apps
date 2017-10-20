@@ -1,4 +1,5 @@
 a_records = []
+srv_records = []
 
 node['environment_v2']['host'].each do |hostname, d|
   if !d['ip_lan'].nil?
@@ -39,60 +40,29 @@ node['environment_v2']['set'].each do |set, d|
       }
   end
 
-  if !d['vip_store'].nil?
-    a_records << {
-        name: [
-          set,
-          node['environment_v2']['domain']['vip_store'],
-          node['environment_v2']['domain']['top']
-        ].join('.'),
-        ttl: 300,
-        host: d['vip_store']
-      }
-  end
-end
+  if d['services'].is_a?(Hash)
+    d['services'].each do |service, c|
+      d['hosts'].each do |host|
 
-## etcd discovery records
-srv_records = []
-
-if node['environment_v2']['set'].has_key?('etcd')
-  node['environment_v2']['set']['etcd']['hosts'].each do |hostname|
-
-    srv_records << {
-      name: [
-        '_etcd-server',
-        '_tcp',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.'),
-      ttl: 300,
-      priority: 0,
-      weight: 0,
-      port: 2380,
-      host: [
-        hostname,
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.')
-    }
-
-    srv_records << {
-      name: [
-        '_etcd-client',
-        '_tcp',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.'),
-      ttl: 300,
-      priority: 0,
-      weight: 0,
-      port: 2379,
-      host: [
-        hostname,
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.')
-    }
+        srv_records << {
+          name: [
+            "_#{service}",
+            "_#{c['proto']}",
+            node['environment_v2']['domain']['host_lan'],
+            node['environment_v2']['domain']['top']
+          ].join('.'),
+          ttl: c["ttl"] || 300,
+          priority: 0,
+          weight: 0,
+          port: c["port"],
+          host: [
+            host,
+            node['environment_v2']['domain']['host_lan'],
+            node['environment_v2']['domain']['top']
+          ].join('.')
+        }
+      end
+    end
   end
 end
 

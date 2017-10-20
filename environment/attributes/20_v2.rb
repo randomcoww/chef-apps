@@ -53,7 +53,29 @@ node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'coreos-kube-master1',
     'coreos-kube-master2'
-  ]
+  ],
+  'services' => {
+    'kube-master' => {
+      "port" => 443,
+      "proto" => "tcp"
+    },
+    'transmission' => {
+      "port" => 30063,
+      "proto" => "tcp"
+    },
+    'sshd' => {
+      "port" => 32222,
+      "proto" => "tcp"
+    },
+    'mpd-control' => {
+      "port" => 30061,
+      "proto" => "tcp"
+    },
+    'mpd-stream' => {
+      "port" => 30062,
+      "proto" => "tcp"
+    }
+  }
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
@@ -68,7 +90,17 @@ node.default['environment_v2']['set']['etcd'] = {
     'coreos-etcd1',
     'coreos-etcd2',
     'coreos-etcd3'
-  ]
+  ],
+  "services" => {
+    'etcd-server' => {
+      "port" => 2380,
+      "proto" => "tcp",
+    },
+    'etcd-client' => {
+      "port" => 2379,
+      "proto" => "tcp"
+    }
+  }
 }
 
 

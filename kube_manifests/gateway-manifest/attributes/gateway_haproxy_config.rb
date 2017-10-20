@@ -5,26 +5,36 @@ lan_domain = [
   node['environment_v2']['domain']['top']
 ].join('.')
 
-node['environment_v2']['service'].each do |name, config|
-  next if !config.has_key?('sets')
 
-  services["frontend #{name}"] = {
-    'default_backend' => name,
-    'bind' => "*:#{config['bind']}",
-    'maxconn' => 2000
-  }
+node['environment_v2']['set'].each_value do |set|
+  if set.is_a?(Hash) &&
+    set.has_key?('services')
 
-  backend = []
-  config['sets'].each do |set, port|
-    node['environment_v2']['set'][set]['hosts'].each do |host|
-      backend << "#{host} #{[host, lan_domain].join('.')}:#{port} check port #{port} init-addr libc,none resolvers default"
+    set['services'].each do |service, c|
+      if node['environment_v2']['service'].has_key?(service) &&
+        node['environment_v2']['service'][service].has_key?('port')
+
+        bind = node['environment_v2']['service'][service]['port']
+
+        services["frontend #{service}"] = {
+          'default_backend' => service,
+          'bind' => "*:#{bind}",
+          'maxconn' => 2000
+        }
+
+        backend = []
+        set['hosts'].each do |host|
+          backend << "#{host} #{[host, lan_domain].join('.')}:#{c['port']} init-addr libc,none resolvers default"
+        end
+
+        services["backend #{service}"] = {
+          "server" => backend
+        }
+      end
     end
   end
-
-  services["backend #{name}"] = {
-    "server" => backend
-  }
 end
+
 
 node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {

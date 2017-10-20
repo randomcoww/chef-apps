@@ -212,7 +212,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube_master']['bind']}",
+            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}",
             "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",

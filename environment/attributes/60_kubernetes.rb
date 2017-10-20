@@ -98,3 +98,4 @@ node.default['kube_manifests']['gateway']['hosts'] = node['environment_v2']['set
 node.default['kube_manifests']['kea']['hosts'] = node['environment_v2']['set']['kea']['hosts']
 node.default['kube_manifests']['kube_master']['hosts'] = node['environment_v2']['set']['kube-master']['hosts']
 node.default['kube_manifests']['kube_worker']['hosts'] = node['environment_v2']['set']['kube-worker']['hosts']
+node.default['kube_manifests']['etcd']['hosts'] = node['environment_v2']['set']['etcd']['hosts']

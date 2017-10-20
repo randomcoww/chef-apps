@@ -20,7 +20,7 @@ table ip filter {
 		iifname "<%= @current_host['if_lan'] %>" pkttype multicast accept;
 
 		## external ssh
-		tcp dport <%= @services['sshd']['bind'] %> accept;
+		tcp dport <%= @services['sshd']['port'] %> accept;
 
 		## external vpn
 		# iifname "<%= @current_host['if_wan'] %>" udp dport 1194 accept;
