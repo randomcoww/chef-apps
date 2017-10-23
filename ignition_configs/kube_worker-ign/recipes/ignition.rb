@@ -22,7 +22,11 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-kubelet_kube_config = {
+flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
+flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
+
+
+kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
   "clusters" => [
@@ -30,65 +34,29 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
   ],
   "users" => [
     {
-      "name" => "kubelet",
+      "name" => "kube",
       "user" => {
         "client-certificate" => node['kubernetes']['cert_path'],
         "client-key" => node['kubernetes']['key_path'],
-        # "token" => node['kubernetes']['tokens']['kubelet']
       }
     }
   ],
   "contexts" => [
     {
-      "name" => "kubelet-context",
+      "name" => "kube-context",
       "context" => {
         "cluster" => node['kubernetes']['cluster_name'],
-        "user" => "kubelet"
+        "user" => "kube"
       }
     }
   ],
-  "current-context" => "kubelet-context"
-}
-
-
-kube_proxy_kube_config = {
-  "apiVersion" => "v1",
-  "kind" => "Config",
-  "clusters" => [
-    {
-      "name" => node['kubernetes']['cluster_name'],
-      "cluster" => {
-        "certificate-authority" => node['kubernetes']['ca_path'],
-
-      }
-    }
-  ],
-  "users" => [
-    {
-      "name" => "kube_proxy",
-      "user" => {
-        "client-certificate" => node['kubernetes']['cert_path'],
-        "client-key" => node['kubernetes']['key_path'],
-        # "token" => node['kubernetes']['tokens']['kube_proxy']
-      }
-    }
-  ],
-  "contexts" => [
-    {
-      "name" => "kube-proxy-context",
-      "context" => {
-        "cluster" => node['kubernetes']['cluster_name'],
-        "user" => "kube_proxy"
-      }
-    }
-  ],
-  "current-context" => "kube-proxy-context"
+  "current-context" => "kube-context"
 }
 
 
@@ -121,6 +89,18 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:,#{host}"
     },
+    ## flannel
+    {
+      "path" => node['kubernetes']['flanneld_cni_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
+    },
+    {
+      "path" => node['kubernetes']['flanneld_cfg_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    },
+    ## kube cert
     {
       "path" => node['kubernetes']['key_path'],
       "mode" => 420,
@@ -136,16 +116,13 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
+    ## kubeconfig
     {
-      "path" => node['kubernetes']['kubelet']['kubeconfig_path'],
+      "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(kubelet_kube_config.to_hash.to_yaml)}"
+      "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
     },
-    {
-      "path" => node['kubernetes']['kube_proxy']['kubeconfig_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(kube_proxy_kube_config.to_hash.to_yaml)}"
-    },
+
     # {
     #   "path" => "/opt/bin/setup-network-environment",
     #   "mode" => 493,
@@ -172,13 +149,13 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
     }
   ]
 
-  flanneld_environment = {
-    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
-    "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
-    "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
-    "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
-    "FLANNELD_IP_MASQ" => true
-  }
+  # flanneld_environment = {
+  #   "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
+  #   "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
+  #   "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
+  #   "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
+  #   "FLANNELD_IP_MASQ" => true
+  # }
 
   systemd = [
     {
@@ -220,7 +197,7 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
             "--hostname-override=#{[host, domain].join('.')}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--tls-cert-file=#{node['kubernetes']['cert_path']}",
             "--tls-private-key-file=#{node['kubernetes']['key_path']}"
           ].join(' '),
@@ -233,43 +210,43 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
         }
       }
     },
-    {
-      "name" => "flanneld.service",
-      "dropins" => [
-        {
-          "name" => "etcd-env.conf",
-          "contents" => {
-            "Service" => {
-              "Environment" => flanneld_environment.map { |k, v|
-                "#{k}=#{v}"
-              },
-              "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name" => "docker.service",
-      "dropins" => [
-        {
-          "name" => "flannel.conf",
-          "contents" => {
-            "Unit" => {
-              "Requires" => "flanneld.service",
-              "After" => "flanneld.service"
-            },
-            "Service" => {
-              "LimitNOFILE" => "infinity",
-              "Environment" => [
-                %Q{DOCKER_OPT_BIP=""},
-                %Q{DOCKER_OPT_IPMASQ=""}
-              ]
-            }
-          }
-        }
-      ]
-    },
+    # {
+    #   "name" => "flanneld.service",
+    #   "dropins" => [
+    #     {
+    #       "name" => "etcd-env.conf",
+    #       "contents" => {
+    #         "Service" => {
+    #           "Environment" => flanneld_environment.map { |k, v|
+    #             "#{k}=#{v}"
+    #           },
+    #           "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_cfg'].to_json}'",
+    #         }
+    #       }
+    #     }
+    #   ]
+    # },
+    # {
+    #   "name" => "docker.service",
+    #   "dropins" => [
+    #     {
+    #       "name" => "flannel.conf",
+    #       "contents" => {
+    #         "Unit" => {
+    #           "Requires" => "flanneld.service",
+    #           "After" => "flanneld.service"
+    #         },
+    #         "Service" => {
+    #           "LimitNOFILE" => "infinity",
+    #           "Environment" => [
+    #             %Q{DOCKER_OPT_BIP=""},
+    #             %Q{DOCKER_OPT_IPMASQ=""}
+    #           ]
+    #         }
+    #       }
+    #     }
+    #   ]
+    # },
     # {
     #   "name" => "setup-network-environment.service",
     #   "contents" => {

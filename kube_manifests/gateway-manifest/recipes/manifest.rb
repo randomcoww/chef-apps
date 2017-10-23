@@ -18,7 +18,7 @@ keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 #           "/hyperkube",
 #           "apiserver",
 #           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
+#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
 #           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
 #           "--allow-privileged=true"
 #         ],

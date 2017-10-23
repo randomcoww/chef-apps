@@ -11,10 +11,10 @@ node['environment_v2']['set'].each_value do |set|
     set.has_key?('services')
 
     set['services'].each do |service, c|
-      if node['environment_v2']['service'].has_key?(service) &&
-        node['environment_v2']['service'][service].has_key?('port')
+      if node['environment_v2']['haproxy'].has_key?(service) &&
+        node['environment_v2']['haproxy'][service].has_key?('port')
 
-        bind = node['environment_v2']['service'][service]['port']
+        bind = node['environment_v2']['haproxy'][service]['port']
 
         services["frontend #{service}"] = {
           'default_backend' => service,

@@ -1,3 +1,72 @@
+flannel_manifest = {
+  "kind" => "Pod",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "name" => "kube-flannel-ds",
+    "namespace" => "kube-system",
+  },
+  "spec" => {
+    "hostNetwork" => true,
+    "containers" => [
+      {
+        "name" => "kube-flannel",
+        "image" => "quay.io/coreos/flannel:v0.9.0-amd64",
+        "command" => [
+          "/opt/bin/flanneld",
+          "--ip-masq",
+          "--kube-subnet-mgr",
+          "--kube-api-url=http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
+        ],
+        "securityContext" => {
+          "privileged" => true
+        },
+        "env" => [
+          {
+            "name" => "POD_NAME",
+            "valueFrom" => {
+              "fieldRef" => {
+                "fieldPath" => "metadata.name"
+              }
+            }
+          },
+          {
+            "name" => "POD_NAMESPACE",
+            "valueFrom" => {
+              "fieldRef" => {
+                "fieldPath" => "metadata.namespace"
+              }
+            }
+          }
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "run",
+            "mountPath" => "/run"
+          },
+          {
+            "name" => "flannel-cfg",
+            "mountPath" => "/etc/kube-flannel/"
+          }
+        ]
+      }
+    ],
+    "volumes" => [
+      {
+        "name" => "run",
+        "hostPath" => {
+          "path" => "/run"
+        }
+      },
+      {
+        "name" => "flannel-cfg",
+        "hostPath" => {
+          "path" => "/etc/kube-flannel"
+        }
+      }
+    ]
+  }
+}
+
 kube_controller_manager_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -162,7 +231,10 @@ kube_apiserver_manifest = {
           # "--address=127.0.0.1",
           "--secure-port=#{node['kubernetes']['secure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
+          "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
+          "--etcd-cafile=#{node['etcd']['ca_path']}",
+          "--etcd-certfile=#{node['etcd']['cert_path']}",
+          "--etcd-keyfile=#{node['etcd']['key_path']}",
           "--tls-cert-file=#{node['kubernetes']['cert_path']}",
           "--tls-private-key-file=#{node['kubernetes']['key_path']}",
           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
@@ -334,7 +406,7 @@ kube_dns_manifest = {
             "containerPort" => 53,
             "name" => "dns-tcp",
             "protocol" => "TCP",
-            "hostPort" => 53530
+            "hostPort" => node['environment_v2']['haproxy']['kube-dns']
           }
         ],
         "resources" => {
@@ -433,10 +505,11 @@ kube_dns_manifest = {
 # }
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
+  node.default['kubernetes']['static_pods'][host]['flannel.yaml'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
-  node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
+  # node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
 end

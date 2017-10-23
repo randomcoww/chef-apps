@@ -24,7 +24,7 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-kubelet_kube_config = {
+kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
   "clusters" => [
@@ -32,30 +32,29 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
   ],
   "users" => [
     {
-      "name" => "kubelet",
+      "name" => "kube",
       "user" => {
         "client-certificate" => node['kubernetes']['cert_path'],
         "client-key" => node['kubernetes']['key_path'],
-        # "token" => node['kubernetes']['tokens']['kubelet']
       }
     }
   ],
   "contexts" => [
     {
-      "name" => "kubelet-context",
+      "name" => "kube-context",
       "context" => {
         "cluster" => node['kubernetes']['cluster_name'],
-        "user" => "kubelet"
+        "user" => "kube"
       }
     }
   ],
-  "current-context" => "kubelet-context"
+  "current-context" => "kube-context"
 }
 
 
@@ -93,7 +92,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       current_host: node['environment_v2']['host'][host],
       sets: node['environment_v2']['set'],
       hosts: node['environment_v2']['host'],
-      services: node['environment_v2']['service']
+      services: node['environment_v2']['haproxy']
     })
     action :nothing
   end.run_action(:create)
@@ -133,9 +132,9 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
     {
-      "path" => node['kubernetes']['kubelet']['kubeconfig_path'],
+      "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(kubelet_kube_config.to_hash.to_yaml)}"
+      "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
     }
   ]
 

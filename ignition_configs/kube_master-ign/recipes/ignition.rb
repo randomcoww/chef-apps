@@ -22,7 +22,13 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-kubelet_kube_config = {
+etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
+)
+etcd_ca = etcd_cert_generator.root_ca
+
+
+kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
   "clusters" => [
@@ -35,10 +41,40 @@ kubelet_kube_config = {
 }
 
 
+flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
+flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
+
+
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
 
+
+  ##
+  ## etcd ssl
+  ##
+  etcd_key = etcd_cert_generator.generate_key
+  etcd_cert = etcd_cert_generator.node_cert(
+    [
+      ['CN', "etcd-#{host}"]
+    ],
+    etcd_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => [
+        '*',
+        node['environment_v2']['domain']['host_lan'],
+        node['environment_v2']['domain']['top']
+      ].join('.')
+    }
+  )
+
+  ##
+  ## kube ssl
+  ##
   key = cert_generator.generate_key
   cert = cert_generator.node_cert(
     [
@@ -70,6 +106,18 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:,#{host}"
     },
+    ## flannel
+    {
+      "path" => node['kubernetes']['flanneld_cni_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
+    },
+    {
+      "path" => node['kubernetes']['flanneld_cfg_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    },
+    ## kube ssl
     {
       "path" => node['kubernetes']['key_path'],
       "mode" => 420,
@@ -86,10 +134,26 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
     {
-      "path" => node['kubernetes']['kubelet']['kubeconfig_path'],
+      "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(kubelet_kube_config.to_hash.to_yaml)}"
-    }
+      "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
+    },
+    ## etcd ssl
+    {
+      "path" => node['etcd']['key_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_key.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['cert_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_cert.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['ca_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_ca.to_pem)}"
+    },
     # {
     #   "path" => "/opt/bin/setup-network-environment",
     #   "mode" => 493,
@@ -116,13 +180,17 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     }
   ]
 
-  flanneld_environment = {
-    "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
-    "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
-    "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
-    "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
-    "FLANNELD_IP_MASQ" => true
-  }
+  # flanneld_environment = {
+  #   "ETCDCTL_API" => 3,
+  #   "FLANNELD_ETCD_ENDPOINTS" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
+  #   "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
+  #   "FLANNELD_ETCD_CAFILE" => node['etcd']['ca_path'],
+  #   "FLANNELD_ETCD_CERTFILE" => node['etcd']['cert_path'],
+  #   "FLANNELD_ETCD_KEYFILE" => node['etcd']['key_path'],
+  #   "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
+  #   "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
+  #   "FLANNELD_IP_MASQ" => true
+  # }
 
   systemd = [
     {
@@ -173,43 +241,50 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         }
       }
     },
-    {
-      "name" => "flanneld.service",
-      "dropins" => [
-        {
-          "name" => "etcd-env.conf",
-          "contents" => {
-            "Service" => {
-              "Environment" => flanneld_environment.map { |e|
-                e.join('=')
-              },
-              "ExecStartPre" => "/usr/bin/etcdctl --endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']} set #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name" => "docker.service",
-      "dropins" => [
-        {
-          "name" => "flannel.conf",
-          "contents" => {
-            "Unit" => {
-              "Requires" => "flanneld.service",
-              "After" => "flanneld.service"
-            },
-            "Service" => {
-              "LimitNOFILE" => "infinity",
-              "Environment" => [
-                %Q{DOCKER_OPT_BIP=""},
-                %Q{DOCKER_OPT_IPMASQ=""}
-              ]
-            }
-          }
-        }
-      ]
-    },
+    # {
+    #   "name" => "flanneld.service",
+    #   "dropins" => [
+    #     {
+    #       "name" => "etcd-env.conf",
+    #       "contents" => {
+    #         "Service" => {
+    #           "Environment" => flanneld_environment.map { |e|
+    #             e.join('=')
+    #           },
+    #           "ExecStartPre" => [
+    #             "/usr/bin/etcdctl",
+    #             "--insecure-skip-tls-verify",
+    #             "--cert=#{flanneld_environment['FLANNELD_ETCD_CERTFILE']}",
+    #             "--key=#{flanneld_environment['FLANNELD_ETCD_KEYFILE']}",
+    #             "--endpoints=#{flanneld_environment['FLANNELD_ETCD_ENDPOINTS']}",
+    #             "put #{flanneld_environment['FLANNELD_ETCD_PREFIX']}/config '#{node['kubernetes']['flanneld_network'].to_json}'",
+    #           ].join(' ')
+    #         }
+    #       }
+    #     }
+    #   ]
+    # },
+    # {
+    #   "name" => "docker.service",
+    #   "dropins" => [
+    #     {
+    #       "name" => "flannel.conf",
+    #       "contents" => {
+    #         "Unit" => {
+    #           "Requires" => "flanneld.service",
+    #           "After" => "flanneld.service"
+    #         },
+    #         "Service" => {
+    #           "LimitNOFILE" => "infinity",
+    #           "Environment" => [
+    #             %Q{DOCKER_OPT_BIP=""},
+    #             %Q{DOCKER_OPT_IPMASQ=""}
+    #           ]
+    #         }
+    #       }
+    #     }
+    #   ]
+    # },
     # {
     #   "name" => "setup-network-environment.service",
     #   "contents" => {

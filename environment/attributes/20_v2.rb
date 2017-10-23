@@ -50,6 +50,15 @@ node.default['environment_v2']['set']['kea'] = {
   ]
 }
 
+node.default['environment_v2']['set']['flannel'] = {
+  'hosts' => [
+    'coreos-kube-master1',
+    'coreos-kube-master2',
+    'coreos-kube-worker1',
+    'coreos-kube-worker2'
+  ]
+}
+
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'coreos-kube-master1',
@@ -61,7 +70,7 @@ node.default['environment_v2']['set']['kube-master'] = {
       "proto" => "tcp"
     },
     'kube-dns' => {
-      "port" => 53530,
+      "port" => 53531,
       "proto" => "tcp"
     },
     'transmission' => {
@@ -97,11 +106,11 @@ node.default['environment_v2']['set']['etcd'] = {
     'coreos-etcd3'
   ],
   "services" => {
-    'etcd-server' => {
+    'etcd-server-ssl' => {
       "port" => 2380,
       "proto" => "tcp",
     },
-    'etcd-client' => {
+    'etcd-client-ssl' => {
       "port" => 2379,
       "proto" => "tcp"
     }

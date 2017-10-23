@@ -44,10 +44,22 @@ node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 # node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['ns']['vip_lan']
 
-node.default['kubernetes']['flanneld_network'] = {
+
+node.default['kubernetes']['flanneld_cfg_path'] = "/etc/cni/net.d/flannel.json"
+node.default['kubernetes']['flanneld_cfg'] = {
   "Network" => node['kubernetes']['cluster_cidr'],
   "Backend" => {
     "Type" => "vxlan"
+  }
+}
+
+node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/cni.json"
+node.default['kubernetes']['flanneld_cni'] = {
+  "name": "cbr0",
+  "type": "flannel",
+  "delegate": {
+    "hairpinMode": true,
+    "isDefaultGateway": true
   }
 }
 
@@ -87,6 +99,5 @@ node.default['kubernetes']['kubectl']['binary_path'] = "/usr/local/bin/kubectl"
 node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
 
 
-node.default['kubernetes']['kubelet']['kubeconfig_path'] = '/var/lib/kubelet/kubeconfig'
-node.default['kubernetes']['kube_proxy']['kubeconfig_path'] = '/var/lib/kube_proxy/kubeconfig'
+node.default['kubernetes']['client']['kubeconfig_path'] = '/var/lib/kubernetes/kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'

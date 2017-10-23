@@ -101,11 +101,11 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
   'stub-zone' => [
     {
       'name' => node['environment_v2']['domain']['top'],
-      'stub-addr' => '127.0.0.1@53530'
+      'stub-addr' => "127.0.0.1@53530"
     },
     {
       'name' => node['kubernetes']['cluster_domain'],
-      'stub-addr' => "#{node['environment_v2']['set']['haproxy']['vip_lan']}@53530"
+      'stub-addr' => "#{node['environment_v2']['set']['haproxy']['vip_lan']}@#{node['environment_v2']['haproxy']['kube-dns']['port']}"
     }
   ]
 })

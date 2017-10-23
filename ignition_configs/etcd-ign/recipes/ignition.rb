@@ -15,18 +15,107 @@ domain = [
   node['environment_v2']['domain']['top']
 ].join('.')
 
+## client
+etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
+)
+etcd_ca = etcd_cert_generator.root_ca
+
+## peer
+etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_peer_ssl', [['CN', 'etcd-peer-ca']]
+)
+etcd_peer_ca = etcd_peer_cert_generator.root_ca
+
 
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
   hostname = [host, domain].join('.')
 
+  ##
+  ## etcd ssl
+  ##
+  etcd_key = etcd_cert_generator.generate_key
+  etcd_cert = etcd_cert_generator.node_cert(
+    [
+      ['CN', "etcd-#{host}"]
+    ],
+    etcd_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => [
+        '*',
+        node['environment_v2']['domain']['host_lan'],
+        node['environment_v2']['domain']['top']
+      ].join('.'),
+      'IP.1' => node['environment_v2']['set']['haproxy']['vip_lan']
+    }
+  )
+
+  ##
+  ## etcd peer ssl
+  ##
+  etcd_peer_key = etcd_peer_cert_generator.generate_key
+  etcd_peer_cert = etcd_peer_cert_generator.node_cert(
+    [
+      ['CN', "etcd-peer-#{host}"]
+    ],
+    etcd_peer_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => [
+        '*',
+        node['environment_v2']['domain']['host_lan'],
+        node['environment_v2']['domain']['top']
+      ].join('.')
+    }
+  )
+
   files = [
     {
       "path" => "/etc/hostname",
       "mode" => 420,
       "contents" => "data:,#{host}"
-    }
+    },
+    ## etcd ssl
+    {
+      "path" => node['etcd']['key_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_key.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['cert_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_cert.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['ca_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_ca.to_pem)}"
+    },
+    ## etcd peer ssl
+    {
+      "path" => node['etcd']['key_peer_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_key.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['cert_peer_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_cert.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['ca_peer_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_ca.to_pem)}"
+    },
   ]
 
   networkd = [
@@ -51,12 +140,21 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
   etcd_environment = {
     "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
     "ETCD_DISCOVERY_SRV" => domain,
-    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "http://#{hostname}:2380",
-    "ETCD_LISTEN_PEER_URLS" => "http://#{hostname}:2380",
-    "ETCD_LISTEN_CLIENT_URLS" => "http://#{hostname}:2379,http://127.0.0.1:2379",
-    "ETCD_ADVERTISE_CLIENT_URLS" => "http://#{hostname}:2379",
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{hostname}:2380",
+    "ETCD_LISTEN_PEER_URLS" => "https://#{hostname}:2380",
+    "ETCD_LISTEN_CLIENT_URLS" => "https://#{hostname}:2379,https://127.0.0.1:2379",
+    "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{hostname}:2379",
     "ETCD_INITIAL_CLUSTER_STATE" => "existing",
-    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1"
+    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1",
+
+    "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
+    "ETCD_CERT_FILE" => node['etcd']['cert_path'],
+    "ETCD_KEY_FILE" => node['etcd']['key_path'],
+
+    "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
+    "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
+    "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
+    "ETCD_PEER_CLIENT_CERT_AUTH" => true
   }
 
   systemd = [
