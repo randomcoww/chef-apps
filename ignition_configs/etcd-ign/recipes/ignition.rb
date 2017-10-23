@@ -16,7 +16,7 @@ domain = [
 ].join('.')
 
 
-node['ignition']['etcd']['hosts'].each do |host|
+node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
   hostname = [host, domain].join('.')
@@ -60,6 +60,68 @@ node['ignition']['etcd']['hosts'].each do |host|
   }
 
   systemd = [
+    # {
+    #   "name" => "kubelet.service",
+    #   "contents" => {
+    #     # "Unit" => {
+    #     #   "Requires" => "setup-network-environment.service",
+    #     #   "After" => "setup-network-environment.service"
+    #     # },
+    #     "Service" => {
+    #       # "EnvironmentFile" => "/etc/network-environment",
+    #       "Environment" => [
+    #         "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
+    #         %Q{RKT_RUN_ARGS="#{[
+    #           "--uuid-file-save=/var/run/kubelet-pod.uuid",
+    #           "--volume var-log,kind=host,source=/var/log",
+    #           "--mount volume=var-log,target=/var/log",
+    #           "--volume dns,kind=host,source=/etc/resolv.conf",
+    #           "--mount volume=dns,target=/etc/resolv.conf",
+    #         ].join(' ')}"}
+    #       ],
+    #       "ExecStartPre" => [
+    #         "/usr/bin/mkdir -p /etc/kubernetes/manifests",
+    #         "/usr/bin/mkdir -p /var/log/containers",
+    #         "-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid"
+    #       ],
+    #       "ExecStart" => [
+    #         "/usr/lib/coreos/kubelet-wrapper",
+    #         "--register-schedulable=false",
+    #         "--register-node=true",
+    #         "--cni-conf-dir=/etc/kubernetes/cni/net.d",
+    #         # "--network-plugin=${NETWORK_PLUGIN}",
+    #         "--container-runtime=docker",
+    #         "--allow-privileged=true",
+    #         "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
+    #         # "--hostname-override=#{ip_lan}",
+    #         # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
+    #         # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+    #         "--make-iptables-util-chains=false",
+    #       ].join(' '),
+    #       "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
+    #       "Restart" => "always",
+    #       "RestartSec" => 10
+    #     },
+    #     "Install" => {
+    #       "WantedBy" => "multi-user.target"
+    #     }
+    #   }
+    # },
+    # {
+    #   "name" => "setup-network-environment.service",
+    #   "contents" => {
+    #     "Unit" => {
+    #       "Requires" => "network-online.target",
+    #       "After" => "network-online.target"
+    #     },
+    #     "Service" => {
+    #       "Type" => "oneshot",
+    #       "ExecStart" => "/opt/bin/setup-network-environment",
+    #       "RemainAfterExit" => "yes"
+    #     }
+    #   }
+    # }
+
     {
       "name" => "etcd-member.service",
       "dropins" => [

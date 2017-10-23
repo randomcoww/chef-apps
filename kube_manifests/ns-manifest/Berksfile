@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+source 'https://supermarket.chef.io'
+
+metadata
+
+cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
+cookbook "dbag", github: "randomcoww/chef-dbag"
+cookbook "nsd_resource", github: "randomcoww/chef-nsd_resource"
+cookbook "dns_zone", github: "randomcoww/chef-dns_zone"

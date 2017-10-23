@@ -1,7 +1,3 @@
-host_ips = node['kube_manifests']['kea']['hosts'].map { |host|
-  node['environment_v2']['host'][host]['ip_lan']
-}
-
 ndbd_manifest = {
   "apiVersion" => "v1",
   "kind" => "Pod",
@@ -147,7 +143,7 @@ resolver_manifest = {
 }
 
 
-node['kube_manifests']['kea']['hosts'].each.with_index(1) do |host, index|
+node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index|
 
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndb-mgmd.yaml'] = {
     "apiVersion" => "v1",

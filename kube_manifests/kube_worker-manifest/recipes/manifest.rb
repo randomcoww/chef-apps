@@ -64,6 +64,6 @@ kube_proxy_manifest = {
   }
 }
 
-node['kube_manifests']['kube_worker']['hosts'].each do |host|
+node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
 end

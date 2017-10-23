@@ -1,29 +1,5 @@
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 
-haproxy_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "haproxy"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "haproxy",
-        "image" => node['kube']['images']['haproxy'],
-        "env" => [
-          {
-            "name" => "CONFIG",
-            "value" => node['kube_manifests']['gateway']['haproxy_config']
-          }
-        ]
-      }
-    ]
-  }
-}
-
 # kube_apiserver_manifest = {
 #   "kind" => "Pod",
 #   "apiVersion" => "v1",
@@ -42,7 +18,7 @@ haproxy_manifest = {
 #           "/hyperkube",
 #           "apiserver",
 #           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd']['bind']}",
+#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['etcd-client']['port']}",
 #           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
 #           "--allow-privileged=true"
 #         ],
@@ -62,7 +38,7 @@ haproxy_manifest = {
 # }
 
 
-node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
+node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
     'vrrp_sync_group VG_gateway' => [
@@ -88,13 +64,13 @@ node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
           }
         ],
         'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
+          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
         ]
       }
     ]
   })
 
-  gateway_manifest = {
+  keepalived_manifest = {
     "apiVersion" => "v1",
     "kind" => "Pod",
     "metadata" => {
@@ -125,7 +101,6 @@ node['kube_manifests']['gateway']['hosts'].uniq.each do |host|
     }
   }
 
-  node.default['kubernetes']['static_pods'][host]['gateway.yaml'] = gateway_manifest
-  node.default['kubernetes']['static_pods'][host]['haproxy_manifest.yaml'] = haproxy_manifest
+  node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
   # node.default['kubernetes']['static_pods'][host]['kube_apiserver_manifest.yaml'] = kube_apiserver_manifest
 end

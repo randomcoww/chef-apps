@@ -35,11 +35,12 @@ node.default['environment_v2']['set']['haproxy'] = {
   'vip_lan' => "192.168.62.240"
 }
 
-node.default['environment_v2']['set']['dns'] = {
+node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
     'coreos-gateway1',
     'coreos-gateway2'
-  ]
+  ],
+  'vip_lan' => "192.168.62.240"
 }
 
 node.default['environment_v2']['set']['kea'] = {
@@ -57,6 +58,10 @@ node.default['environment_v2']['set']['kube-master'] = {
   'services' => {
     'kube-master' => {
       "port" => 443,
+      "proto" => "tcp"
+    },
+    'kube-dns' => {
+      "port" => 53530,
       "proto" => "tcp"
     },
     'transmission' => {

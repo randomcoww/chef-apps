@@ -23,7 +23,7 @@ node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolv
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.7.6'
+node.default['kubernetes']['version'] = '1.8.1'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -41,7 +41,8 @@ node.default['kubernetes']['cluster_cidr'] = '10.244.0.0/16'
 ## service network
 node.default['kubernetes']['service_ip_range'] = '10.3.0.0/24'
 node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
-node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
+# node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
+node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['ns']['vip_lan']
 
 node.default['kubernetes']['flanneld_network'] = {
   "Network" => node['kubernetes']['cluster_cidr'],
@@ -89,13 +90,3 @@ node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkub
 node.default['kubernetes']['kubelet']['kubeconfig_path'] = '/var/lib/kubelet/kubeconfig'
 node.default['kubernetes']['kube_proxy']['kubeconfig_path'] = '/var/lib/kube_proxy/kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'
-
-
-node.default['kube_manifests']['dns']['hosts'] = node['environment_v2']['set']['dns']['hosts']
-node.default['kube_manifests']['gateway']['hosts'] = node['environment_v2']['set']['gateway']['hosts'] +
-  node['environment_v2']['set']['haproxy']['hosts']
-
-node.default['kube_manifests']['kea']['hosts'] = node['environment_v2']['set']['kea']['hosts']
-node.default['kube_manifests']['kube_master']['hosts'] = node['environment_v2']['set']['kube-master']['hosts']
-node.default['kube_manifests']['kube_worker']['hosts'] = node['environment_v2']['set']['kube-worker']['hosts']
-node.default['kube_manifests']['etcd']['hosts'] = node['environment_v2']['set']['etcd']['hosts']

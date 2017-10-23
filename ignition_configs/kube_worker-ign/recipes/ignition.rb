@@ -30,7 +30,7 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        # "server" => "https://#{node['kubernetes']['master_ip']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}"
       }
     }
   ],
@@ -65,7 +65,7 @@ kube_proxy_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        # "server" => "https://#{node['kubernetes']['master_ip']}"
+
       }
     }
   ],
@@ -92,7 +92,7 @@ kube_proxy_kube_config = {
 }
 
 
-node['ignition']['kube_worker']['hosts'].each do |host|
+node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
 
@@ -209,7 +209,6 @@ node['ignition']['kube_worker']['hosts'].each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}",
             "--register-schedulable=true",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",

@@ -32,7 +32,7 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        # "server" => "https://#{node['kubernetes']['master_ip']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}"
       }
     }
   ],
@@ -59,7 +59,7 @@ kubelet_kube_config = {
 }
 
 
-node['ignition']['gateway']['hosts'].uniq.each do |host|
+node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
   ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']
@@ -169,7 +169,7 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
           "LinkLocalAddressing" => "no",
           "DHCP" => "yes",
           "DNS" => [
-            node['environment_v2']['set']['haproxy']['vip_lan'],
+            node['environment_v2']['set']['ns']['vip_lan'],
             '8.8.8.8'
           ]
         },
@@ -212,7 +212,6 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['service']['kube-master']['port']}",
             "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
@@ -221,8 +220,6 @@ node['ignition']['gateway']['hosts'].uniq.each do |host|
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
             "--hostname-override=#{ip_lan}",
-            # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-            # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             "--make-iptables-util-chains=false",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",

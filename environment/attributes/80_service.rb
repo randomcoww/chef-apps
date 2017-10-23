@@ -21,3 +21,7 @@ node.default['environment_v2']['service']['kube-master'] = {
 node.default['environment_v2']['service']['etcd-client'] = {
   "port" => 2379
 }
+
+node.default['environment_v2']['service']['kube-dns'] = {
+  "port" => 53530
+}

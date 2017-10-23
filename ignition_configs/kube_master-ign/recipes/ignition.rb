@@ -22,7 +22,20 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-node['ignition']['kube_master']['hosts'].each do |host|
+kubelet_kube_config = {
+  "apiVersion" => "v1",
+  "kind" => "Config",
+  "clusters" => [
+    {
+      "local-server" => {
+        "server" => "http://127.0.0.1:8080"
+      }
+    }
+  ]
+}
+
+
+node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
 
@@ -72,6 +85,11 @@ node['ignition']['kube_master']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
+    {
+      "path" => node['kubernetes']['kubelet']['kubeconfig_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(kubelet_kube_config.to_hash.to_yaml)}"
+    }
     # {
     #   "path" => "/opt/bin/setup-network-environment",
     #   "mode" => 493,
@@ -133,7 +151,6 @@ node['ignition']['kube_master']['hosts'].each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--api-servers=http://127.0.0.1:8080",
             "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
@@ -144,7 +161,8 @@ node['ignition']['kube_master']['hosts'].each do |host|
             # "--hostname-override=${DEFAULT_IPV4}",
             "--hostname-override=#{[host, domain].join('.')}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-            "--cluster_domain=#{node['kubernetes']['cluster_domain']}"
+            "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",
