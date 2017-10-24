@@ -106,11 +106,6 @@ kube_proxy_manifest = {
         },
         "volumeMounts": [
           {
-            "name" => "srv-kubernetes",
-            "mountPath" => node['kubernetes']['srv_path'],
-            "readOnly" => true
-          },
-          {
             "name" => "kubeconfig",
             "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
             "readOnly" => true
@@ -125,15 +120,9 @@ kube_proxy_manifest = {
     ],
     "volumes": [
       {
-        "name" => "srv-kubernetes",
-        "hostPath" => {
-          "path" => node['kubernetes']['srv_path']
-        }
-      },
-      {
         "name" => "kubeconfig",
         "hostPath" => {
-          "path" => node['kubernetes']['kube_proxy']['kubeconfig_path']
+          "path" => node['kubernetes']['client']['kubeconfig_path']
         }
       },
       {

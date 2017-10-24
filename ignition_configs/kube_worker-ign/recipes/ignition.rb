@@ -175,8 +175,8 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
               "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
               "--mount volume=dns,target=/etc/resolv.conf",
-              "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
-              "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
+              # "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
+              # "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
             ].join(' ')}"}
           ],
           "ExecStartPre" => [

@@ -53,7 +53,7 @@ node.default['kubernetes']['flanneld_cfg'] = {
   }
 }
 
-node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/cni.json"
+node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/net-conf.json"
 node.default['kubernetes']['flanneld_cni'] = {
   "name": "cbr0",
   "type": "flannel",
@@ -63,11 +63,11 @@ node.default['kubernetes']['flanneld_cni'] = {
   }
 }
 
-node.default['kubernetes']['srv_path'] = '/srv/kubernetes'
+node.default['kubernetes']['ssl_path'] = '/etc/ssl/certs'
 ## cert and auth
-node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['srv_path'], 'ca.crt')
-node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['srv_path'], 'server.crt')
-node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['srv_path'], 'server.key')
+node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_ca.crt')
+node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_cert.crt')
+node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_key.key')
 
 
 ## pods
@@ -99,5 +99,5 @@ node.default['kubernetes']['kubectl']['binary_path'] = "/usr/local/bin/kubectl"
 node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
 
 
-node.default['kubernetes']['client']['kubeconfig_path'] = '/var/lib/kubernetes/kubeconfig'
+node.default['kubernetes']['client']['kubeconfig_path'] = '/var/lib/kubelet/client_kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'

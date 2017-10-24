@@ -28,16 +28,49 @@ etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
 etcd_ca = etcd_cert_generator.root_ca
 
 
+# kube_config = {
+#   "apiVersion" => "v1",
+#   "kind" => "Config",
+#   "clusters" => [
+#     {
+#       "name" => node['kubernetes']['cluster_name'],
+#       "cluster" => {
+#         "server" => "http://127.0.0.1:8080"
+#       }
+#     }
+#   ]
+# }
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
   "clusters" => [
     {
-      "local-server" => {
-        "server" => "http://127.0.0.1:8080"
+      "name" => node['kubernetes']['cluster_name'],
+      "cluster" => {
+        "certificate-authority" => node['kubernetes']['ca_path'],
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
-  ]
+  ],
+  "users" => [
+    {
+      "name" => "kube",
+      "user" => {
+        "client-certificate" => node['kubernetes']['cert_path'],
+        "client-key" => node['kubernetes']['key_path'],
+      }
+    }
+  ],
+  "contexts" => [
+    {
+      "name" => "kube-context",
+      "context" => {
+        "cluster" => node['kubernetes']['cluster_name'],
+        "user" => "kube"
+      }
+    }
+  ],
+  "current-context" => "kube-context"
 }
 
 
@@ -230,7 +263,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--hostname-override=#{[host, domain].join('.')}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

@@ -84,6 +84,7 @@ kube_controller_manager_manifest = {
         "command" => [
           "/hyperkube",
           "controller-manager",
+          "--allocate-node-cidrs=true",
           "--cluster-name=#{node['kubernetes']['cluster_name']}",
           "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
@@ -93,11 +94,6 @@ kube_controller_manager_manifest = {
           "--master=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
         ],
         "volumeMounts" => [
-          {
-            "name" => "srv-kubernetes",
-            "mountPath" => node['kubernetes']['srv_path'],
-            "readOnly" => true
-          },
           {
             "name" => "ssl-certs-host",
             "mountPath" => "/etc/ssl",
@@ -117,12 +113,6 @@ kube_controller_manager_manifest = {
       }
     ],
     "volumes" => [
-      {
-        "name" => "srv-kubernetes",
-        "hostPath" => {
-          "path" => node['kubernetes']['srv_path'],
-        }
-      },
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
@@ -231,7 +221,7 @@ kube_apiserver_manifest = {
           # "--address=127.0.0.1",
           "--secure-port=#{node['kubernetes']['secure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
+          "--etcd-servers=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
           "--etcd-cafile=#{node['etcd']['ca_path']}",
           "--etcd-certfile=#{node['etcd']['cert_path']}",
           "--etcd-keyfile=#{node['etcd']['key_path']}",
@@ -245,11 +235,6 @@ kube_apiserver_manifest = {
           "--allow-privileged=true"
         ],
         "volumeMounts" => [
-          {
-            "name" => "srv-kubernetes",
-            "mountPath" => node['kubernetes']['srv_path'],
-            "readOnly" => true
-          },
           {
             "name" => "ssl-certs-host",
             "mountPath" => "/etc/ssl",
@@ -269,12 +254,6 @@ kube_apiserver_manifest = {
       }
     ],
     "volumes" => [
-      {
-        "name" => "srv-kubernetes",
-        "hostPath" => {
-          "path" => node['kubernetes']['srv_path']
-        }
-      },
       {
         "name" => "ssl-certs-host",
         "hostPath" => {

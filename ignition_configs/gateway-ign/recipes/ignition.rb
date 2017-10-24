@@ -200,8 +200,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
               "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
               "--mount volume=dns,target=/etc/resolv.conf",
-              "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
-              "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
+              # "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
+              # "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
             ].join(' ')}"}
           ],
           "ExecStartPre" => [
@@ -222,7 +222,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
             "--make-iptables-util-chains=false",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            "--kubeconfig=#{node['kubernetes']['kubelet']['kubeconfig_path']}",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--tls-cert-file=#{node['kubernetes']['cert_path']}",
             "--tls-private-key-file=#{node['kubernetes']['key_path']}"
           ].join(' '),
