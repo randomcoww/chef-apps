@@ -10,7 +10,7 @@ flannel_manifest = {
     "containers" => [
       {
         "name" => "kube-flannel",
-        "image" => "quay.io/coreos/flannel:v0.9.0-amd64",
+        "image" => node['kube']['images']['flannel'],
         "command" => [
           "/opt/bin/flanneld",
           "--ip-masq",
@@ -271,6 +271,7 @@ kube_dns_manifest = {
     "name" => "kube-dns",
   },
   "spec" => {
+    "hostNetwork" => true,
     "volumes" => [
       {
         "name" => "kube-dns-config",
@@ -311,6 +312,7 @@ kube_dns_manifest = {
           "timeoutSeconds" => 5
         },
         "args" => [
+          "--nameservers=#{node['environment_v2']['set']['ns']['vip_lan']}",
           "--domain=#{node['kubernetes']['cluster_domain']}.",
           "--dns-port=10053",
           "--config-dir=/kube-dns-config",
@@ -323,23 +325,23 @@ kube_dns_manifest = {
             "value" => "10055"
           }
         ],
-        "ports" => [
-          {
-            "containerPort" => 10053,
-            "name" => "dns-local",
-            "protocol" => "UDP"
-          },
-          {
-            "containerPort" => 10053,
-            "name" => "dns-tcp-local",
-            "protocol" => "TCP"
-          },
-          {
-            "containerPort" => 10055,
-            "name" => "metrics",
-            "protocol" => "TCP"
-          }
-        ],
+        # "ports" => [
+        #   {
+        #     "containerPort" => 10053,
+        #     "name" => "dns-local",
+        #     "protocol" => "UDP"
+        #   },
+        #   {
+        #     "containerPort" => 10053,
+        #     "name" => "dns-tcp-local",
+        #     "protocol" => "TCP"
+        #   },
+        #   {
+        #     "containerPort" => 10055,
+        #     "name" => "metrics",
+        #     "protocol" => "TCP"
+        #   }
+        # ],
         "volumeMounts" => [
           {
             "name" => "kube-dns-config",
@@ -375,19 +377,18 @@ kube_dns_manifest = {
           "--server=/in-addr.arpa/127.0.0.1#10053",
           "--server=/ip6.arpa/127.0.0.1#10053"
         ],
-        "ports" => [
-          {
-            "containerPort" => 53,
-            "name" => "dns",
-            "protocol" => "UDP"
-          },
-          {
-            "containerPort" => 53,
-            "name" => "dns-tcp",
-            "protocol" => "TCP",
-            "hostPort" => node['environment_v2']['haproxy']['kube-dns']
-          }
-        ],
+        # "ports" => [
+        #   {
+        #     "containerPort" => 53,
+        #     "name" => "dns",
+        #     "protocol" => "UDP"
+        #   },
+        #   {
+        #     "containerPort" => 53,
+        #     "name" => "dns-tcp",
+        #     "protocol" => "TCP"
+        #   }
+        # ],
         "resources" => {
           "requests" => {
             "cpu" => "150m",
@@ -421,13 +422,13 @@ kube_dns_manifest = {
           "--probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV",
           "--probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV"
         ],
-        "ports" => [
-          {
-            "containerPort" => 10054,
-            "name" => "metrics",
-            "protocol" => "TCP"
-          }
-        ],
+        # "ports" => [
+        #   {
+        #     "containerPort" => 10054,
+        #     "name" => "metrics",
+        #     "protocol" => "TCP"
+        #   }
+        # ],
         "resources" => {
           "requests" => {
             "memory" => "20Mi",
@@ -483,12 +484,77 @@ kube_dns_manifest = {
 #   }
 # }
 
+
+keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
+vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
+
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
+
+  keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
+    'vrrp_sync_group VG_kube' => [
+      {
+        'group' => [
+          'VI_kube'
+        ]
+      }
+    ],
+    'vrrp_instance VI_kube' => [
+      {
+        'state' => 'BACKUP',
+        'virtual_router_id' => 81,
+        'interface' => node['environment_v2']['host'][host]['if_lan'],
+        'priority' => 100,
+        'authentication' => [
+          {
+            'auth_type' => 'AH',
+            'auth_pass' => keepalived_bag.get_or_create('VI_kube', SecureRandom.base64(6))
+          }
+        ],
+        'virtual_ipaddress' => ['haproxy', 'kube-master'].map { |v|
+          "#{node['environment_v2']['set'][v]['vip_lan']}/#{vip_subnet}"
+        }
+      }
+    ]
+  })
+
+  keepalived_manifest = {
+    "apiVersion" => "v1",
+    "kind" => "Pod",
+    "metadata" => {
+      "name" => "keepalived"
+    },
+    "spec" => {
+      "restartPolicy" => "Always",
+      "hostNetwork" => true,
+      "containers" => [
+        {
+          "name" => "keepalived",
+          "image" => node['kube']['images']['keepalived'],
+          "securityContext" => {
+            "capabilities" => {
+              "add" => [
+                "NET_ADMIN"
+              ]
+            }
+          },
+          "env" => [
+            {
+              "name" => "CONFIG",
+              "value" => keepalived_config
+            }
+          ]
+        }
+      ]
+    }
+  }
+
   node.default['kubernetes']['static_pods'][host]['flannel.yaml'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
-  # node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
+  node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
+
+  node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
 end

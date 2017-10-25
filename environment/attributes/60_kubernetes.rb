@@ -17,6 +17,7 @@ node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:latest"
 node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:latest"
 # node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
+node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.0-amd64"
 
 
 ##
@@ -42,7 +43,7 @@ node.default['kubernetes']['cluster_cidr'] = '10.244.0.0/16'
 node.default['kubernetes']['service_ip_range'] = '10.3.0.0/24'
 node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 # node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
-node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['ns']['vip_lan']
+node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['kube-master']['vip_lan']
 
 node.default['kubernetes']['cni_conf_dir'] = "/etc/kubernetes/cni/net.d"
 

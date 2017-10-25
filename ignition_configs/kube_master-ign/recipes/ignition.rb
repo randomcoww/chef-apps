@@ -35,7 +35,7 @@ kube_config = {
     {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
-        "server" => "http://127.0.0.1:8080"
+        "server" => "http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
       }
     }
   ],
@@ -122,11 +122,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "contents" => "data:,#{host}"
     },
     ## flannel
-    # {
-    #   "path" => node['kubernetes']['flanneld_cni_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
-    # },
     {
       "path" => node['kubernetes']['flanneld_cfg_path'],
       "mode" => 420,
@@ -201,17 +196,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     }
   ]
 
-  # flanneld_environment = {
-  #   "ETCDCTL_API" => 3,
-  #   "FLANNELD_ETCD_ENDPOINTS" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
-  #   "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
-  #   "FLANNELD_ETCD_CAFILE" => node['etcd']['ca_path'],
-  #   "FLANNELD_ETCD_CERTFILE" => node['etcd']['cert_path'],
-  #   "FLANNELD_ETCD_KEYFILE" => node['etcd']['key_path'],
-  #   "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
-  #   "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
-  #   "FLANNELD_IP_MASQ" => true
-  # }
 
   systemd = [
     {

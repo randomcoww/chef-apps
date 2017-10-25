@@ -1,42 +1,6 @@
+
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
-
-# kube_apiserver_manifest = {
-#   "kind" => "Pod",
-#   "apiVersion" => "v1",
-#   "metadata" => {
-#     "namespace" => "kube-system",
-#     "name" => "kube-apiserver"
-#   },
-#   "spec" => {
-#     "hostNetwork" => true,
-#     "restartPolicy" => 'Always',
-#     "containers" => [
-#       {
-#         "name" => "kube-apiserver",
-#         "image" => node['kube']['images']['hyperkube'],
-#         "command" => [
-#           "/hyperkube",
-#           "apiserver",
-#           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-#           "--etcd-servers=http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
-#           "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-#           "--allow-privileged=true"
-#         ],
-#         "livenessProbe" => {
-#           "httpGet" => {
-#             "scheme" => "HTTP",
-#             "host" => "127.0.0.1",
-#             "port" => node['kubernetes']['insecure_port'],
-#             "path" => "/healthz"
-#           },
-#           "initialDelaySeconds" => 15,
-#           "timeoutSeconds" => 15
-#         }
-#       }
-#     ]
-#   }
-# }
-
+vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
 
 node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
@@ -63,9 +27,9 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
             'auth_pass' => keepalived_bag.get_or_create('VI_gateway_v2', SecureRandom.base64(6))
           }
         ],
-        'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-        ]
+        'virtual_ipaddress' => ['ns', 'gateway'].map { |v|
+          "#{node['environment_v2']['set'][v]['vip_lan']}/#{vip_subnet}"
+        }
       }
     ]
   })

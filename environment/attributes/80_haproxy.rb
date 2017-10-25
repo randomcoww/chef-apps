@@ -15,13 +15,9 @@ node.default['environment_v2']['haproxy']['mpd-stream'] = {
 }
 
 node.default['environment_v2']['haproxy']['kube-master'] = {
-  "port" => 443
+  "port" => 4443
 }
 
 node.default['environment_v2']['haproxy']['etcd-client-ssl'] = {
   "port" => 2379
-}
-
-node.default['environment_v2']['haproxy']['kube-dns'] = {
-  "port" => 53531
 }

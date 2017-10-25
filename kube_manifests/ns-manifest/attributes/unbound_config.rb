@@ -87,12 +87,10 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
       "#{node['environment_v2']['domain']['top']} nodefault",
     ],
     "private-domain" => [
-      node['environment_v2']['domain']['top'],
-      node['kubernetes']['cluster_domain']
+      node['environment_v2']['domain']['top']
     ],
     "domain-insecure" => [
-      node['environment_v2']['domain']['top'],
-      node['kubernetes']['cluster_domain']
+      node['environment_v2']['domain']['top']
     ]
   },
   'remote-control' => {
@@ -102,10 +100,6 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
     {
       'name' => node['environment_v2']['domain']['top'],
       'stub-addr' => "127.0.0.1@53530"
-    },
-    # {
-    #   'name' => node['kubernetes']['cluster_domain'],
-    #   'stub-addr' => "#{node['environment_v2']['set']['haproxy']['vip_lan']}@#{node['environment_v2']['haproxy']['kube-dns']['port']}"
-    # }
+    }
   ]
 })

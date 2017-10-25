@@ -10,7 +10,7 @@ end
 
 
 [
-  node['kubernetes']['srv_path'],
+  node['kubernetes']['ssl_path'],
 ].each do |d|
   directory d do
     recursive true
@@ -27,7 +27,7 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
   ],
@@ -37,7 +37,6 @@ kubelet_kube_config = {
       "user" => {
         "client-certificate" => node['kubernetes']['cert_path'],
         "client-key" => node['kubernetes']['key_path'],
-        # "token" => node['kubernetes']['tokens']['kubelet']
       }
     }
   ],

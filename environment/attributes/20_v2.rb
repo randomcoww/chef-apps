@@ -27,20 +27,12 @@ node.default['environment_v2']['set']['gateway'] = {
   'vip_lan' => "192.168.62.240"
 }
 
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'coreos-gateway1',
-    'coreos-gateway2'
-  ],
-  'vip_lan' => "192.168.62.240"
-}
-
 node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
     'coreos-gateway1',
     'coreos-gateway2'
   ],
-  'vip_lan' => "192.168.62.240"
+  'vip_lan' => "192.168.62.241"
 }
 
 node.default['environment_v2']['set']['kea'] = {
@@ -50,13 +42,13 @@ node.default['environment_v2']['set']['kea'] = {
   ]
 }
 
-node.default['environment_v2']['set']['flannel'] = {
+
+node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
     'coreos-kube-master1',
-    'coreos-kube-master2',
-    'coreos-kube-worker1',
-    'coreos-kube-worker2'
-  ]
+    'coreos-kube-master2'
+  ],
+  'vip_lan' => "192.168.62.242"
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
@@ -89,8 +81,10 @@ node.default['environment_v2']['set']['kube-master'] = {
       "port" => 30062,
       "proto" => "tcp"
     }
-  }
+  },
+  'vip_lan' => "192.168.62.243"
 }
+
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
@@ -115,6 +109,16 @@ node.default['environment_v2']['set']['etcd'] = {
       "proto" => "tcp"
     }
   }
+}
+
+
+node.default['environment_v2']['set']['flannel'] = {
+  'hosts' => [
+    'coreos-kube-master1',
+    'coreos-kube-master2',
+    'coreos-kube-worker1',
+    'coreos-kube-worker2'
+  ]
 }
 
 

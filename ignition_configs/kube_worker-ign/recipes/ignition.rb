@@ -93,11 +93,6 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "contents" => "data:,#{host}"
     },
     ## flannel
-    # {
-    #   "path" => node['kubernetes']['flanneld_cni_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
-    # },
     {
       "path" => node['kubernetes']['flanneld_cfg_path'],
       "mode" => 420,
@@ -156,13 +151,6 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
     }
   ]
 
-  # flanneld_environment = {
-  #   "FLANNELD_ETCD_ENDPOINTS" => "http://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['etcd-client-ssl']['port']}",
-  #   "FLANNELD_ETCD_PREFIX" => '/docker_overlay/network',
-  #   "FLANNELD_SUBNET_DIR" => '/run/flannel/networks',
-  #   "FLANNELD_SUBNET_FILE" => '/run/flannel/subnet.env',
-  #   "FLANNELD_IP_MASQ" => true
-  # }
 
   systemd = [
     {
