@@ -22,10 +22,6 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
-flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
-
-
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -60,10 +56,17 @@ kube_config = {
 }
 
 
+flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
+flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
+
+
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
 
+  ##
+  ## kube ssl
+  ##
   key = cert_generator.generate_key
   cert = cert_generator.node_cert(
     [
@@ -90,15 +93,20 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "contents" => "data:,#{host}"
     },
     ## flannel
-    {
-      "path" => node['kubernetes']['flanneld_cni_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
-    },
+    # {
+    #   "path" => node['kubernetes']['flanneld_cni_path'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
+    # },
     {
       "path" => node['kubernetes']['flanneld_cfg_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    },
+    {
+      "path" => ::File.join(node['kubernetes']['cni_conf_dir'], '10-flannel.conf'),
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
     },
     ## kube cert
     {
@@ -122,7 +130,6 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
     },
-
     # {
     #   "path" => "/opt/bin/setup-network-environment",
     #   "mode" => 493,
@@ -188,8 +195,8 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
             "/usr/lib/coreos/kubelet-wrapper",
             "--register-schedulable=true",
             "--register-node=true",
-            "--cni-conf-dir=/etc/kubernetes/cni/net.d",
-            # "--network-plugin=${NETWORK_PLUGIN}",
+            "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
+            "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",

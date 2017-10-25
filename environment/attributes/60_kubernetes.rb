@@ -44,8 +44,9 @@ node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 # node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['ns']['vip_lan']
 
+node.default['kubernetes']['cni_conf_dir'] = "/etc/kubernetes/cni/net.d"
 
-node.default['kubernetes']['flanneld_cfg_path'] = "/etc/cni/net.d/flannel.json"
+node.default['kubernetes']['flanneld_cfg_path'] = "/etc/kube-flannel/net-conf.json"
 node.default['kubernetes']['flanneld_cfg'] = {
   "Network" => node['kubernetes']['cluster_cidr'],
   "Backend" => {
@@ -53,7 +54,7 @@ node.default['kubernetes']['flanneld_cfg'] = {
   }
 }
 
-node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/net-conf.json"
+node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/cni-conf.json"
 node.default['kubernetes']['flanneld_cni'] = {
   "name": "cbr0",
   "type": "flannel",

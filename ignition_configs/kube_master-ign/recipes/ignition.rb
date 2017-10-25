@@ -28,18 +28,6 @@ etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
 etcd_ca = etcd_cert_generator.root_ca
 
 
-# kube_config = {
-#   "apiVersion" => "v1",
-#   "kind" => "Config",
-#   "clusters" => [
-#     {
-#       "name" => node['kubernetes']['cluster_name'],
-#       "cluster" => {
-#         "server" => "http://127.0.0.1:8080"
-#       }
-#     }
-#   ]
-# }
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -47,18 +35,13 @@ kube_config = {
     {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
-        "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
+        "server" => "http://127.0.0.1:8080"
       }
     }
   ],
   "users" => [
     {
       "name" => "kube",
-      "user" => {
-        "client-certificate" => node['kubernetes']['cert_path'],
-        "client-key" => node['kubernetes']['key_path'],
-      }
     }
   ],
   "contexts" => [
@@ -81,7 +64,6 @@ flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
-
 
   ##
   ## etcd ssl
@@ -129,7 +111,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         node['environment_v2']['domain']['top']
       ].join('.'),
       'IP.1' => node['kubernetes']['cluster_service_ip'],
-      'IP.3' => node['environment_v2']['set']['haproxy']['vip_lan']
+      'IP.2' => node['environment_v2']['set']['haproxy']['vip_lan']
     }
   )
 
@@ -140,15 +122,20 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "contents" => "data:,#{host}"
     },
     ## flannel
-    {
-      "path" => node['kubernetes']['flanneld_cni_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
-    },
+    # {
+    #   "path" => node['kubernetes']['flanneld_cni_path'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
+    # },
     {
       "path" => node['kubernetes']['flanneld_cfg_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    },
+    {
+      "path" => ::File.join(node['kubernetes']['cni_conf_dir'], '10-flannel.conf'),
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
     },
     ## kube ssl
     {
@@ -166,6 +153,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
+    ## kubeconfig
     {
       "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
@@ -254,8 +242,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "/usr/lib/coreos/kubelet-wrapper",
             "--register-schedulable=false",
             "--register-node=true",
-            "--cni-conf-dir=/etc/kubernetes/cni/net.d",
-            # "--network-plugin=${NETWORK_PLUGIN}",
+            "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
+            "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",

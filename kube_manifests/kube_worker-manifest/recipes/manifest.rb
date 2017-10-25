@@ -18,7 +18,7 @@ flannel_manifest = {
           "--ip-masq",
           "--kube-subnet-mgr",
           "--kube-api-url=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}",
-          "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
+          "--kubeconfig-file=#{node['kubernetes']['client']['kubeconfig_path']}"
         ],
         "securityContext" => {
           "privileged" => true
@@ -55,7 +55,12 @@ flannel_manifest = {
             "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
             "readOnly" => true
           },
-        ],
+          {
+            "mountPath": "/etc/ssl",
+            "name": "ssl-certs-host",
+            "readOnly": true
+          }
+        ]
       }
     ],
     "volumes" => [
@@ -77,6 +82,12 @@ flannel_manifest = {
           "path" => node['kubernetes']['client']['kubeconfig_path']
         }
       },
+      {
+        "name" => "ssl-certs-host",
+        "hostPath" => {
+          "path" => "/etc/ssl"
+        }
+      }
     ]
   }
 }
