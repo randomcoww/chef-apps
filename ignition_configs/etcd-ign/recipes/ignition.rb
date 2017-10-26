@@ -31,7 +31,7 @@ etcd_peer_ca = etcd_peer_cert_generator.root_ca
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
-  hostname = [host, domain].join('.')
+  # hostname = [host, domain].join('.')
 
   ##
   ## etcd ssl
@@ -116,6 +116,12 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(etcd_peer_ca.to_pem)}"
     },
+    ## setup-network-environment
+    {
+      "path" => "/opt/bin/setup-network-environment",
+      "mode" => 493,
+      "contents" => node['environment_v2']['url']['setup_network_environment']
+    }
   ]
 
   networkd = [
@@ -137,25 +143,25 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     }
   ]
 
-  etcd_environment = {
-    "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
-    "ETCD_DISCOVERY_SRV" => domain,
-    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{hostname}:2380",
-    "ETCD_LISTEN_PEER_URLS" => "https://#{hostname}:2380",
-    "ETCD_LISTEN_CLIENT_URLS" => "https://#{hostname}:2379,https://127.0.0.1:2379",
-    "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{hostname}:2379",
-    "ETCD_INITIAL_CLUSTER_STATE" => "existing",
-    "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1",
-
-    "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
-    "ETCD_CERT_FILE" => node['etcd']['cert_path'],
-    "ETCD_KEY_FILE" => node['etcd']['key_path'],
-
-    "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
-    "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
-    "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
-    "ETCD_PEER_CLIENT_CERT_AUTH" => true
-  }
+  # etcd_environment = {
+  #   "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
+  #   "ETCD_DISCOVERY_SRV" => domain,
+  #   "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{hostname}:2380",
+  #   "ETCD_LISTEN_PEER_URLS" => "https://#{hostname}:2380",
+  #   "ETCD_LISTEN_CLIENT_URLS" => "https://#{hostname}:2379,https://127.0.0.1:2379",
+  #   "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{hostname}:2379",
+  #   "ETCD_INITIAL_CLUSTER_STATE" => "existing",
+  #   "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1",
+  #
+  #   "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
+  #   "ETCD_CERT_FILE" => node['etcd']['cert_path'],
+  #   "ETCD_KEY_FILE" => node['etcd']['key_path'],
+  #
+  #   "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
+  #   "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
+  #   "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
+  #   "ETCD_PEER_CLIENT_CERT_AUTH" => true
+  # }
 
   systemd = [
     # {
@@ -206,20 +212,36 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     #   }
     # },
     # {
-    #   "name" => "setup-network-environment.service",
+    #   "name" => "var-lib-etcd.mount",
     #   "contents" => {
     #     "Unit" => {
-    #       "Requires" => "network-online.target",
-    #       "After" => "network-online.target"
+    #       "After" => "network.target"
     #     },
-    #     "Service" => {
-    #       "Type" => "oneshot",
-    #       "ExecStart" => "/opt/bin/setup-network-environment",
-    #       "RemainAfterExit" => "yes"
+    #     "Mount" => {
+    #       "What" => "#{node['environment_v2']['node_host']['ip_lan']}:/data/pv",
+    #       "Where" => "/var/lib/etcd",
+    #       "Type" => "nfs"
+    #     },
+    #     "Install" => {
+    #       "WantedBy" => "machines.target"
     #     }
     #   }
     # }
 
+    {
+      "name" => "setup-network-environment.service",
+      "contents" => {
+        "Unit" => {
+          "Requires" => "network-online.target",
+          "After" => "network-online.target"
+        },
+        "Service" => {
+          "Type" => "oneshot",
+          "ExecStart" => "/opt/bin/setup-network-environment",
+          "RemainAfterExit" => "yes"
+        }
+      }
+    },
     {
       "name" => "etcd-member.service",
       "dropins" => [
@@ -227,33 +249,62 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           "name" => "etcd-env.conf",
           "contents" => {
             "Unit" => {
-              "Requires" => "var-lib-etcd.mount",
-              "After" => "var-lib-etcd.mount"
+              "Requires" => [
+                # "var-lib-etcd.mount",
+                "setup-network-environment.service",
+              ],
+              "After" => [
+                # "var-lib-etcd.mount",
+                "setup-network-environment.service"
+              ]
             },
             "Service" => {
-              "Environment" => etcd_environment.map { |e|
-                e.join('=')
-              }
+              # "Environment" => etcd_environment.map { |e|
+              #   e.join('=')
+              # }
+              "EnvironmentFile" => "/etc/network-environment",
+              "ExecStart" => [
+                '',
+                [
+                  "/usr/lib/coreos/etcd-wrapper",
+                  "--data-dir",
+                  "/var/lib/etcd",
+                  "--discovery-srv",
+                  domain,
+                  "--initial-advertise-peer-urls",
+                  "https://${DEFAULT_IPV4}:2380",
+                  "--listen-peer-urls",
+                  "https://${DEFAULT_IPV4}:2380",
+                  "--listen-client-urls",
+                  "https://${DEFAULT_IPV4}:2379,http://127.0.0.1:2379",
+                  "--advertise-client-urls",
+                  "https://${DEFAULT_IPV4}:2379",
+                  "--initial-cluster-state",
+                  "new",
+                  "--initial-cluster-token",
+                  node['etcd']['cluster_name'],
+
+                  "--trusted-ca-file",
+                  node['etcd']['ca_path'],
+                  "--cert-file",
+                  node['etcd']['cert_path'],
+                  "--key-file",
+                  node['etcd']['key_path'],
+
+                  "--peer-trusted-ca-file",
+                  node['etcd']['ca_peer_path'],
+                  "--peer-cert-file",
+                  node['etcd']['cert_peer_path'],
+                  "--peer-key-file",
+                  node['etcd']['key_peer_path'],
+
+                  "--peer-client-cert-auth"
+                ].join(' ')
+              ]
             }
           }
         }
       ]
-    },
-    {
-      "name" => "var-lib-etcd.mount",
-      "contents" => {
-        "Unit" => {
-          "After" => "network.target"
-        },
-        "Mount" => {
-          "What" => "#{node['environment_v2']['node_host']['ip_lan']}:/data/pv",
-          "Where" => "/var/lib/etcd",
-          "Type" => "nfs"
-        },
-        "Install" => {
-          "WantedBy" => "machines.target"
-        }
-      }
     }
   ]
 

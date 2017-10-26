@@ -45,16 +45,14 @@ node.default['environment_v2']['set']['kea'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'coreos-kube-master1',
-    'coreos-kube-master2'
+    'coreos-kube-master',
   ],
   'vip_lan' => "192.168.62.242"
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
-    'coreos-kube-master1',
-    'coreos-kube-master2'
+    'coreos-kube-master',
   ],
   'services' => {
     'kube-master' => {
@@ -88,8 +86,7 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'coreos-kube-worker1',
-    'coreos-kube-worker2'
+    'coreos-kube-worker'
   ]
 }
 
@@ -97,7 +94,6 @@ node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'coreos-etcd1',
     'coreos-etcd2',
-    'coreos-etcd3'
   ],
   "services" => {
     'etcd-server-ssl' => {
@@ -111,13 +107,10 @@ node.default['environment_v2']['set']['etcd'] = {
   }
 }
 
-
 node.default['environment_v2']['set']['flannel'] = {
   'hosts' => [
-    'coreos-kube-master1',
-    'coreos-kube-master2',
-    'coreos-kube-worker1',
-    'coreos-kube-worker2'
+    'coreos-kube-master',
+    'coreos-kube-worker'
   ]
 }
 
@@ -144,7 +137,6 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
   'vcpu' => 2
 }
 
-
 node.default['environment_v2']['host']['coreos-etcd1'] = {
   'if_lan' => 'eth0',
   'memory' => 4096,
@@ -157,36 +149,23 @@ node.default['environment_v2']['host']['coreos-etcd2'] = {
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-etcd3'] = {
-  'if_lan' => 'eth0',
-  'memory' => 4096,
-  'vcpu' => 2
-}
+# node.default['environment_v2']['host']['coreos-etcd3'] = {
+#   'if_lan' => 'eth0',
+#   'memory' => 4096,
+#   'vcpu' => 2
+# }
 
 
-node.default['environment_v2']['host']['coreos-kube-master1'] = {
-  'if_lan' => 'eth0',
-  'memory' => 8192,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kube-master2'] = {
+node.default['environment_v2']['host']['coreos-kube-master'] = {
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 2
 }
 
-
-node.default['environment_v2']['host']['coreos-kube-worker1'] = {
+node.default['environment_v2']['host']['coreos-kube-worker'] = {
   'if_lan' => 'eth0',
   'memory' => 8192,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['coreos-kube-worker2'] = {
-  'if_lan' => 'eth0',
-  'memory' => 8192,
-  'vcpu' => 2
+  'vcpu' => 6
 }
 
 

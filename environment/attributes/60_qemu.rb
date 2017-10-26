@@ -5,7 +5,7 @@ node.default['qemu']['pxe_initrd_path'] = '/data/kvm/coreos_production_pxe_image
 
 node.default['qemu']['vm1']['guests'] = [
   'coreos-gateway1', 'coreos-gateway2',
-  'coreos-etcd1', 'coreos-etcd2', 'coreos-etcd3',
-  'coreos-kube-master1',
-  'coreos-kube-worker1'
+  'coreos-etcd1', 'coreos-etcd2',
+  'coreos-kube-master',
+  'coreos-kube-worker'
 ]
