@@ -84,21 +84,60 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     }
   )
 
+  ##
+  ## nftables
+  ##
 
-  t = Tempfile.new('/tmp')
-  template t.path do
-    source 'nft.erb'
-    variables ({
-      current_host: node['environment_v2']['host'][host],
-      sets: node['environment_v2']['set'],
-      hosts: node['environment_v2']['host'],
-      services: node['environment_v2']['haproxy']
-    })
-    action :nothing
-  end.run_action(:create)
-  t.close
+  nftables_load_rules = File.join(node['environment_v2']['nftables']['load_path'], 'rules', host)
+  nftables_rules = []
+  nftables_defines = {}
 
-  nftables_config = IO.binread(t.path).gsub(/\t/, "  ")
+  node['environment_v2']['subnet'].each do |k, v|
+    case v
+    when String,Integer
+      nftables_defines["subnet_#{k}"] = v
+    end
+  end
+
+  node['environment_v2']['set'].each do |k, v|
+    case v
+    when Hash
+      if !v['vip_lan'].nil?
+        nftables_defines["set_#{k}"] = v['vip_lan']
+      end
+    end
+  end
+
+  node['environment_v2']['host'][host].each do |k, v|
+    case v
+    when String,Integer
+      nftables_defines["host_#{k}"] = v
+    end
+  end
+
+  node['environment_v2']['haproxy'].each do |k, v|
+    case v
+    when Hash
+      if !v['port'].nil?
+        nftables_defines["subnet_#{k}"] = v['port']
+      end
+    end
+  end
+
+  nftables_defines.each do |k, v|
+    nftables_rules << "define #{k} = #{v}"
+  end
+
+  nftables_rules << %Q{include "#{nftables_load_rules}"}
+  nftables_rules << ''
+
+
+  directories = [
+    {
+      "path" => node['environment_v2']['nftables']['load_path'],
+      "mode" => 511
+    }
+  ]
 
   files = [
     {
@@ -106,16 +145,24 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "mode" => 420,
       "contents" => "data:,#{host}"
     },
+    ## nftables
     {
-      "path" => nftables_path,
+      "path" => node['environment_v2']['nftables']['defines_rules'],
       "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(nftables_config)}"
+      "contents" => "data:;base64,#{Base64.encode64(nftables_rules.join($/))}"
     },
+    # {
+    #   "path" => nftables_load_rules,
+    #   "mode" => 420,
+    #   "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
+    # },
+    ## sysctl
     {
       "path" => "/etc/sysctl.d/ipforward.conf",
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(sysctl_config)}"
     },
+    ## kube ssl
     {
       "path" => node['kubernetes']['key_path'],
       "mode" => 420,
@@ -131,6 +178,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
     },
+    ## kubeconfig
     {
       "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
@@ -255,14 +303,29 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "contents" => {
         "Unit" => {
           "Wants" => "network-pre.target",
-          "Before" => "network-pre.target"
+          "Before" => "network-pre.target",
+          # "ConditionPathExists" => nftables_load_rules
         },
         "Service" => {
           "Type" => "oneshot",
           "ExecStartPre" => "-/usr/sbin/nft flush ruleset",
-          "ExecStart" => "/usr/sbin/nft -f #{nftables_path}",
-          "ExecStop" => "/usr/sbin/nft flush ruleset",
-          "RemainAfterExit" => "yes"
+          "ExecStart" => "/usr/sbin/nft -f #{node['environment_v2']['nftables']['defines_rules']}"
+        },
+        "Install" => {
+          "WantedBy" => "multi-user.target"
+        }
+      }
+    },
+    {
+      "name" => "nftables.path",
+      "contents" => {
+        # "Unit" => {
+        #   "Wants" => "network-pre.target",
+        #   "Before" => "network-pre.target",
+        #   "ConditionPathExists" => nftables_load_rules
+        # },
+        "Path" => {
+          "PathChanged" => nftables_load_rules
         },
         "Install" => {
           "WantedBy" => "multi-user.target"
@@ -274,6 +337,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
   node.default['ignition']['configs'][host] = {
     'base' => base,
     'files' => files,
+    'directories' => directories,
     'networkd' => networkd,
     'systemd' => systemd
   }

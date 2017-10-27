@@ -100,3 +100,5 @@ node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkub
 
 node.default['kubernetes']['client']['kubeconfig_path'] = '/var/lib/kubelet/client_kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'
+
+node.default['environment_v2']['url']['manifests'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests'

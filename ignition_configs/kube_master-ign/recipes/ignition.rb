@@ -110,6 +110,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     }
   )
 
+  directories = []
+
   files = [
     {
       "path" => "/etc/hostname",
@@ -260,6 +262,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['ignition']['configs'][host] = {
     'base' => base,
     'files' => files,
+    'directories' => directories,
     'networkd' => networkd,
     'systemd' => systemd
   }

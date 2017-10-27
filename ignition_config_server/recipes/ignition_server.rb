@@ -7,6 +7,7 @@ node['ignition']['configs'].each do |host, config|
       version node['ignition']['version']
       base config['base']
       files config['files']
+      directories config['directories']
       networkd config['networkd']
       systemd config['systemd']
       path config_path
