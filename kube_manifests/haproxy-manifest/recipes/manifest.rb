@@ -2,6 +2,7 @@ haproxy_manifest = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {
+    # "namespace" => "kube-system",
     "name" => "haproxy"
   },
   "spec" => {

@@ -521,6 +521,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     "apiVersion" => "v1",
     "kind" => "Pod",
     "metadata" => {
+      # "namespace" => "kube-system",
       "name" => "keepalived"
     },
     "spec" => {

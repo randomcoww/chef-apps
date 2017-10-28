@@ -222,7 +222,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--register-schedulable=false",
+            # "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
             "--network-plugin=cni",
