@@ -104,22 +104,7 @@ kea_manifest = {
             "value" => JSON.pretty_generate(node['kube_manifests']['kea']['dhcp4_config'])
           }
         ]
-      }
-    ]
-  }
-}
-
-
-resolver_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "kea-resolver"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
+      },
       {
         "name" => "kea-resolver",
         "image" =>node['kube']['images']['kea_resolver'],
@@ -175,5 +160,4 @@ node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd.yaml'] = ndbd_manifest
   node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld.yaml'] = mysqld_manifest
   node.default['kubernetes']['static_pods'][host]['kea-mysql.yaml'] = kea_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-resolver.yaml'] = resolver_manifest
 end

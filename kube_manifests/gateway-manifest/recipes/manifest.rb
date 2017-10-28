@@ -65,48 +65,48 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
     }
   }
 
-  gitsync_manifest = {
-    "apiVersion": "v1",
-    "kind": "Pod",
-    "metadata": {
-      "name": "nftables-sync"
-    },
-    "spec": {
-      "restartPolicy" => "Always",
-      "hostNetwork" => true,
-      "containers": [
-        {
-          "name": "git-sync",
-          "image": "gcr.io/google_containers/git-sync:v2.0.4",
-          "imagePullPolicy": "Always",
-          "volumeMounts": [
-            {
-              "name": "nftables",
-              "mountPath": "/git"
-            }
-          ],
-          "args" => [
-            "--root=/git",
-            "--dest=rules",
-            "--repo=https://github.com/randomcoww/nftables-config.git",
-            "--branch=master",
-            "--wait=30"
-          ]
-        }
-      ],
-      "volumes": [
-        {
-          "name": "nftables",
-          "hostPath" => {
-            "path" => node['environment_v2']['nftables']['load_path']
-          }
-        }
-      ]
-    }
-  }
+  # gitsync_manifest = {
+  #   "apiVersion": "v1",
+  #   "kind": "Pod",
+  #   "metadata": {
+  #     "name": "nftables-sync"
+  #   },
+  #   "spec": {
+  #     "restartPolicy" => "Always",
+  #     "hostNetwork" => true,
+  #     "containers": [
+  #       {
+  #         "name": "git-sync",
+  #         "image": "gcr.io/google_containers/git-sync:v2.0.4",
+  #         "imagePullPolicy": "Always",
+  #         "volumeMounts": [
+  #           {
+  #             "name": "nftables",
+  #             "mountPath": "/git"
+  #           }
+  #         ],
+  #         "args" => [
+  #           "--root=/git",
+  #           "--dest=rules",
+  #           "--repo=https://github.com/randomcoww/nftables-config.git",
+  #           "--branch=master",
+  #           "--wait=30"
+  #         ]
+  #       }
+  #     ],
+  #     "volumes": [
+  #       {
+  #         "name": "nftables",
+  #         "hostPath" => {
+  #           "path" => node['environment_v2']['nftables']['load_path']
+  #         }
+  #       }
+  #     ]
+  #   }
+  # }
 
 
   node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
-  node.default['kubernetes']['static_pods'][host]['nftables_sync.yaml'] = gitsync_manifest
+  # node.default['kubernetes']['static_pods'][host]['nftables_sync.yaml'] = gitsync_manifest
   # node.default['kubernetes']['static_pods'][host]['kube_apiserver_manifest.yaml'] = kube_apiserver_manifest
 end

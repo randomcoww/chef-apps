@@ -103,7 +103,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     case v
     when Hash
       if !v['vip_lan'].nil?
-        nftables_defines["set_#{k}"] = v['vip_lan']
+        nftables_defines["vip_#{k}"] = v['vip_lan']
       end
     end
   end
@@ -119,13 +119,13 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     case v
     when Hash
       if !v['port'].nil?
-        nftables_defines["subnet_#{k}"] = v['port']
+        nftables_defines["port_#{k}"] = v['port']
       end
     end
   end
 
   nftables_defines.each do |k, v|
-    nftables_rules << "define #{k} = #{v}"
+    nftables_rules << "define #{k.gsub('-', '_')} = #{v}"
   end
 
   nftables_rules << %Q{include "#{nftables_load_rules}"}
@@ -133,10 +133,10 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
 
   directories = [
-    {
-      "path" => node['environment_v2']['nftables']['load_path'],
-      "mode" => 511
-    }
+    # {
+    #   "path" => node['environment_v2']['nftables']['load_path'],
+    #   "mode" => 511
+    # }
   ]
 
   files = [
@@ -151,11 +151,11 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(nftables_rules.join($/))}"
     },
-    # {
-    #   "path" => nftables_load_rules,
-    #   "mode" => 420,
-    #   "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
-    # },
+    {
+      "path" => nftables_load_rules,
+      "mode" => 420,
+      "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
+    },
     ## sysctl
     {
       "path" => "/etc/sysctl.d/ipforward.conf",
@@ -325,7 +325,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         #   "ConditionPathExists" => nftables_load_rules
         # },
         "Path" => {
-          "PathChanged" => nftables_load_rules
+          "PathChanged" => nftables_load_rules,
+          "PathExists" => nftables_load_rules
         },
         "Install" => {
           "WantedBy" => "multi-user.target"

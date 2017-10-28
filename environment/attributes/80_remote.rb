@@ -2,5 +2,5 @@ node.default['environment_v2']['url']['manifests'] = 'https://raw.githubusercont
 node.default['environment_v2']['url']['libvirt'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/libvirt'
 node.default['environment_v2']['url']['ignition'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/ignition'
 node.default['environment_v2']['url']['setup_network_environment'] = 'https://github.com/kelseyhightower/setup-network-environment/releases/download/1.0.1/setup-network-environment'
-# node.default['environment_v2']['url']['nftables'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/nftables'
-node.default['environment_v2']['url']['nftables'] = 'https://raw.githubusercontent.com/randomcoww/nftables-config/master'
+node.default['environment_v2']['url']['nftables'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/nftables'
+# node.default['environment_v2']['url']['nftables'] = 'https://raw.githubusercontent.com/randomcoww/nftables-config/master'

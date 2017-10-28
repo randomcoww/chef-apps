@@ -139,7 +139,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
         },
         "DHCP" => {
           "UseDNS" => "true",
-          "RouteMetric" => 500
+          "RouteMetric" => 500,
+          # "UseHostname" => "%m"
         }
       }
     }

@@ -264,183 +264,183 @@ kube_apiserver_manifest = {
   }
 }
 
-kube_dns_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "kube-dns",
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "volumes" => [
-      {
-        "name" => "kube-dns-config",
-        "emptyDir" => {}
-      }
-    ],
-    "containers" => [
-      {
-        "name" => "kubedns",
-        "image" => "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.6",
-        "resources" => {
-          "limits" => {
-            "memory" => "170Mi"
-          },
-          "requests" => {
-            "cpu" => "100m",
-            "memory" => "70Mi"
-          }
-        },
-        "livenessProbe" => {
-          "httpGet" => {
-            "path" => "/healthcheck/kubedns",
-            "port" => 10054,
-            "scheme" => "HTTP"
-          },
-          "initialDelaySeconds" => 60,
-          "timeoutSeconds" => 5,
-          "successThreshold" => 1,
-          "failureThreshold" => 5
-        },
-        "readinessProbe" => {
-          "httpGet" => {
-            "path" => "/readiness",
-            "port" => 8081,
-            "scheme" => "HTTP"
-          },
-          "initialDelaySeconds" => 3,
-          "timeoutSeconds" => 5
-        },
-        "args" => [
-          "--nameservers=#{node['environment_v2']['set']['ns']['vip_lan']}",
-          "--domain=#{node['kubernetes']['cluster_domain']}.",
-          "--dns-port=10053",
-          "--config-dir=/kube-dns-config",
-          "--v=2",
-          "--kube-master-url=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
-        ],
-        "env" => [
-          {
-            "name" => "PROMETHEUS_PORT",
-            "value" => "10055"
-          }
-        ],
-        # "ports" => [
-        #   {
-        #     "containerPort" => 10053,
-        #     "name" => "dns-local",
-        #     "protocol" => "UDP"
-        #   },
-        #   {
-        #     "containerPort" => 10053,
-        #     "name" => "dns-tcp-local",
-        #     "protocol" => "TCP"
-        #   },
-        #   {
-        #     "containerPort" => 10055,
-        #     "name" => "metrics",
-        #     "protocol" => "TCP"
-        #   }
-        # ],
-        "volumeMounts" => [
-          {
-            "name" => "kube-dns-config",
-            "mountPath" => "/kube-dns-config"
-          }
-        ]
-      },
-      {
-        "name" => "dnsmasq",
-        "image" => "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.6",
-        "livenessProbe" => {
-          "httpGet" => {
-            "path" => "/healthcheck/dnsmasq",
-            "port" => 10054,
-            "scheme" => "HTTP"
-          },
-          "initialDelaySeconds" => 60,
-          "timeoutSeconds" => 5,
-          "successThreshold" => 1,
-          "failureThreshold" => 5
-        },
-        "args" => [
-          "-v=2",
-          "-logtostderr",
-          "-configDir=/etc/k8s/dns/dnsmasq-nanny",
-          "-restartDnsmasq=true",
-          "--",
-          "-k",
-          "--cache-size=1000",
-          "--no-negcache",
-          "--log-facility=-",
-          "--server=/#{node['kubernetes']['cluster_domain']}/127.0.0.1#10053",
-          "--server=/in-addr.arpa/127.0.0.1#10053",
-          "--server=/ip6.arpa/127.0.0.1#10053"
-        ],
-        # "ports" => [
-        #   {
-        #     "containerPort" => 53,
-        #     "name" => "dns",
-        #     "protocol" => "UDP"
-        #   },
-        #   {
-        #     "containerPort" => 53,
-        #     "name" => "dns-tcp",
-        #     "protocol" => "TCP"
-        #   }
-        # ],
-        "resources" => {
-          "requests" => {
-            "cpu" => "150m",
-            "memory" => "20Mi"
-          }
-        },
-        "volumeMounts" => [
-          {
-            "name" => "kube-dns-config",
-            "mountPath" => "/etc/k8s/dns/dnsmasq-nanny"
-          }
-        ]
-      },
-      {
-        "name" => "sidecar",
-        "image" => "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.6",
-        "livenessProbe" => {
-          "httpGet" => {
-            "path" => "/metrics",
-            "port" => 10054,
-            "scheme" => "HTTP"
-          },
-          "initialDelaySeconds" => 60,
-          "timeoutSeconds" => 5,
-          "successThreshold" => 1,
-          "failureThreshold" => 5
-        },
-        "args" => [
-          "--v=2",
-          "--logtostderr",
-          "--probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV",
-          "--probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV"
-        ],
-        # "ports" => [
-        #   {
-        #     "containerPort" => 10054,
-        #     "name" => "metrics",
-        #     "protocol" => "TCP"
-        #   }
-        # ],
-        "resources" => {
-          "requests" => {
-            "memory" => "20Mi",
-            "cpu" => "10m"
-          }
-        }
-      }
-    ],
-    "dnsPolicy" => "Default"
-  }
-}
-
+# kube_dns_manifest = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     "name" => "kube-dns",
+#   },
+#   "spec" => {
+#     "hostNetwork" => true,
+#     "volumes" => [
+#       {
+#         "name" => "kube-dns-config",
+#         "emptyDir" => {}
+#       }
+#     ],
+#     "containers" => [
+#       {
+#         "name" => "kubedns",
+#         "image" => "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.6",
+#         "resources" => {
+#           "limits" => {
+#             "memory" => "170Mi"
+#           },
+#           "requests" => {
+#             "cpu" => "100m",
+#             "memory" => "70Mi"
+#           }
+#         },
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "path" => "/healthcheck/kubedns",
+#             "port" => 10054,
+#             "scheme" => "HTTP"
+#           },
+#           "initialDelaySeconds" => 60,
+#           "timeoutSeconds" => 5,
+#           "successThreshold" => 1,
+#           "failureThreshold" => 5
+#         },
+#         "readinessProbe" => {
+#           "httpGet" => {
+#             "path" => "/readiness",
+#             "port" => 8081,
+#             "scheme" => "HTTP"
+#           },
+#           "initialDelaySeconds" => 3,
+#           "timeoutSeconds" => 5
+#         },
+#         "args" => [
+#           "--nameservers=#{node['environment_v2']['set']['ns']['vip_lan']}",
+#           "--domain=#{node['kubernetes']['cluster_domain']}.",
+#           "--dns-port=10053",
+#           "--config-dir=/kube-dns-config",
+#           "--v=2",
+#           "--kube-master-url=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
+#         ],
+#         "env" => [
+#           {
+#             "name" => "PROMETHEUS_PORT",
+#             "value" => "10055"
+#           }
+#         ],
+#         # "ports" => [
+#         #   {
+#         #     "containerPort" => 10053,
+#         #     "name" => "dns-local",
+#         #     "protocol" => "UDP"
+#         #   },
+#         #   {
+#         #     "containerPort" => 10053,
+#         #     "name" => "dns-tcp-local",
+#         #     "protocol" => "TCP"
+#         #   },
+#         #   {
+#         #     "containerPort" => 10055,
+#         #     "name" => "metrics",
+#         #     "protocol" => "TCP"
+#         #   }
+#         # ],
+#         "volumeMounts" => [
+#           {
+#             "name" => "kube-dns-config",
+#             "mountPath" => "/kube-dns-config"
+#           }
+#         ]
+#       },
+#       {
+#         "name" => "dnsmasq",
+#         "image" => "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.6",
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "path" => "/healthcheck/dnsmasq",
+#             "port" => 10054,
+#             "scheme" => "HTTP"
+#           },
+#           "initialDelaySeconds" => 60,
+#           "timeoutSeconds" => 5,
+#           "successThreshold" => 1,
+#           "failureThreshold" => 5
+#         },
+#         "args" => [
+#           "-v=2",
+#           "-logtostderr",
+#           "-configDir=/etc/k8s/dns/dnsmasq-nanny",
+#           "-restartDnsmasq=true",
+#           "--",
+#           "-k",
+#           "--cache-size=1000",
+#           "--no-negcache",
+#           "--log-facility=-",
+#           "--server=/#{node['kubernetes']['cluster_domain']}/127.0.0.1#10053",
+#           "--server=/in-addr.arpa/127.0.0.1#10053",
+#           "--server=/ip6.arpa/127.0.0.1#10053"
+#         ],
+#         # "ports" => [
+#         #   {
+#         #     "containerPort" => 53,
+#         #     "name" => "dns",
+#         #     "protocol" => "UDP"
+#         #   },
+#         #   {
+#         #     "containerPort" => 53,
+#         #     "name" => "dns-tcp",
+#         #     "protocol" => "TCP"
+#         #   }
+#         # ],
+#         "resources" => {
+#           "requests" => {
+#             "cpu" => "150m",
+#             "memory" => "20Mi"
+#           }
+#         },
+#         "volumeMounts" => [
+#           {
+#             "name" => "kube-dns-config",
+#             "mountPath" => "/etc/k8s/dns/dnsmasq-nanny"
+#           }
+#         ]
+#       },
+#       {
+#         "name" => "sidecar",
+#         "image" => "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.6",
+#         "livenessProbe" => {
+#           "httpGet" => {
+#             "path" => "/metrics",
+#             "port" => 10054,
+#             "scheme" => "HTTP"
+#           },
+#           "initialDelaySeconds" => 60,
+#           "timeoutSeconds" => 5,
+#           "successThreshold" => 1,
+#           "failureThreshold" => 5
+#         },
+#         "args" => [
+#           "--v=2",
+#           "--logtostderr",
+#           "--probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV",
+#           "--probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.#{node['kubernetes']['cluster_domain']},5,SRV"
+#         ],
+#         # "ports" => [
+#         #   {
+#         #     "containerPort" => 10054,
+#         #     "name" => "metrics",
+#         #     "protocol" => "TCP"
+#         #   }
+#         # ],
+#         "resources" => {
+#           "requests" => {
+#             "memory" => "20Mi",
+#             "cpu" => "10m"
+#           }
+#         }
+#       }
+#     ],
+#     "dnsPolicy" => "Default"
+#   }
+# }
+#
 # kube_dashboard = {
 #   "kind" => "Pod",
 #   "apiVersion" => "v1",
@@ -554,7 +554,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
-  node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
+  # node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
 
   node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
 end
