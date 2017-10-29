@@ -1,4 +1,3 @@
-
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
 

@@ -196,7 +196,11 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         },
         "Network" => {
           "LinkLocalAddressing" => "no",
-          "DHCP" => "no"
+          "DHCP" => "no",
+          "DNS" => [
+            '127.0.0.1',
+            '8.8.8.8'
+          ]
         },
         "Address" => {
           "Address" => "#{ip_lan}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
@@ -215,15 +219,12 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         },
         "Network" => {
           "LinkLocalAddressing" => "no",
-          "DHCP" => "yes",
-          "DNS" => [
-            node['environment_v2']['set']['ns']['vip_lan'],
-            '8.8.8.8'
-          ]
+          "DHCP" => "yes"
         },
         "DHCP" => {
           "UseDNS" => "false",
           "UseNTP" => "false",
+          "Anonymize" => "true",
           "SendHostname" => "false",
           "UseHostname" => "false",
           "UseDomains" => "false",
