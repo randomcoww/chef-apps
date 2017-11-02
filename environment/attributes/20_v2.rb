@@ -56,11 +56,7 @@ node.default['environment_v2']['set']['kube-master'] = {
   ],
   'services' => {
     'kube-master' => {
-      "port" => 443,
-      "proto" => "tcp"
-    },
-    'kube-dns' => {
-      "port" => 53531,
+      "port" => 20443,
       "proto" => "tcp"
     },
     'transmission' => {
