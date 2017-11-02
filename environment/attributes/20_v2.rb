@@ -31,8 +31,7 @@ node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
     'coreos-gateway1',
     'coreos-gateway2'
-  ],
-  'vip_lan' => "192.168.62.241"
+  ]
 }
 
 node.default['environment_v2']['set']['kea'] = {
@@ -75,8 +74,7 @@ node.default['environment_v2']['set']['kube-master'] = {
       "port" => 30062,
       "proto" => "tcp"
     }
-  },
-  'vip_lan' => "192.168.62.243"
+  }
 }
 
 

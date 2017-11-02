@@ -26,9 +26,9 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
             'auth_pass' => keepalived_bag.get_or_create('VI_gateway_v2', SecureRandom.base64(6))
           }
         ],
-        'virtual_ipaddress' => ['ns', 'gateway'].map { |v|
-          "#{node['environment_v2']['set'][v]['vip_lan']}/#{vip_subnet}"
-        }
+        'virtual_ipaddress' => [
+          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{vip_subnet}"
+        ]
       }
     ]
   })
