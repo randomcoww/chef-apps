@@ -209,11 +209,6 @@ node.default['environment_v2']['host']['sw'] = {
   'ip_lan' => '192.168.63.95'
 }
 
-node.default['environment_v2']['host']['ups'] = {
-  'ip_lan' => '192.168.63.96'
-}
-
-
 ## load current host under 'current_host'
 node.default['environment_v2']['node_name'] = ENV['NODE_NAME']
 node.default['environment_v2']['node_host'] = node['environment_v2']['host'][node['environment_v2']['node_name']]
