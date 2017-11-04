@@ -52,7 +52,10 @@ node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::Con
     'pidfile' => '/var/run/haproxy.pid'
   },
   'resolvers default' => {
-    'nameserver' => "dns1 127.0.0.1:53",
+    # 'nameserver' => "dns1 127.0.0.1:53",
+    # 'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
+    #   "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
+    # },
     'resolve_retries' => 3
   },
   'defaults' => {
