@@ -233,6 +233,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
+            "--docker-disable-shared-pid=false"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

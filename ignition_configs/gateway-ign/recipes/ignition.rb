@@ -274,7 +274,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             # "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             # "--tls-cert-file=#{node['kubernetes']['cert_path']}",
-            # "--tls-private-key-file=#{node['kubernetes']['key_path']}"
+            # "--tls-private-key-file=#{node['kubernetes']['key_path']}",
+            "--docker-disable-shared-pid=false"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

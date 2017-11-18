@@ -1,8 +1,3 @@
-node.default['environment_v2']['ssh_authorized_keys']['default'] = [
-  'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC48pu0Cl9VJ5p40Fqb/HU2FH6W4WlxG3N4R+SikofgzhhUI1yy/nrKziunFy+82kOA1RYKnlqQfv3cOoeSt0I+Qe622UmKsJEmmOo/ynEdzb22BnLIW+t+OFDCGs9NP1vIhnBPl7rxuw1U8w+0BZf7aJ5ateNhWh/7S6ACmpiIqtPAyKSGlel1sir3zDrSL21Ds9mUNRGhaQhVwNxr/q82C1DAYRnCNr04+BWh3BnY6kREWVfbr+FvpdCSN8Z42pfWByc3ZkQZYSJPBGBhRxPc3l08WwE663pFAaQTCq1wyaWplK5FLnl8ZrnfjU0Ej87iTiN8LG46UpPOjMRqH8uN',
-  'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV32iY0Sg4ZrLBg8MzUGtwteIJn4CpqxRLCRv/ayGBIbv8yRD0zR5K8mT2lh9NjST0g84W8x8MZswnurTzD/a9FyQzD9nOGCpe+PMFlOPg9oArZO0GOa74j36aRKdMou+/URi37EMc5caQPGbKzez7ylj4LKsznoeRQuIGDFE1kwatTXvH9alb/lp1jX97fcesEVc0r28MEU70lmfc9tdkF3+9gpzztDrrg0zdsuE8l9LtnbMK+SVbXASjLbkYDjBn6qP8zmv1gFOLz09N+/0C6Jsqzmxxa5KW5f6DfnYv1i3Ov+1lbN8L7709/qcVZs6kG9jsuYiyAjrsouu7jlNj'
-]
-
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
