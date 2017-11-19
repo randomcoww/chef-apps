@@ -66,8 +66,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      'DNS.1' => [host, domain].join('.'),
-      # 'DNS.1' => ['*', domain].join('.')
+      # 'DNS.1' => [host, domain].join('.'),
+      'DNS.1' => ['*', domain].join('.')
     }
   )
 
