@@ -1,7 +1,9 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
-node.default['environment_v2']['subnet']['lan_dhcp_pool'] = "192.168.62.32/27"
-node.default['environment_v2']['subnet']['store_dhcp_pool'] = "192.168.126.32/27"
+
+node.default['environment_v2']['subnet']['dhcp_pool_lan'] = "192.168.62.32/27"
+node.default['environment_v2']['subnet']['dhcp_pool_store'] = "192.168.126.32/27"
+node.default['environment_v2']['domain']['rev_lan'] = '168.192.in-addr.arpa'
 
 node.default['environment_v2']['domain']['top'] = 'lan'
 node.default['environment_v2']['domain']['host_lan'] = 'hl'

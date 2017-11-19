@@ -56,6 +56,12 @@ flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
 flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
 
 
+domain = [
+  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['top']
+].join('.')
+
+
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
@@ -73,13 +79,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "basicConstraints" => "CA:FALSE",
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
-    {
-      'DNS.1' => [
-        '*',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.')
-    }
+    {}
   )
 
   ##
@@ -100,11 +100,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       'DNS.2' => 'kubernetes.default',
       'DNS.3' => 'kubernetes.default.svc',
       'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
-      'DNS.5' => [
-        '*',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.'),
+      'DNS.5' => [host, domain].join('.'),
+      # 'DNS.5' => ['*', domain].join('.'),
       'IP.1' => node['kubernetes']['cluster_service_ip'],
       'IP.2' => node['environment_v2']['set']['haproxy']['vip_lan']
     }

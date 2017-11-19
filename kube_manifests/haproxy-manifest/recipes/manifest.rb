@@ -15,7 +15,7 @@ haproxy_manifest = {
         "env" => [
           {
             "name" => "CONFIG",
-            "value" => node['kube_manifests']['gateway']['haproxy_config']
+            "value" => node['kube_manifests']['haproxy']['haproxy_config']
           }
         ]
       }

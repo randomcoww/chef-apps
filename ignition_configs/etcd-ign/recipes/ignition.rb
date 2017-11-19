@@ -31,7 +31,6 @@ etcd_peer_ca = etcd_peer_cert_generator.root_ca
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if_lan']
-  # hostname = [host, domain].join('.')
 
   ##
   ## etcd ssl
@@ -47,12 +46,9 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      'DNS.1' => [
-        '*',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.'),
-      'IP.1' => node['environment_v2']['set']['haproxy']['vip_lan']
+      'DNS.1' => [host, domain].join('.'),
+      # 'DNS.1' => ['*', domain].join('.'),
+      # 'IP.1' => node['environment_v2']['set']['haproxy']['vip_lan']
     }
   )
 
@@ -70,11 +66,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      'DNS.1' => [
-        '*',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.')
+      'DNS.1' => [host, domain].join('.'),
+      # 'DNS.1' => ['*', domain].join('.')
     }
   )
 

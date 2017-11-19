@@ -117,8 +117,6 @@ kea_manifest = {
           node['mysql_credentials']['kea']['username'],
           "-w",
           node['mysql_credentials']['kea']['password'],
-          "-domain",
-          node['environment_v2']['domain']['top'],
           "-listen",
           "53530"
         ]

@@ -72,13 +72,7 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "basicConstraints" => "CA:FALSE",
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
-    {
-      'DNS.1' => [
-        '*',
-        node['environment_v2']['domain']['host_lan'],
-        node['environment_v2']['domain']['top']
-      ].join('.')
-    }
+    {}
   )
 
   directories = []

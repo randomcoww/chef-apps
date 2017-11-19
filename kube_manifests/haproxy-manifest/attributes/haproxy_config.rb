@@ -36,26 +36,27 @@ node['environment_v2']['set'].each_value do |set|
 end
 
 
-node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
+node.default['kube_manifests']['haproxy']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
-    'user' => 'haproxy',
-    'group' => 'haproxy',
+    # 'user' => 'haproxy',
+    # 'group' => 'haproxy',
     'log' => '127.0.0.1 local0',
     'log-tag' => 'haproxy',
     'daemon' => nil,
     'quiet' => nil,
     'stats' => [
-      'socket /var/run/haproxy.sock user haproxy group haproxy',
+      # 'socket /var/run/haproxy.sock user haproxy group haproxy',
+      'socket /var/run/haproxy.sock',
       'timeout 2m'
     ],
     'maxconn' => 1024,
     'pidfile' => '/var/run/haproxy.pid'
   },
   'resolvers default' => {
-    # 'nameserver' => "dns1 127.0.0.1:53",
-    # 'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
-    #   "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
-    # },
+    'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
+      "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
+    },
+    # 'nameserver' => "vip #{node['environment_v2']['set']['gateway']['vip_lan']}:53",
     'resolve_retries' => 3
   },
   'defaults' => {
@@ -71,6 +72,6 @@ node.default['kube_manifests']['gateway']['haproxy_config'] = HaproxyHelper::Con
       'dontlognull',
       'redispatch'
     ],
-    'stats' => 'uri /haproxy-status'
+    # 'stats' => 'uri /haproxy-status'
   }
 }.merge(services))

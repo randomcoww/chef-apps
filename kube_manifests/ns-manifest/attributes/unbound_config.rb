@@ -85,12 +85,13 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
     }).map { |r| %Q{"#{r}"} },
     'local-zone' => [
       "#{node['environment_v2']['domain']['top']} nodefault",
+      "#{node['environment_v2']['domain']['rev_lan']} nodefault",
     ],
     "private-domain" => [
-      node['environment_v2']['domain']['top']
+      node['environment_v2']['domain']['top'],
     ],
     "domain-insecure" => [
-      node['environment_v2']['domain']['top']
+      node['environment_v2']['domain']['top'],
     ]
   },
   'remote-control' => {
@@ -99,6 +100,10 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
   'stub-zone' => [
     {
       'name' => node['environment_v2']['domain']['top'],
+      'stub-addr' => "127.0.0.1@53530"
+    },
+    {
+      'name' => node['environment_v2']['domain']['rev_lan'],
       'stub-addr' => "127.0.0.1@53530"
     }
   ]

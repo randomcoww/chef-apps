@@ -1,4 +1,15 @@
 [
+  node['kubernetes']['ssl_path'],
+  ::File.dirname(node['kubernetes']['kubectl']['kubeconfig_path'])
+].each do |d|
+  directory d do
+    recursive true
+    action [:create]
+  end
+end
+
+
+[
   'kubectl',
 ].each do |e|
   remote_file node['kubernetes'][e]['binary_path'] do
@@ -9,13 +20,38 @@
 end
 
 
-[
-  node['kubernetes']['ssl_path'],
-].each do |d|
-  directory d do
-    recursive true
-    action [:create]
-  end
+cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
+)
+ca = cert_generator.root_ca
+
+##
+## kube ssl
+##
+key = cert_generator.generate_key
+cert = cert_generator.node_cert(
+  [
+    ['CN', "kubectl"]
+  ],
+  key,
+  {
+    "basicConstraints" => "CA:FALSE",
+    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+  },
+  {}
+)
+
+
+file node['kubernetes']['ca_path'] do
+  content ca.to_pem
+end
+
+file node['kubernetes']['key_path'] do
+  content key.to_pem
+end
+
+file node['kubernetes']['cert_path'] do
+  content cert.to_pem
 end
 
 
@@ -52,30 +88,6 @@ kubelet_kube_config = {
   "current-context" => "kubelet-context"
 }
 
-
-## ssl
-kubernetes_ca 'ca' do
-  data_bag 'deploy_config'
-  data_bag_item 'kubernetes_ssl'
-  cert_path node['kubernetes']['ca_path']
-  action :create
-end
-
-kubernetes_admin_cert 'client' do
-  data_bag 'deploy_config'
-  data_bag_item 'kubernetes_ssl'
-  cn "kube-client"
-  key_path node['kubernetes']['key_path']
-  cert_path node['kubernetes']['cert_path']
-  action :create_if_missing
-  subscribes :create, "kubernetes_ca[ca]", :immediately
-end
-
-
-directory ::File.dirname(node['kubernetes']['kubectl']['kubeconfig_path']) do
-  recursive true
-  action [:create]
-end
 
 file node['kubernetes']['kubectl']['kubeconfig_path'] do
   content kubelet_kube_config.to_yaml

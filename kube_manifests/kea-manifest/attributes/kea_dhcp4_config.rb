@@ -40,7 +40,7 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
         ],
         "pools" => [
           {
-           "pool" => node['environment_v2']['subnet']['lan_dhcp_pool']
+           "pool" => node['environment_v2']['subnet']['dhcp_pool_lan']
           }
         ],
         "reservations" => host_lan_reservations
@@ -49,7 +49,7 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
         "subnet" => node['environment_v2']['subnet']['store'],
         "pools" => [
           {
-           "pool" => node['environment_v2']['subnet']['store_dhcp_pool']
+           "pool" => node['environment_v2']['subnet']['dhcp_pool_store']
           }
         ],
         "reservations" => host_store_reservations
