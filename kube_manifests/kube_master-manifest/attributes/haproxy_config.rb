@@ -1,11 +1,10 @@
-services = {}
-
 lan_domain = [
   node['environment_v2']['domain']['host_lan'],
   node['environment_v2']['domain']['top']
 ].join('.')
 
 
+services = {}
 node['environment_v2']['set'].each_value do |set|
   if set.is_a?(Hash) &&
     set.has_key?('services')
@@ -36,13 +35,12 @@ node['environment_v2']['set'].each_value do |set|
 end
 
 
-node.default['kube_manifests']['haproxy']['haproxy_config'] = HaproxyHelper::ConfigGenerator.generate_from_hash({
+haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
     # 'user' => 'haproxy',
     # 'group' => 'haproxy',
     'log' => '127.0.0.1 local0',
     'log-tag' => 'haproxy',
-    'daemon' => nil,
     'quiet' => nil,
     'stats' => [
       # 'socket /var/run/haproxy.sock user haproxy group haproxy',
@@ -75,3 +73,27 @@ node.default['kube_manifests']['haproxy']['haproxy_config'] = HaproxyHelper::Con
     # 'stats' => 'uri /haproxy-status'
   }
 }.merge(services))
+
+
+haproxy_template = [
+  '{{range $index, $element := .}}{{if $element.NodePort}}',
+  HaproxyHelper::ConfigGenerator.generate_from_hash({
+    'frontend {{$index.ServiceName}}_{{$index.PortName}}' => {
+      'default_backend' => '{{$index.ServiceName}}_{{$index.PortName}}',
+      'bind' => '*:{{$element.Port}}',
+      'maxconn' => 2000
+    },
+    'backend {{$index.ServiceName}}_{{$index.PortName}}' => {
+      'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
+        "#{e} #{[e, lan_domain].join('.')}:{{$element.NodePort}} init-addr libc,none resolvers default"
+      }
+    }
+  }),
+  '{{end}}{{end}}'
+].join($/)
+
+
+# node.default['kube_manifests']['haproxy']['config'] = haproxy_config
+node.default['kube_manifests']['haproxy']['template'] = [haproxy_config, haproxy_template].join($/)
+node.default['kube_manifests']['haproxy']['config_path'] = '/etc/haproxy/haproxy.cfg'
+node.default['kube_manifests']['haproxy']['pid_path'] = '/run/haproxy.pid'

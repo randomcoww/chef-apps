@@ -15,7 +15,8 @@ flannel_manifest = {
           "/opt/bin/flanneld",
           "--ip-masq",
           "--kube-subnet-mgr",
-          "--kube-api-url=http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
+          "--kube-api-url=http://127.0.0.1:#{node['kubernetes']['insecure_port']}",
+          "--kubeconfig-file=#{node['kubernetes']['client']['kubeconfig_path']}"
         ],
         "securityContext" => {
           "privileged" => true
@@ -46,7 +47,17 @@ flannel_manifest = {
           {
             "name" => "flannel-cfg",
             "mountPath" => "/etc/kube-flannel/"
-          }
+          },
+          {
+            "name" => "kubeconfig",
+            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+            "readOnly" => true
+          },
+          # {
+          #   "mountPath": "/etc/ssl",
+          #   "name": "ssl-certs-host",
+          #   "readOnly": true
+          # }
         ]
       }
     ],
@@ -62,7 +73,19 @@ flannel_manifest = {
         "hostPath" => {
           "path" => "/etc/kube-flannel"
         }
-      }
+      },
+      {
+        "name" => "kubeconfig",
+        "hostPath" => {
+          "path" => node['kubernetes']['client']['kubeconfig_path']
+        }
+      },
+      # {
+      #   "name" => "ssl-certs-host",
+      #   "hostPath" => {
+      #     "path" => "/etc/ssl"
+      #   }
+      # }
     ]
   }
 }
@@ -264,6 +287,92 @@ kube_apiserver_manifest = {
     ]
   }
 }
+
+
+kube_haproxy_manifest = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    # "namespace" => "kube-system",
+    "name" => "haproxy"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "containers" => [
+      {
+        "name" => "haproxy",
+        "image" => node['kube']['images']['kube_haproxy'],
+        "args" => [
+          "haproxy",
+          "-f",
+          node['kube_manifests']['haproxy']['config_path'],
+          "-p",
+          node['kube_manifests']['haproxy']['pid_path']
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "haproxy-config",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
+          },
+          {
+            "name" => "haproxy-pid",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          }
+        ]
+      },
+      {
+        "name" => "kube-haproxy",
+        "image" => node['kube']['images']['kube_haproxy'],
+        "env" => [
+          {
+            "name" => "CONFIG",
+            "value" => node['kube_manifests']['haproxy']['template']
+          }
+        ],
+        "command" => [
+          "/kubeapi.sh",
+        ],
+        "args" => [
+          "-kubeconfig",
+          node['kubernetes']['client']['kubeconfig_path']
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "haproxy-config",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
+          },
+          {
+            "name" => "haproxy-pid",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          },
+          {
+            "name" => "kubeconfig",
+            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+            "readOnly" => true
+          }
+        ]
+      }
+    ],
+    "volumes" => [
+      {
+        "name" => "haproxy-config",
+        "emptyDir" => {}
+      },
+      {
+        "name" => "haproxy-pid",
+        "emptyDir" => {}
+      },
+      {
+        "name" => "kubeconfig",
+        "hostPath" => {
+          "path" => node['kubernetes']['client']['kubeconfig_path']
+        }
+      }
+    ]
+  }
+}
+
 
 # kube_dns_manifest = {
 #   "apiVersion" => "v1",
@@ -485,12 +594,78 @@ kube_apiserver_manifest = {
 #   }
 # }
 
+keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
+vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
+
+
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['flannel.yaml'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest.yaml'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest.yaml'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest.yaml'] = kube_haproxy_manifest
+
+  keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
+    'vrrp_sync_group VG_kube' => [
+      {
+        'group' => [
+          'VI_kube'
+        ]
+      }
+    ],
+    'vrrp_instance VI_kube' => [
+      {
+        'state' => 'BACKUP',
+        'virtual_router_id' => 81,
+        'interface' => node['environment_v2']['host'][host]['if_lan'],
+        'priority' => 100,
+        'authentication' => [
+          {
+            'auth_type' => 'AH',
+            'auth_pass' => keepalived_bag.get_or_create('VI_kube', SecureRandom.base64(6))
+          }
+        ],
+        'virtual_ipaddress' => [
+          "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{vip_subnet}"
+        ]
+      }
+    ]
+  })
+
+  keepalived_manifest = {
+    "apiVersion" => "v1",
+    "kind" => "Pod",
+    "metadata" => {
+      # "namespace" => "kube-system",
+      "name" => "keepalived"
+    },
+    "spec" => {
+      "restartPolicy" => "Always",
+      "hostNetwork" => true,
+      "containers" => [
+        {
+          "name" => "keepalived",
+          "image" => node['kube']['images']['keepalived'],
+          "securityContext" => {
+            "capabilities" => {
+              "add" => [
+                "NET_ADMIN"
+              ]
+            }
+          },
+          "env" => [
+            {
+              "name" => "CONFIG",
+              "value" => keepalived_config
+            }
+          ]
+        }
+      ]
+    }
+  }
+
+  node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
   # node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
 end
