@@ -4,7 +4,7 @@ node.default['kube']['images']['mysql_cluster_ndb_mgmd'] = "randomcoww/k8s-mysql
 node.default['kube']['images']['mysql_cluster_seeder'] = "randomcoww/k8s-mysql_cluster_seeder:latest"
 node.default['kube']['images']['kea_dhcp4'] = "randomcoww/k8s-kea:latest"
 node.default['kube']['images']['kea_dhcp_ddns'] = "randomcoww/k8s-kea:latest"
-node.default['kube']['images']['haproxy'] = "randomcoww/k8s-haproxy:latest"
+# node.default['kube']['images']['haproxy'] = "randomcoww/k8s-haproxy:latest"
 node.default['kube']['images']['keepalived'] = "randomcoww/k8s-keepalived:latest"
 node.default['kube']['images']['ddclient'] = "randomcoww/k8s-ddclient:latest"
 node.default['kube']['images']['knot'] = "randomcoww/k8s-knot:latest"
@@ -16,8 +16,9 @@ node.default['kube']['images']['env_writer'] = "randomcoww/env_writer:latest"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:latest"
 node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:latest"
-# node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
+node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:latest"
 node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.0-amd64"
+# node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
 
 
 ##
