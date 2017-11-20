@@ -5,11 +5,10 @@ node.default['environment_v2']['subnet']['dhcp_pool_lan'] = "192.168.62.32/27"
 node.default['environment_v2']['subnet']['dhcp_pool_store'] = "192.168.126.32/27"
 node.default['environment_v2']['domain']['rev_lan'] = '168.192.in-addr.arpa'
 
-node.default['environment_v2']['domain']['top'] = 'lan'
-node.default['environment_v2']['domain']['host_lan'] = 'hl'
-node.default['environment_v2']['domain']['vip_lan'] = 'vl'
-node.default['environment_v2']['domain']['host_store'] = 'hs'
-node.default['environment_v2']['domain']['vip_store'] = 'vs'
+node.default['environment_v2']['domain']['top'] = 'internal'
+node.default['environment_v2']['domain']['vip_lan'] = 'svc'
+node.default['environment_v2']['domain']['host_lan'] = 'lan'
+node.default['environment_v2']['domain']['host_store'] = 'san'
 
 
 ##
@@ -18,37 +17,37 @@ node.default['environment_v2']['domain']['vip_store'] = 'vs'
 
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
-    'coreos-gateway1',
-    'coreos-gateway2'
+    'gateway1',
+    'gateway2'
   ],
   'vip_lan' => "192.168.62.240"
 }
 
 node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
-    'coreos-gateway1',
-    'coreos-gateway2'
+    'gateway1',
+    'gateway2'
   ]
 }
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
-    'coreos-gateway1',
-    'coreos-gateway2'
+    'gateway1',
+    'gateway2'
   ]
 }
 
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'coreos-kube-master',
+    'kube-master',
   ],
   'vip_lan' => "192.168.62.242"
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
-    'coreos-kube-master',
+    'kube-master',
   ],
   'services' => {
     'kube-master' => {
@@ -77,14 +76,14 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'coreos-kube-worker'
+    'kube-worker'
   ]
 }
 
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
-    'coreos-etcd1',
-    'coreos-etcd2',
+    'etcd1',
+    'etcd2',
   ],
   "services" => {
     'etcd-server-ssl' => {
@@ -100,8 +99,8 @@ node.default['environment_v2']['set']['etcd'] = {
 
 node.default['environment_v2']['set']['flannel'] = {
   'hosts' => [
-    'coreos-kube-master',
-    'coreos-kube-worker'
+    'kube-master',
+    'kube-worker'
   ]
 }
 
@@ -110,7 +109,7 @@ node.default['environment_v2']['set']['flannel'] = {
 ## hosts
 ##
 
-node.default['environment_v2']['host']['coreos-gateway1'] = {
+node.default['environment_v2']['host']['gateway1'] = {
   'ip_lan' => "192.168.62.217",
   'if_lan' => 'eth0',
   'if_wan' => 'eth1',
@@ -119,7 +118,7 @@ node.default['environment_v2']['host']['coreos-gateway1'] = {
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-gateway2'] = {
+node.default['environment_v2']['host']['gateway2'] = {
   'ip_lan' => "192.168.62.218",
   'if_lan' => 'eth0',
   'if_wan' => 'eth1',
@@ -128,32 +127,32 @@ node.default['environment_v2']['host']['coreos-gateway2'] = {
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-etcd1'] = {
+node.default['environment_v2']['host']['etcd1'] = {
   'if_lan' => 'eth0',
   'memory' => 4096,
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-etcd2'] = {
+node.default['environment_v2']['host']['etcd2'] = {
   'if_lan' => 'eth0',
   'memory' => 4096,
   'vcpu' => 2
 }
 
-# node.default['environment_v2']['host']['coreos-etcd3'] = {
+# node.default['environment_v2']['host']['etcd3'] = {
 #   'if_lan' => 'eth0',
 #   'memory' => 4096,
 #   'vcpu' => 2
 # }
 
 
-node.default['environment_v2']['host']['coreos-kube-master'] = {
+node.default['environment_v2']['host']['kube-master'] = {
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 2
 }
 
-node.default['environment_v2']['host']['coreos-kube-worker'] = {
+node.default['environment_v2']['host']['kube-worker'] = {
   'if_lan' => 'eth0',
   'memory' => 8192,
   'vcpu' => 6
@@ -177,6 +176,12 @@ node.default['environment_v2']['host']['vm1'] = {
   #   'function' => "0x0",
   #   'file' => "/data/kvm/firmware/mptsas3.rom"
   # }
+  'guests' => [
+    'gateway1', 'gateway2',
+    'etcd1', 'etcd2',
+    'kube-master',
+    'kube-worker'
+  ]
 }
 
 node.default['environment_v2']['host']['vm2'] = {
@@ -207,5 +212,5 @@ node.default['environment_v2']['host']['sw'] = {
 }
 
 ## load current host under 'current_host'
-node.default['environment_v2']['node_name'] = ENV['NODE_NAME']
-node.default['environment_v2']['node_host'] = node['environment_v2']['host'][node['environment_v2']['node_name']]
+# node.default['environment_v2']['node_name'] = ENV['NODE_NAME']
+# node.default['environment_v2']['node_host'] = node['environment_v2']['host'][node['environment_v2']['node_name']]
