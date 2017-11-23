@@ -93,13 +93,6 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
   nftables_rules = []
   nftables_defines = {}
 
-  node['environment_v2']['subnet'].each do |k, v|
-    case v
-    when String,Integer
-      nftables_defines["subnet_#{k}"] = v
-    end
-  end
-
   node['environment_v2']['set'].each do |k, v|
     case v
     when Hash
@@ -113,15 +106,6 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     case v
     when String,Integer
       nftables_defines["host_#{k}"] = v
-    end
-  end
-
-  node['environment_v2']['haproxy'].each do |k, v|
-    case v
-    when Hash
-      if !v['port'].nil?
-        nftables_defines["port_#{k}"] = v['port']
-      end
     end
   end
 

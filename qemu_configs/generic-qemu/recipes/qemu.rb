@@ -9,7 +9,39 @@ node['environment_v2']['host'].each do |h, v|
   end
 end
 
-guests.uniq.each do |guest, host|
+
+guests.values.uniq.each do |host|
+  [
+    "if_lan",
+    'if_store',
+    "if_wan",
+  ].each do |i|
+
+    if_name = node['environment_v2']['host'][host][i]
+    if !if_name.nil?
+
+      node.default['qemu']['configs']["net-#{host}-#{i}"] = LibvirtConfig::ConfigGenerator.generate_from_hash({
+        "network"=>{
+          "name"=>i,
+          "forward"=>{
+            "#attributes"=>{
+              "mode"=>"hostdev",
+              "managed"=>"yes"
+            },
+            "pf"=>{
+              "#attributes"=>{
+                "dev"=>if_name
+              }
+            }
+          }
+        }
+      })
+    end
+  end
+end
+
+
+guests.each do |guest, host|
 
   host_config = node['environment_v2']['host'][host]
   guest_config = node['environment_v2']['host'][guest]
@@ -39,15 +71,14 @@ guests.uniq.each do |guest, host|
         }
       end
 
+      ## sriov
       networks << {
         "#attributes"=>{
-          "type"=>"direct",
-          "trustGuestRxFilters"=>"yes"
+          "type"=>"network"
         },
         "source"=>{
           "#attributes"=>{
-            "dev"=>host_config[if_key],
-            "mode"=>"bridge"
+            "network"=>if_key
           }
         },
         "model"=>{
@@ -56,6 +87,25 @@ guests.uniq.each do |guest, host|
           }
         }
       }.merge(mac_hash)
+
+      ## macvtap
+      # networks << {
+      #   "#attributes"=>{
+      #     "type"=>"direct",
+      #     "trustGuestRxFilters"=>"yes"
+      #   },
+      #   "source"=>{
+      #     "#attributes"=>{
+      #       "dev"=>host_config[if_key],
+      #       "mode"=>"bridge"
+      #     }
+      #   },
+      #   "model"=>{
+      #     "#attributes"=>{
+      #       "type"=>"virtio-net"
+      #     }
+      #   }
+      # }.merge(mac_hash)
     end
   end
 
@@ -111,6 +161,7 @@ guests.uniq.each do |guest, host|
             "coreos.first_boot=1",
             "console=ttyS0",
             "coreos.config.url=#{node['environment_v2']['url']['ignition']}/#{guest}",
+            "net.ifnames=0"
           ].join(' '),
         },
         "boot"=>{

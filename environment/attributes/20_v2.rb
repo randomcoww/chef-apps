@@ -18,7 +18,7 @@ node.default['environment_v2']['domain']['host_store'] = 'san'
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
     'gateway1',
-    'gateway2'
+    # 'gateway2'
   ],
   'vip_lan' => "192.168.62.240"
 }
@@ -26,14 +26,14 @@ node.default['environment_v2']['set']['gateway'] = {
 node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
     'gateway1',
-    'gateway2'
+    # 'gateway2'
   ]
 }
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
     'gateway1',
-    'gateway2'
+    # 'gateway2'
   ]
 }
 
@@ -166,9 +166,9 @@ node.default['environment_v2']['host']['kube-worker'] = {
 node.default['environment_v2']['host']['vm1'] = {
   'ip_lan' => '192.168.62.251',
   'ip_store' => '192.168.126.251',
-  'if_lan' => 'host_lan',
-  'if_wan' => 'host_wan',
-  'if_store' => 'host_store',
+  'if_lan' => 'eno1',
+  'if_wan' => 'eno2',
+  'if_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -187,9 +187,9 @@ node.default['environment_v2']['host']['vm1'] = {
 node.default['environment_v2']['host']['vm2'] = {
   'ip_lan' => '192.168.62.252',
   'ip_store' => '192.168.126.252',
-  'if_lan' => 'host_lan',
-  'if_wan' => 'host_wan',
-  'if_store' => 'host_store',
+  'if_lan' => 'eno1',
+  'if_wan' => 'eno2',
+  'if_store' => 'ens1',
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",

@@ -307,18 +307,18 @@ kube_haproxy_manifest = {
           "haproxy",
           "-f",
           node['kube_manifests']['haproxy']['config_path'],
-          "-p",
-          node['kube_manifests']['haproxy']['pid_path']
+          # "-p",
+          # node['kube_manifests']['haproxy']['pid_path']
         ],
         "volumeMounts" => [
           {
             "name" => "haproxy-config",
             "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
           },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          }
+          # {
+          #   "name" => "haproxy-pid",
+          #   "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          # }
         ]
       },
       {
@@ -342,10 +342,10 @@ kube_haproxy_manifest = {
             "name" => "haproxy-config",
             "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
           },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          },
+          # {
+          #   "name" => "haproxy-pid",
+          #   "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          # },
           {
             "name" => "kubeconfig",
             "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
@@ -359,10 +359,10 @@ kube_haproxy_manifest = {
         "name" => "haproxy-config",
         "emptyDir" => {}
       },
-      {
-        "name" => "haproxy-pid",
-        "emptyDir" => {}
-      },
+      # {
+      #   "name" => "haproxy-pid",
+      #   "emptyDir" => {}
+      # },
       {
         "name" => "kubeconfig",
         "hostPath" => {
