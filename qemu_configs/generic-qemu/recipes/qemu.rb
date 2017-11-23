@@ -159,9 +159,10 @@ guests.each do |guest, host|
         "cmdline"=>{
           "#text"=>[
             "coreos.first_boot=1",
-            "console=ttyS0",
             "coreos.config.url=#{node['environment_v2']['url']['ignition']}/#{guest}",
-            "net.ifnames=0"
+            "net.ifnames=0",
+            "console=hvc0",
+            "elevator=noop"
           ].join(' '),
         },
         "boot"=>{
@@ -214,13 +215,24 @@ guests.each do |guest, host|
           }
         ],
         "interface"=>networks,
-        "serial"=>{
+        # "serial"=>{
+        #   "#attributes"=>{
+        #     "type"=>"pty"
+        #   },
+        #   "target"=>{
+        #     "#attributes"=>{
+        #       "port"=>"0"
+        #     }
+        #   }
+        # },
+        "channel"=>{
           "#attributes"=>{
-            "type"=>"pty"
+            "type"=>"spicevmc"
           },
           "target"=>{
             "#attributes"=>{
-              "port"=>"0"
+              "type"=>"virtio",
+              "name"=>"com.redhat.spice.0"
             }
           }
         },
@@ -230,7 +242,7 @@ guests.each do |guest, host|
           },
           "target"=>{
             "#attributes"=>{
-              "type"=>"serial",
+              "type"=>"virtio",
               "port"=>"0"
             }
           }

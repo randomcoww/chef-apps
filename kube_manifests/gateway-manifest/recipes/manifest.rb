@@ -14,9 +14,9 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
     'vrrp_instance VI_gateway' => [
       {
         'state' => 'BACKUP',
-        'notify_master' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} up"},
-        'notify_backup' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} down"},
-        'notify_fault' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} down"},
+        # 'notify_master' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} up"},
+        # 'notify_backup' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} down"},
+        # 'notify_fault' => %Q{"/sbin/ip link set #{node['environment_v2']['host'][host]['if_wan']} down"},
         'virtual_router_id' => 80,
         'interface' => node['environment_v2']['host'][host]['if_lan'],
         'priority' => 100,
