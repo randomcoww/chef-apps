@@ -32,6 +32,11 @@ guests.values.uniq.each do |host|
               "#attributes"=>{
                 "dev"=>if_name
               }
+            },
+            "driver"=>{
+              "#attributes"=>{
+                "name"=>"vfio"
+              }
             }
           }
         }

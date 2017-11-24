@@ -305,20 +305,21 @@ kube_haproxy_manifest = {
         "image" => node['kube']['images']['kube_haproxy'],
         "args" => [
           "haproxy",
+          "-V",
           "-f",
           node['kube_manifests']['haproxy']['config_path'],
-          # "-p",
-          # node['kube_manifests']['haproxy']['pid_path']
+          "-p",
+          node['kube_manifests']['haproxy']['pid_path']
         ],
         "volumeMounts" => [
           {
             "name" => "haproxy-config",
             "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
           },
-          # {
-          #   "name" => "haproxy-pid",
-          #   "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          # }
+          {
+            "name" => "haproxy-pid",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          }
         ]
       },
       {
@@ -332,6 +333,10 @@ kube_haproxy_manifest = {
         ],
         "command" => [
           "/kubeapi.sh",
+          "-output",
+          node['kube_manifests']['haproxy']['config_path'],
+          "-pid",
+          node['kube_manifests']['haproxy']['pid_path']
         ],
         "args" => [
           "-kubeconfig",
@@ -342,10 +347,10 @@ kube_haproxy_manifest = {
             "name" => "haproxy-config",
             "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
           },
-          # {
-          #   "name" => "haproxy-pid",
-          #   "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          # },
+          {
+            "name" => "haproxy-pid",
+            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+          },
           {
             "name" => "kubeconfig",
             "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
@@ -359,10 +364,10 @@ kube_haproxy_manifest = {
         "name" => "haproxy-config",
         "emptyDir" => {}
       },
-      # {
-      #   "name" => "haproxy-pid",
-      #   "emptyDir" => {}
-      # },
+      {
+        "name" => "haproxy-pid",
+        "emptyDir" => {}
+      },
       {
         "name" => "kubeconfig",
         "hostPath" => {
