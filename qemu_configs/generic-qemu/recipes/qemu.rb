@@ -77,32 +77,13 @@ guests.each do |guest, host|
       end
 
       ## sriov
-      networks << {
-        "#attributes"=>{
-          "type"=>"network"
-        },
-        "source"=>{
-          "#attributes"=>{
-            "network"=>if_key
-          }
-        },
-        "model"=>{
-          "#attributes"=>{
-            "type"=>"virtio-net"
-          }
-        }
-      }.merge(mac_hash)
-
-      ## macvtap
       # networks << {
       #   "#attributes"=>{
-      #     "type"=>"direct",
-      #     "trustGuestRxFilters"=>"yes"
+      #     "type"=>"network"
       #   },
       #   "source"=>{
       #     "#attributes"=>{
-      #       "dev"=>host_config[if_key],
-      #       "mode"=>"bridge"
+      #       "network"=>if_key
       #     }
       #   },
       #   "model"=>{
@@ -111,6 +92,25 @@ guests.each do |guest, host|
       #     }
       #   }
       # }.merge(mac_hash)
+
+      ## macvtap
+      networks << {
+        "#attributes"=>{
+          "type"=>"direct",
+          "trustGuestRxFilters"=>"yes"
+        },
+        "source"=>{
+          "#attributes"=>{
+            "dev"=>host_config[if_key],
+            "mode"=>"bridge"
+          }
+        },
+        "model"=>{
+          "#attributes"=>{
+            "type"=>"virtio-net"
+          }
+        }
+      }.merge(mac_hash)
     end
   end
 
