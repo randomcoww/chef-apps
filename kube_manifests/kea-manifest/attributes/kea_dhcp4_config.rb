@@ -28,13 +28,13 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
           },
           {
             "name" => "domain-name-servers",
-            "data" => (node['environment_v2']['set']['ns']['hosts'].map { |e|
-              node['environment_v2']['host'][e]['ip_lan']
-            } + [ '8.8.8.8' ]).join(','),
-            # "data" => [
-            #   node['environment_v2']['set']['ns']['vip_lan'],
-            #   '8.8.8.8'
-            # ].join(','),
+            # "data" => (node['environment_v2']['set']['ns']['hosts'].map { |e|
+            #   node['environment_v2']['host'][e]['ip_lan']
+            # } + [ '8.8.8.8' ]).join(','),
+            "data" => [
+              node['environment_v2']['set']['ns']['vip_lan'],
+              '8.8.8.8'
+            ].join(','),
             "csv-format" => true
           }
         ],

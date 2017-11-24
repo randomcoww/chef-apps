@@ -51,10 +51,10 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
     'pidfile' => '/var/run/haproxy.pid'
   },
   'resolvers default' => {
-    'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
-      "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
-    },
-    # 'nameserver' => "vip #{node['environment_v2']['set']['gateway']['vip_lan']}:53",
+    # 'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
+    #   "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
+    # },
+    'nameserver' => "vip #{node['environment_v2']['set']['ns']['vip_lan']}:53",
     'resolve_retries' => 3
   },
   'defaults' => {

@@ -41,7 +41,6 @@ node.default['kubernetes']['cluster_cidr'] = '10.244.0.0/16'
 node.default['kubernetes']['service_ip_range'] = '10.3.0.0/24'
 node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
-# node.default['kubernetes']['cluster_dns_ip'] = node['environment_v2']['set']['ns']['vip_lan']
 
 node.default['kubernetes']['cni_conf_dir'] = "/etc/kubernetes/cni/net.d"
 

@@ -27,7 +27,8 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
           }
         ],
         'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{vip_subnet}"
+          "#{node['environment_v2']['set']['gateway']['vip_lan']}/#{vip_subnet}",
+          "#{node['environment_v2']['set']['ns']['vip_lan']}/#{vip_subnet}"
         ]
       }
     ]
