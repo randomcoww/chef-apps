@@ -615,6 +615,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       }
     ],
     'vrrp_instance VI_kube' => [
+      # 'use_vmac',
+      # 'vmac_xmit_base',
       {
         'state' => 'BACKUP',
         'virtual_router_id' => 81,
@@ -628,7 +630,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         ],
         'virtual_ipaddress' => [
           "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{vip_subnet}"
-        ]
+        ],
       }
     ]
   })
