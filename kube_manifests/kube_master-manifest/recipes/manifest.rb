@@ -302,7 +302,7 @@ kube_haproxy_manifest = {
     "containers" => [
       {
         "name" => "haproxy",
-        "image" => node['kube']['images']['kube_haproxy'],
+        "image" => node['kube']['images']['haproxy'],
         "args" => [
           "haproxy",
           "-V",
@@ -331,16 +331,13 @@ kube_haproxy_manifest = {
             "value" => node['kube_manifests']['haproxy']['template']
           }
         ],
-        "command" => [
-          "/kubeapi.sh",
+        "args" => [
+          "-kubeconfig",
+          node['kubernetes']['client']['kubeconfig_path'],
           "-output",
           node['kube_manifests']['haproxy']['config_path'],
           "-pid",
           node['kube_manifests']['haproxy']['pid_path']
-        ],
-        "args" => [
-          "-kubeconfig",
-          node['kubernetes']['client']['kubeconfig_path']
         ],
         "volumeMounts" => [
           {

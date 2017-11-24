@@ -18,6 +18,7 @@ node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:latest"
 node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:latest"
 node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.0-amd64"
+node.default['kube']['images']['haproxy'] = "haproxy:rc-alpine"
 # node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
 
 
