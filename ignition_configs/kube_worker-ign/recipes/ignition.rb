@@ -17,6 +17,12 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
+# domain = [
+#   node['environment_v2']['domain']['host_lan'],
+#   node['environment_v2']['domain']['top']
+# ].join('.')
+
+
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",

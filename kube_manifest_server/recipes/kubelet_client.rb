@@ -55,6 +55,12 @@ file node['kubernetes']['cert_path'] do
 end
 
 
+# domain = [
+#   node['environment_v2']['domain']['host_lan'],
+#   node['environment_v2']['domain']['top']
+# ].join('.')
+
+
 kubelet_kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
