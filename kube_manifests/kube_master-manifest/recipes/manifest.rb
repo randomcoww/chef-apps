@@ -642,8 +642,9 @@ kube_haproxy_manifest = {
 #   }
 # }
 
-keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
-vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
+
+# keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
+# vip_subnet = node['environment_v2']['subnet']['lan'].split('/').last
 
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
@@ -653,69 +654,69 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest.yaml'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
   node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest.yaml'] = kube_haproxy_manifest
-
-  keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
-    'vrrp_sync_group VG_kube' => [
-      {
-        'group' => [
-          'VI_kube'
-        ]
-      }
-    ],
-    'vrrp_instance VI_kube' => [
-      # 'use_vmac',
-      # 'vmac_xmit_base',
-      {
-        'state' => 'BACKUP',
-        'virtual_router_id' => 81,
-        'interface' => node['environment_v2']['host'][host]['if_lan'],
-        'priority' => 100,
-        'authentication' => [
-          {
-            'auth_type' => 'AH',
-            'auth_pass' => keepalived_bag.get_or_create('VI_kube', SecureRandom.base64(6))
-          }
-        ],
-        'virtual_ipaddress' => [
-          "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{vip_subnet}"
-        ],
-      }
-    ]
-  })
-
-  keepalived_manifest = {
-    "apiVersion" => "v1",
-    "kind" => "Pod",
-    "metadata" => {
-      "namespace" => "kube-system",
-      "name" => "keepalived"
-    },
-    "spec" => {
-      "restartPolicy" => "Always",
-      "hostNetwork" => true,
-      "containers" => [
-        {
-          "name" => "keepalived",
-          "image" => node['kube']['images']['keepalived'],
-          "securityContext" => {
-            "capabilities" => {
-              "add" => [
-                "NET_ADMIN"
-              ]
-            }
-          },
-          "env" => [
-            {
-              "name" => "CONFIG",
-              "value" => keepalived_config
-            }
-          ]
-        }
-      ]
-    }
-  }
-
-  node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard.yaml'] = kube_dashboard
   # node.default['kubernetes']['static_pods'][host]['kube_dns.yaml'] = kube_dns_manifest
+
+  # keepalived_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
+  #   'vrrp_sync_group VG_kube' => [
+  #     {
+  #       'group' => [
+  #         'VI_kube'
+  #       ]
+  #     }
+  #   ],
+  #   'vrrp_instance VI_kube' => [
+  #     # 'use_vmac',
+  #     # 'vmac_xmit_base',
+  #     {
+  #       'state' => 'BACKUP',
+  #       'virtual_router_id' => 81,
+  #       'interface' => node['environment_v2']['host'][host]['if_lan'],
+  #       'priority' => 100,
+  #       'authentication' => [
+  #         {
+  #           'auth_type' => 'AH',
+  #           'auth_pass' => keepalived_bag.get_or_create('VI_kube', SecureRandom.base64(6))
+  #         }
+  #       ],
+  #       'virtual_ipaddress' => [
+  #         "#{node['environment_v2']['set']['haproxy']['vip_lan']}/#{vip_subnet}"
+  #       ],
+  #     }
+  #   ]
+  # })
+  #
+  # keepalived_manifest = {
+  #   "apiVersion" => "v1",
+  #   "kind" => "Pod",
+  #   "metadata" => {
+  #     "namespace" => "kube-system",
+  #     "name" => "keepalived"
+  #   },
+  #   "spec" => {
+  #     "restartPolicy" => "Always",
+  #     "hostNetwork" => true,
+  #     "containers" => [
+  #       {
+  #         "name" => "keepalived",
+  #         "image" => node['kube']['images']['keepalived'],
+  #         "securityContext" => {
+  #           "capabilities" => {
+  #             "add" => [
+  #               "NET_ADMIN"
+  #             ]
+  #           }
+  #         },
+  #         "env" => [
+  #           {
+  #             "name" => "CONFIG",
+  #             "value" => keepalived_config
+  #           }
+  #         ]
+  #       }
+  #     ]
+  #   }
+  # }
+  #
+  # node.default['kubernetes']['static_pods'][host]['keepalived.yaml'] = keepalived_manifest
 end

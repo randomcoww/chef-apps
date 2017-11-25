@@ -43,7 +43,7 @@ node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
     'kube-master',
   ],
-  'vip_lan' => "192.168.62.242"
+  # 'vip_lan' => "192.168.62.242",
 }
 
 node.default['environment_v2']['set']['kube-master'] = {

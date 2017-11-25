@@ -17,24 +17,24 @@ cert_generator = OpenSSLHelper::CertGenerator.new(
 ca = cert_generator.root_ca
 
 
-# domain = [
-#   node['environment_v2']['domain']['host_lan'],
-#   node['environment_v2']['domain']['top']
-# ].join('.')
+domain = [
+  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['top']
+].join('.')
 
 
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
-  "clusters" => [
+  "clusters" => node['environment_v2']['set']['kube-master']['hosts'].map { |host|
     {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
+        "server" => "https://#{[host, domain].join('.')}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
-  ],
+  },
   "users" => [
     {
       "name" => "kube",
