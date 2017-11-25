@@ -52,23 +52,7 @@ node.default['environment_v2']['set']['kube-master'] = {
   ],
   'services' => {
     'kube-master' => {
-      "port" => 20443,
-      "proto" => "tcp"
-    },
-    'transmission' => {
-      "port" => 30063,
-      "proto" => "tcp"
-    },
-    'sshd' => {
-      "port" => 32222,
-      "proto" => "tcp"
-    },
-    'mpd-control' => {
-      "port" => 30061,
-      "proto" => "tcp"
-    },
-    'mpd-stream' => {
-      "port" => 30062,
+      "port" => 62442,
       "proto" => "tcp"
     }
   }

@@ -48,6 +48,7 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
       'timeout 2m'
     ],
     'maxconn' => 1024,
+    'master-worker' => 'exit-on-failure',
     'pidfile' => '/var/run/haproxy.pid'
   },
   'resolvers default' => {

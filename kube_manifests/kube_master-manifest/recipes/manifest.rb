@@ -309,7 +309,8 @@ kube_haproxy_manifest = {
           "-f",
           node['kube_manifests']['haproxy']['config_path'],
           "-p",
-          node['kube_manifests']['haproxy']['pid_path']
+          node['kube_manifests']['haproxy']['pid_path'],
+          # "-st"
         ],
         "volumeMounts" => [
           {
