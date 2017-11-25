@@ -3,9 +3,9 @@ host_store_reservations = []
 
 node.default['kube_manifests']['kea']['dhcp4_config'] = {
   "Dhcp4" => {
-    "valid-lifetime" => 3600,
-    "renew-timer" => 3600,
-    "rebind-timer" => 3600,
+    "valid-lifetime" => 300,
+    "renew-timer" => 300,
+    "rebind-timer" => 300,
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },

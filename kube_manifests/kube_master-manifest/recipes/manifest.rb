@@ -569,7 +569,7 @@ kube_haproxy_manifest = {
 #         "name" => "kube-dashboard",
 #         "image" => node['kube']['images']['kube_dashboard'],
 #         "args" => [
-#           "--apiserver-host=http://127.0.0.1:8080"
+#           "--apiserver-host=http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
 #         ],
 #         "volumeMounts" => [
 #           {
