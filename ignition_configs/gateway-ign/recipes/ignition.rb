@@ -25,35 +25,37 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
 
   ##
-  ## nftables
+  ## add basic nftables rules
   ##
 
-  nftables_load_rules = File.join(node['environment_v2']['nftables']['load_path'], 'rules', host)
-  nftables_rules = []
-  nftables_defines = {}
 
-  node['environment_v2']['set'].each do |k, v|
-    case v
-    when Hash
-      if !v['vip_lan'].nil?
-        nftables_defines["vip_#{k}"] = v['vip_lan']
-      end
-    end
-  end
 
-  node['environment_v2']['host'][host].each do |k, v|
-    case v
-    when String,Integer
-      nftables_defines["host_#{k}"] = v
-    end
-  end
-
-  nftables_defines.each do |k, v|
-    nftables_rules << "define #{k.gsub('-', '_')} = #{v}"
-  end
-
-  nftables_rules << %Q{include "#{nftables_load_rules}"}
-  nftables_rules << ''
+  # nftables_load_rules = File.join(node['environment_v2']['nftables']['load_path'], 'rules', host)
+  # nftables_rules = []
+  # nftables_defines = {}
+  #
+  # node['environment_v2']['set'].each do |k, v|
+  #   case v
+  #   when Hash
+  #     if !v['vip_lan'].nil?
+  #       nftables_defines["vip_#{k}"] = v['vip_lan']
+  #     end
+  #   end
+  # end
+  #
+  # node['environment_v2']['host'][host].each do |k, v|
+  #   case v
+  #   when String,Integer
+  #     nftables_defines["host_#{k}"] = v
+  #   end
+  # end
+  #
+  # nftables_defines.each do |k, v|
+  #   nftables_rules << "define #{k.gsub('-', '_')} = #{v}"
+  # end
+  #
+  # nftables_rules << %Q{include "#{nftables_load_rules}"}
+  # nftables_rules << ''
 
 
   directories = [
@@ -70,16 +72,16 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "contents" => "data:,#{host}"
     },
     ## nftables
-    {
-      "path" => node['environment_v2']['nftables']['defines_rules'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(nftables_rules.join($/))}"
-    },
-    {
-      "path" => nftables_load_rules,
-      "mode" => 420,
-      "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
-    },
+    # {
+    #   "path" => node['environment_v2']['nftables']['defines_rules'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(nftables_rules.join($/))}"
+    # },
+    # {
+    #   "path" => nftables_load_rules,
+    #   "mode" => 420,
+    #   "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
+    # },
     ## sysctl
     {
       "path" => "/etc/sysctl.d/ipforward.conf",
@@ -192,41 +194,41 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         }
       ]
     },
-    {
-      "name" => "nftables.service",
-      "contents" => {
-        "Unit" => {
-          "Wants" => "network-pre.target",
-          "Before" => "network-pre.target",
-          # "ConditionPathExists" => nftables_load_rules
-        },
-        "Service" => {
-          "Type" => "oneshot",
-          "ExecStartPre" => "-/usr/sbin/nft flush ruleset",
-          "ExecStart" => "/usr/sbin/nft -f #{node['environment_v2']['nftables']['defines_rules']}"
-        },
-        "Install" => {
-          "WantedBy" => "multi-user.target"
-        }
-      }
-    },
-    {
-      "name" => "nftables.path",
-      "contents" => {
-        # "Unit" => {
-        #   "Wants" => "network-pre.target",
-        #   "Before" => "network-pre.target",
-        #   "ConditionPathExists" => nftables_load_rules
-        # },
-        "Path" => {
-          "PathChanged" => nftables_load_rules,
-          "PathExists" => nftables_load_rules
-        },
-        "Install" => {
-          "WantedBy" => "multi-user.target"
-        }
-      }
-    }
+    # {
+    #   "name" => "nftables.service",
+    #   "contents" => {
+    #     "Unit" => {
+    #       "Wants" => "network-pre.target",
+    #       "Before" => "network-pre.target",
+    #       # "ConditionPathExists" => nftables_load_rules
+    #     },
+    #     "Service" => {
+    #       "Type" => "oneshot",
+    #       "ExecStartPre" => "-/usr/sbin/nft flush ruleset",
+    #       "ExecStart" => "/usr/sbin/nft -f #{node['environment_v2']['nftables']['defines_rules']}"
+    #     },
+    #     "Install" => {
+    #       "WantedBy" => "multi-user.target"
+    #     }
+    #   }
+    # },
+    # {
+    #   "name" => "nftables.path",
+    #   "contents" => {
+    #     # "Unit" => {
+    #     #   "Wants" => "network-pre.target",
+    #     #   "Before" => "network-pre.target",
+    #     #   "ConditionPathExists" => nftables_load_rules
+    #     # },
+    #     "Path" => {
+    #       "PathChanged" => nftables_load_rules,
+    #       "PathExists" => nftables_load_rules
+    #     },
+    #     "Install" => {
+    #       "WantedBy" => "multi-user.target"
+    #     }
+    #   }
+    # }
   ]
 
   node.default['ignition']['configs'][host] = {

@@ -55,13 +55,6 @@ file node['kubernetes']['cert_path'] do
 end
 
 
-server_alias = [
-  node['environment_v2']['set']['kube-master']['alias'],
-  node['environment_v2']['domain']['vip_lan'],
-  node['environment_v2']['domain']['top']
-].join('.')
-
-
 kubelet_kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -70,8 +63,7 @@ kubelet_kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        # "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
-        "server" => "https://#{server_alias}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
   ],
