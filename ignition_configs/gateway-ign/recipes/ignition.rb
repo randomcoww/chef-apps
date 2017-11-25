@@ -17,73 +17,12 @@ sysctl_config = [
 ].join($/)
 
 
-# cert_generator = OpenSSLHelper::CertGenerator.new(
-#   'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
-# )
-# ca = cert_generator.root_ca
-
-
-# kube_config = {
-#   "apiVersion" => "v1",
-#   "kind" => "Config",
-#   "clusters" => [
-#     {
-#       "name" => node['kubernetes']['cluster_name'],
-#       "cluster" => {
-#         "certificate-authority" => node['kubernetes']['ca_path'],
-#         "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
-#       }
-#     }
-#   ],
-#   "users" => [
-#     {
-#       "name" => "kube",
-#       "user" => {
-#         "client-certificate" => node['kubernetes']['cert_path'],
-#         "client-key" => node['kubernetes']['key_path'],
-#       }
-#     }
-#   ],
-#   "contexts" => [
-#     {
-#       "name" => "kube-context",
-#       "context" => {
-#         "cluster" => node['kubernetes']['cluster_name'],
-#         "user" => "kube"
-#       }
-#     }
-#   ],
-#   "current-context" => "kube-context"
-# }
-
-
 node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
   ip_lan = node['environment_v2']['host'][host]['ip_lan']
   if_lan = node['environment_v2']['host'][host]['if_lan']
   if_wan = node['environment_v2']['host'][host]['if_wan']
 
-  ##
-  ## kube ssl
-  ##
-  # etcd_key = etcd_cert_generator.generate_key
-  # etcd_cert = etcd_cert_generator.node_cert(
-  #   [
-  #     ['CN', "etcd-#{host}"]
-  #   ],
-  #   etcd_key,
-  #   {
-  #     "basicConstraints" => "CA:FALSE",
-  #     "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-  #   },
-  #   {
-  #     'DNS.1' => [
-  #       '*',
-  #       node['environment_v2']['domain']['host_lan'],
-  #       node['environment_v2']['domain']['top']
-  #     ].join('.')
-  #   }
-  # )
 
   ##
   ## nftables
@@ -146,29 +85,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "path" => "/etc/sysctl.d/ipforward.conf",
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(sysctl_config)}"
-    },
-    ## kube ssl
-    # {
-    #   "path" => node['kubernetes']['key_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(key.to_pem)}"
-    # },
-    # {
-    #   "path" => node['kubernetes']['cert_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(cert.to_pem)}"
-    # },
-    # {
-    #   "path" => node['kubernetes']['ca_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
-    # },
-    ## kubeconfig
-    # {
-    #   "path" => node['kubernetes']['client']['kubeconfig_path'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
-    # }
+    }
   ]
 
   networkd = [
@@ -213,9 +130,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
           "UseHostname" => "false",
           "UseDomains" => "false",
           "UseTimezone" => "no",
-          "RouteMetric" => 1024,
-          # "IPMasquerade" => "yes",
-          # "IPForward" => "ipv4"
+          "RouteMetric" => 1024
         }
       }
     }
@@ -234,8 +149,6 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
               "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
               "--mount volume=dns,target=/etc/resolv.conf",
-              # "--volume ssl,kind=host,source=#{node['kubernetes']['srv_path']}",
-              # "--mount volume=ssl,target=#{node['kubernetes']['srv_path']}"
             ].join(' ')}"}
           ],
           "ExecStartPre" => [
@@ -245,20 +158,14 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            # "--register-schedulable=false",
             "--register-node=true",
             "--cni-conf-dir=/etc/kubernetes/cni/net.d",
-            # "--network-plugin=${NETWORK_PLUGIN}",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            # "--hostname-override=#{ip_lan}",
             "--make-iptables-util-chains=false",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            # "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
-            # "--tls-cert-file=#{node['kubernetes']['cert_path']}",
-            # "--tls-private-key-file=#{node['kubernetes']['key_path']}",
             "--docker-disable-shared-pid=false"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",

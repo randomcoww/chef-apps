@@ -47,8 +47,6 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     },
     {
       'DNS.1' => [host, domain].join('.'),
-      # 'DNS.1' => ['*', domain].join('.'),
-      # 'IP.1' => node['environment_v2']['set']['haproxy']['vip_lan']
     }
   )
 
@@ -66,7 +64,6 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      # 'DNS.1' => [host, domain].join('.'),
       'DNS.1' => ['*', domain].join('.')
     }
   )

@@ -17,7 +17,6 @@ flannel_manifest = {
           "/opt/bin/flanneld",
           "--ip-masq",
           "--kube-subnet-mgr",
-          "--kube-api-url=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}",
           "--kubeconfig-file=#{node['kubernetes']['client']['kubeconfig_path']}"
         ],
         "securityContext" => {
@@ -109,7 +108,6 @@ kube_proxy_manifest = {
         "command": [
           "/hyperkube",
           "proxy",
-          "--master=https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}",
           "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
         ],
         "securityContext": {
