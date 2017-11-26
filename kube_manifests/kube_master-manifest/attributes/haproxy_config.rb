@@ -21,13 +21,9 @@ node['environment_v2']['set'].each_value do |set|
           'maxconn' => 2000
         }
 
-        backend = []
-        set['hosts'].each do |host|
-          backend << "#{host} #{[host, lan_domain].join('.')}:#{c['port']} init-addr libc,none resolvers default"
-        end
-
         services["backend #{service}"] = {
-          "server" => backend
+          "{{range $node, $host := $.Nodes}}server" => "{{$node.NodeName}} {{$host.InternalIP}}:#{c['port']} check
+  {{end}}"
         }
       end
     end
@@ -51,13 +47,10 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
     'master-worker' => 'exit-on-failure',
     'pidfile' => '/var/run/haproxy.pid'
   },
-  'resolvers default' => {
-    # 'nameserver' => node['environment_v2']['set']['ns']['hosts'].map { |e|
-    #   "#{e} #{node['environment_v2']['host'][e]['ip_lan']}:53"
-    # },
-    'nameserver' => "vip #{node['environment_v2']['set']['ns']['vip_lan']}:53",
-    'resolve_retries' => 3
-  },
+  # 'resolvers default' => {
+  #   'nameserver' => "vip #{node['environment_v2']['set']['ns']['vip_lan']}:53",
+  #   'resolve_retries' => 3
+  # },
   'defaults' => {
     'timeout' => [
       'connect 5000ms',
@@ -71,28 +64,38 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
       'dontlognull',
       'redispatch'
     ],
-    # 'stats' => 'uri /haproxy-status'
   }
 }.merge(services))
 
+# haproxy_template = [
+#   '{{range $index, $element := .}}{{if $element.NodePort}}',
+#   HaproxyHelper::ConfigGenerator.generate_from_hash({
+#     'frontend {{$index.ServiceName}}_{{$index.PortName}}' => {
+#       'default_backend' => '{{$index.ServiceName}}_{{$index.PortName}}',
+#       'bind' => '*:{{$element.Port}}',
+#       'maxconn' => 2000
+#     },
+#     'backend {{$index.ServiceName}}_{{$index.PortName}}' => {
+#       'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
+#         "#{e} #{[e, lan_domain].join('.')}:{{$element.NodePort}} init-addr libc,none resolvers default"
+#       }
+#     }
+#   }),
+#   '{{end}}{{end}}'
+# ].join($/)
 
-haproxy_template = [
-  '{{range $index, $element := .}}{{if $element.NodePort}}',
-  HaproxyHelper::ConfigGenerator.generate_from_hash({
-    'frontend {{$index.ServiceName}}_{{$index.PortName}}' => {
-      'default_backend' => '{{$index.ServiceName}}_{{$index.PortName}}',
-      'bind' => '*:{{$element.Port}}',
-      'maxconn' => 2000
-    },
-    'backend {{$index.ServiceName}}_{{$index.PortName}}' => {
-      'server' => node['environment_v2']['set']['kube-master']['hosts'].map { |e|
-        "#{e} #{[e, lan_domain].join('.')}:{{$element.NodePort}} init-addr libc,none resolvers default"
-      }
-    }
-  }),
-  '{{end}}{{end}}'
-].join($/)
 
+haproxy_template = <<-EOF
+{{range $service, $ports := $.Services}}{{if $ports.NodePort}}
+frontend {{$service.ServiceName}}_{{$service.PortName}}
+  default_backend {{$service.ServiceName}}_{{$service.PortName}}
+  bind *:{{$ports.Port}}
+  maxconn 2000
+backend {{$service.ServiceName}}_{{$service.PortName}}
+  {{range $node, $host := $.Nodes}}server {{$node.NodeName}} {{$host.InternalIP}}:{{$ports.NodePort}} check
+  {{end}}
+{{end}}{{end}}
+EOF
 
 # node.default['kube_manifests']['haproxy']['config'] = haproxy_config
 node.default['kube_manifests']['haproxy']['template'] = [haproxy_config, haproxy_template].join($/)
