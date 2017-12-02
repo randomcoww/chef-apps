@@ -1,32 +1,8 @@
-node.default['kube']['images']['mysql_cluster_mysqld'] = "randomcoww/k8s-mysql_cluster_mysqld:latest"
-node.default['kube']['images']['mysql_cluster_ndbd'] = "randomcoww/k8s-mysql_cluster_ndbd:latest"
-node.default['kube']['images']['mysql_cluster_ndb_mgmd'] = "randomcoww/k8s-mysql_cluster_ndb_mgmd:latest"
-node.default['kube']['images']['mysql_cluster_seeder'] = "randomcoww/k8s-mysql_cluster_seeder:latest"
-node.default['kube']['images']['kea_dhcp4'] = "randomcoww/k8s-kea:latest"
-node.default['kube']['images']['kea_dhcp_ddns'] = "randomcoww/k8s-kea:latest"
-# node.default['kube']['images']['haproxy'] = "randomcoww/k8s-haproxy:latest"
-node.default['kube']['images']['keepalived'] = "randomcoww/k8s-keepalived:latest"
-node.default['kube']['images']['ddclient'] = "randomcoww/k8s-ddclient:latest"
-node.default['kube']['images']['knot'] = "randomcoww/k8s-knot:latest"
-node.default['kube']['images']['nsd'] = "randomcoww/k8s-nsd:latest"
-node.default['kube']['images']['unbound'] = "randomcoww/k8s-unbound:latest"
-node.default['kube']['images']['openvpn'] = "randomcoww/k8s-openvpn:latest"
-node.default['kube']['images']['sshd'] = "randomcoww/k8s-sshd:latest"
-node.default['kube']['images']['env_writer'] = "randomcoww/env_writer:latest"
-node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:latest"
-node.default['kube']['images']['nftables'] = "randomcoww/k8s-nftables:latest"
-node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:latest"
-node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:latest"
-node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.0-amd64"
-node.default['kube']['images']['haproxy'] = "haproxy:1.8-alpine"
-# node.default['kube']['images']['kube_dashboard'] = "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.7.1"
-
-
 ##
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.8.1'
+node.default['kubernetes']['version'] = '1.8.4'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -95,11 +71,29 @@ node.default['kubernetes']['manifests_path'] = '/config/manifests'
 node.default['kubernetes']['kubectl']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kubectl"
 node.default['kubernetes']['kubectl']['binary_path'] = "/usr/local/bin/kubectl"
 
-
-node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
-
-
 node.default['kubernetes']['client']['kubeconfig_path'] = '/var/lib/kubelet/client_kubeconfig'
 node.default['kubernetes']['kubectl']['kubeconfig_path'] = '/var/lib/kubectl/kubeconfig'
 
 node.default['environment_v2']['url']['manifests'] = 'https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests'
+
+
+##
+## images
+##
+node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
+node.default['kube']['images']['mysql_cluster'] = "randomcoww/mysql_cluster:20171201.06"
+node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:20171201.05"
+node.default['kube']['images']['haproxy'] = "haproxy:1.8.0-alpine"
+node.default['kube']['images']['keepalived'] = "randomcoww/keepalived:20171201.08"
+node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171201.01"
+node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171201.06"
+node.default['kube']['images']['nftables'] = "randomcoww/nftables:20171201.01"
+node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:20171201.01"
+node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20171201.01"
+node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.1-amd64"
+# node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
+
+# node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
+# node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"
+# node.default['kube']['images']['transmission'] = "randomcoww/transmission:20171201.01"
+# node.default['kube']['images']['mpd'] = "randomcoww/mpd:20171201.01"

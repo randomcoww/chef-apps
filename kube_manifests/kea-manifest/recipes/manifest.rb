@@ -10,8 +10,9 @@ ndbd_manifest = {
     "containers" => [
       {
         "name" => "ndbd",
-        "image" => node['kube']['images']['mysql_cluster_ndbd'],
+        "image" => node['kube']['images']['mysql_cluster'],
         "args" => [
+          "/ndbd-entrypoint",
           %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['host_ips'].join(',')}}
         ],
         "volumeMounts" => [
@@ -43,8 +44,9 @@ mysqld_manifest = {
     "containers" => [
       {
         "name" => "mysqld",
-        "image" => node['kube']['images']['mysql_cluster_mysqld'],
+        "image" => node['kube']['images']['mysql_cluster'],
         "args" => [
+          "/mysqld-entrypoint",
           "--ndbcluster",
           "--default_storage_engine=ndbcluster",
           "--bind-address=0.0.0.0",
@@ -77,8 +79,9 @@ kea_manifest = {
     "initContainers" => [
       {
         "name" => "kea-mysql-seeder",
-        "image" => node['kube']['images']['mysql_cluster_seeder'],
+        "image" => node['kube']['images']['mysql_cluster'],
         "args" => [
+          "/seeder",
           "--host=127.0.0.1",
           "--user=#{node['mysql_credentials']['kea']['username']}",
           "--password=#{node['mysql_credentials']['kea']['password']}"
@@ -140,8 +143,9 @@ node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index
       "containers" => [
         {
           "name" => "ndb-mgmd",
-          "image" => node['kube']['images']['mysql_cluster_ndb_mgmd'],
+          "image" => node['kube']['images']['mysql_cluster'],
           "args" => [
+            "/ndb_mgmd-entrypoint",
             "--ndb-nodeid=#{index}"
           ],
           "env" => [

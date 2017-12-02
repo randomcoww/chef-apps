@@ -110,7 +110,7 @@ EOF
       "initContainers" => [
         {
           "name" => "nftables",
-          "image" => "randomcoww/k8s-nftables:latest",
+          "image" => node['kube']['images']['nftables'],
           "securityContext" => {
             "capabilities" => {
               "add" => [
