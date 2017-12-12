@@ -19,45 +19,6 @@ sysctl_config = [
 
 node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
-  ip_lan = node['environment_v2']['host'][host]['ip_lan']
-  if_lan = node['environment_v2']['host'][host]['if_lan']
-  if_wan = node['environment_v2']['host'][host]['if_wan']
-
-
-  ##
-  ## add basic nftables rules
-  ##
-
-
-
-  # nftables_load_rules = File.join(node['environment_v2']['nftables']['load_path'], 'rules', host)
-  # nftables_rules = []
-  # nftables_defines = {}
-  #
-  # node['environment_v2']['set'].each do |k, v|
-  #   case v
-  #   when Hash
-  #     if !v['vip_lan'].nil?
-  #       nftables_defines["vip_#{k}"] = v['vip_lan']
-  #     end
-  #   end
-  # end
-  #
-  # node['environment_v2']['host'][host].each do |k, v|
-  #   case v
-  #   when String,Integer
-  #     nftables_defines["host_#{k}"] = v
-  #   end
-  # end
-  #
-  # nftables_defines.each do |k, v|
-  #   nftables_rules << "define #{k.gsub('-', '_')} = #{v}"
-  # end
-  #
-  # nftables_rules << %Q{include "#{nftables_load_rules}"}
-  # nftables_rules << ''
-
-
   directories = [
     # {
     #   "path" => node['environment_v2']['nftables']['load_path'],
@@ -71,17 +32,6 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
       "mode" => 420,
       "contents" => "data:,#{host}"
     },
-    ## nftables
-    # {
-    #   "path" => node['environment_v2']['nftables']['defines_rules'],
-    #   "mode" => 420,
-    #   "contents" => "data:;base64,#{Base64.encode64(nftables_rules.join($/))}"
-    # },
-    # {
-    #   "path" => nftables_load_rules,
-    #   "mode" => 420,
-    #   "contents" => "#{node['environment_v2']['url']['nftables']}/#{host}"
-    # },
     ## sysctl
     {
       "path" => "/etc/sysctl.d/ipforward.conf",
@@ -90,39 +40,25 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     }
   ]
 
-  networkd = [
-    {
-      "name" => "#{if_lan}.network",
+
+  networkd = []
+
+  wan_interface = node['environment_v2']['host'][host]['if']['wan']
+  if !wan_interface.nil?
+
+    networkd << {
+      "name" => "#{wan_interface}.network",
       "contents" => {
         "Match" => {
-          "Name" => if_lan
+          "Name" => wan_interface
         },
         "Network" => {
           "LinkLocalAddressing" => "no",
-          "DHCP" => "no",
+          "DHCP" => "yes",
           "DNS" => [
             '127.0.0.1',
             '8.8.8.8'
           ]
-        },
-        "Address" => {
-          "Address" => "#{ip_lan}/#{node['environment_v2']['subnet']['lan'].split('/').last}"
-        },
-        "Route" => {
-          "Gateway" => node['environment_v2']['set']['gateway']['vip_lan'],
-          "Metric" => 2048
-        }
-      }
-    },
-    {
-      "name" => "#{if_wan}.network",
-      "contents" => {
-        "Match" => {
-          "Name" => if_wan
-        },
-        "Network" => {
-          "LinkLocalAddressing" => "no",
-          "DHCP" => "yes"
         },
         "DHCP" => {
           "UseDNS" => "false",
@@ -136,7 +72,43 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         }
       }
     }
-  ]
+  end
+
+
+  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
+
+    interface = node['environment_v2']['host'][host]['if'][i]
+    addr = node['environment_v2']['host'][host]['ip'][i]
+    vip_route = node['environment_v2']['set']['gateway']['vip'][i]
+
+    if !interface.nil? &&
+      !addr.nil? &&
+      !vip_route.nil?
+
+      subnet_mask = node['environment_v2']['subnet'][i].split('/').last
+
+      networkd << {
+        "name" => "#{interface}.network",
+        "contents" => {
+          "Match" => {
+            "Name" => interface
+          },
+          "Network" => {
+            "LinkLocalAddressing" => "no",
+            "DHCP" => "no",
+          },
+          "Address" => {
+            "Address" => "#{addr}/#{subnet_mask}"
+          },
+          "Route" => {
+            "Gateway" => vip_route,
+            "Metric" => 2048
+          }
+        }
+      }
+    end
+  end
+
 
   systemd = [
     {
@@ -193,42 +165,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
           }
         }
       ]
-    },
-    # {
-    #   "name" => "nftables.service",
-    #   "contents" => {
-    #     "Unit" => {
-    #       "Wants" => "network-pre.target",
-    #       "Before" => "network-pre.target",
-    #       # "ConditionPathExists" => nftables_load_rules
-    #     },
-    #     "Service" => {
-    #       "Type" => "oneshot",
-    #       "ExecStartPre" => "-/usr/sbin/nft flush ruleset",
-    #       "ExecStart" => "/usr/sbin/nft -f #{node['environment_v2']['nftables']['defines_rules']}"
-    #     },
-    #     "Install" => {
-    #       "WantedBy" => "multi-user.target"
-    #     }
-    #   }
-    # },
-    # {
-    #   "name" => "nftables.path",
-    #   "contents" => {
-    #     # "Unit" => {
-    #     #   "Wants" => "network-pre.target",
-    #     #   "Before" => "network-pre.target",
-    #     #   "ConditionPathExists" => nftables_load_rules
-    #     # },
-    #     "Path" => {
-    #       "PathChanged" => nftables_load_rules,
-    #       "PathExists" => nftables_load_rules
-    #     },
-    #     "Install" => {
-    #       "WantedBy" => "multi-user.target"
-    #     }
-    #   }
-    # }
+    }
   ]
 
   node.default['ignition']['configs'][host] = {

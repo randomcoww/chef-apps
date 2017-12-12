@@ -5,5 +5,3 @@ metadata
 
 cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
 cookbook "haproxy_resource", github: "randomcoww/chef-haproxy_resource"
-cookbook "dbag", github: "randomcoww/chef-dbag"
-cookbook "keepalived_resource", github: "randomcoww/chef-keepalived_resource"

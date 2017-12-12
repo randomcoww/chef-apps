@@ -145,6 +145,6 @@ kube_proxy_manifest = {
 }
 
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
-  node.default['kubernetes']['static_pods'][host]['flannel.yaml'] = flannel_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest.yaml'] = kube_proxy_manifest
+  node.default['kubernetes']['static_pods'][host]['flannel'] = flannel_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
 end

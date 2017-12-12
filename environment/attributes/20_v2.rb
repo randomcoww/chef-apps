@@ -1,14 +1,14 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 
-node.default['environment_v2']['subnet']['dhcp_pool_lan'] = "192.168.62.32/27"
-node.default['environment_v2']['subnet']['dhcp_pool_store'] = "192.168.126.32/27"
-node.default['environment_v2']['domain']['rev_lan'] = '168.192.in-addr.arpa'
+node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.32/27"
+node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.32/27"
 
+node.default['environment_v2']['domain']['rev'] = '168.192.in-addr.arpa'
 node.default['environment_v2']['domain']['top'] = 'internal'
-node.default['environment_v2']['domain']['vip_lan'] = 'svc'
-node.default['environment_v2']['domain']['host_lan'] = 'lan'
-node.default['environment_v2']['domain']['host_store'] = 'san'
+node.default['environment_v2']['domain']['vip'] = 'svc'
+node.default['environment_v2']['domain']['lan'] = 'lan'
+node.default['environment_v2']['domain']['store'] = 'san'
 
 
 ##
@@ -18,23 +18,27 @@ node.default['environment_v2']['domain']['host_store'] = 'san'
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
     'gateway1',
-    # 'gateway2'
+    'gateway2'
   ],
-  'vip_lan' => "192.168.62.240"
+  'vip' => {
+    'lan' => "192.168.62.240",
+  }
 }
 
 node.default['environment_v2']['set']['ns'] = {
   'hosts' => [
     'gateway1',
-    # 'gateway2'
+    'gateway2'
   ],
-  'vip_lan' => "192.168.62.241"
+  'vip' => {
+    'lan' => "192.168.62.241",
+  }
 }
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
     'gateway1',
-    # 'gateway2'
+    'gateway2'
   ]
 }
 
@@ -43,7 +47,9 @@ node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
     'kube-master',
   ],
-  'vip_lan' => "192.168.62.242",
+  'vip' => {
+    'lan' => "192.168.62.242",
+  }
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
@@ -95,50 +101,64 @@ node.default['environment_v2']['set']['flannel'] = {
 ##
 
 node.default['environment_v2']['host']['gateway1'] = {
-  'ip_lan' => "192.168.62.217",
-  'if_lan' => 'eth0',
-  'if_wan' => 'eth1',
-  'mac_wan' => "52:54:00:63:6e:b0",
+  'ip' => {
+    'lan' => "192.168.62.217"
+  },
+  'if' => {
+    'lan' => "eth0",
+    'wan' => "eth1",
+  },
+  'mac' => {
+    "wan" => "52:54:00:63:6e:b0"
+  },
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['gateway2'] = {
-  'ip_lan' => "192.168.62.218",
-  'if_lan' => 'eth0',
-  'if_wan' => 'eth1',
-  'mac_wan' => "52:54:00:63:6e:b1",
+  'ip' => {
+    'lan' => "192.168.62.218"
+  },
+  'if' => {
+    'lan' => "eth0",
+    'wan' => "eth1",
+  },
+  'mac' => {
+    "wan" => "52:54:00:63:6e:b1"
+  },
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
-  'if_lan' => 'eth0',
+  'if' => {
+    'lan' => "eth0",
+  },
   'memory' => 4096,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['etcd2'] = {
-  'if_lan' => 'eth0',
+  'if' => {
+    'lan' => "eth0",
+  },
   'memory' => 4096,
   'vcpu' => 2
 }
 
-# node.default['environment_v2']['host']['etcd3'] = {
-#   'if_lan' => 'eth0',
-#   'memory' => 4096,
-#   'vcpu' => 2
-# }
-
 
 node.default['environment_v2']['host']['kube-master'] = {
-  'if_lan' => 'eth0',
+  'if' => {
+    'lan' => "eth0",
+  },
   'memory' => 8192,
   'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['kube-worker'] = {
-  'if_lan' => 'eth0',
+  'if' => {
+    'lan' => "eth0",
+  },
   'memory' => 8192,
   'vcpu' => 6
 }
@@ -149,11 +169,15 @@ node.default['environment_v2']['host']['kube-worker'] = {
 ##
 
 node.default['environment_v2']['host']['vm1'] = {
-  'ip_lan' => '192.168.62.251',
-  'ip_store' => '192.168.126.251',
-  'if_lan' => 'eno1',
-  'if_wan' => 'eno2',
-  'if_store' => 'ens1',
+  'ip' => {
+    'lan' => '192.168.62.251',
+    'store' => '192.168.126.251',
+  },
+  'if' => {
+    'lan' => "eno1",
+    'wan' => "eno2",
+    'store' => "ens1",
+  },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -170,11 +194,15 @@ node.default['environment_v2']['host']['vm1'] = {
 }
 
 node.default['environment_v2']['host']['vm2'] = {
-  'ip_lan' => '192.168.62.252',
-  'ip_store' => '192.168.126.252',
-  'if_lan' => 'eno1',
-  'if_wan' => 'eno2',
-  'if_store' => 'ens1',
+  'ip' => {
+    'lan' => '192.168.62.252',
+    'store' => '192.168.126.252',
+  },
+  'if' => {
+    'lan' => "eno1",
+    'wan' => "eno2",
+    'store' => "ens1",
+  },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
@@ -185,15 +213,21 @@ node.default['environment_v2']['host']['vm2'] = {
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
-  'ip_lan' => '192.168.63.61'
+  'ip' => {
+    'lan' => '192.168.63.61'
+  }
 }
 
 node.default['environment_v2']['host']['vm2-ipmi'] = {
-  'ip_lan' => '192.168.63.62'
+  'ip' => {
+    'lan' => '192.168.63.62'
+  }
 }
 
 node.default['environment_v2']['host']['sw'] = {
-  'ip_lan' => '192.168.63.95'
+  'ip' => {
+    'lan' => '192.168.63.95'
+  }
 }
 
 ## load current host under 'current_host'

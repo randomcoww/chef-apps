@@ -131,7 +131,7 @@ kea_manifest = {
 
 node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index|
 
-  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndb-mgmd.yaml'] = {
+  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndb-mgmd'] = {
     "apiVersion" => "v1",
     "kind" => "Pod",
     "metadata" => {
@@ -159,7 +159,7 @@ node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index
     }
   }
 
-  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd.yaml'] = ndbd_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld.yaml'] = mysqld_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-mysql.yaml'] = kea_manifest
+  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd'] = ndbd_manifest
+  node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld'] = mysqld_manifest
+  node.default['kubernetes']['static_pods'][host]['kea-mysql'] = kea_manifest
 end

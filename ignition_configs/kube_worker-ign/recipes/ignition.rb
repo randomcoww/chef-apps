@@ -31,7 +31,7 @@ kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip_lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip']['lan']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
       }
     }
   ],
@@ -71,8 +71,6 @@ flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
 
 
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
-
-  if_lan = node['environment_v2']['host'][host]['if_lan']
 
   ##
   ## kube ssl
@@ -139,24 +137,33 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
     }
   ]
 
-  networkd = [
-    {
-      "name" => "#{if_lan}.network",
-      "contents" => {
-        "Match" => {
-          "Name" => if_lan
-        },
-        "Network" => {
-          "LinkLocalAddressing" => "no",
-          "DHCP" => "yes",
-        },
-        "DHCP" => {
-          "UseDNS" => "true",
-          "RouteMetric" => 500
+
+  networkd = []
+
+  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
+
+    interface = node['environment_v2']['host'][host]['if'][i]
+    if !interface.nil?
+
+      networkd << {
+        "name" => "#{interface}.network",
+        "contents" => {
+          "Match" => {
+            "Name" => interface
+          },
+          "Network" => {
+            "LinkLocalAddressing" => "no",
+            "DHCP" => "yes",
+          },
+          "DHCP" => {
+            "UseDNS" => "true",
+            "RouteMetric" => 500,
+            # "UseHostname" => "%m"
+          }
         }
       }
-    }
-  ]
+    end
+  end
 
 
   systemd = [

@@ -47,10 +47,6 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
     # 'master-worker' => 'exit-on-failure',
     'pidfile' => '/var/run/haproxy.pid'
   },
-  # 'resolvers default' => {
-  #   'nameserver' => "vip #{node['environment_v2']['set']['ns']['vip_lan']}:53",
-  #   'resolve_retries' => 3
-  # },
   'defaults' => {
     'timeout' => [
       'connect 5000ms',

@@ -64,8 +64,6 @@ flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
-  if_lan = node['environment_v2']['host'][host]['if_lan']
-
   ##
   ## etcd ssl
   ##
@@ -103,7 +101,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       # 'DNS.5' => [host, domain].join('.'),
       # 'DNS.5' => ['*', domain].join('.'),
       'IP.1' => node['kubernetes']['cluster_service_ip'],
-      'IP.2' => node['environment_v2']['set']['haproxy']['vip_lan']
+      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['lan']
     }
   )
 
@@ -172,24 +170,33 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     }
   ]
 
-  networkd = [
-    {
-      "name" => "#{if_lan}.network",
-      "contents" => {
-        "Match" => {
-          "Name" => if_lan
-        },
-        "Network" => {
-          "LinkLocalAddressing" => "no",
-          "DHCP" => "yes",
-        },
-        "DHCP" => {
-          "UseDNS" => "true",
-          "RouteMetric" => 500
+
+  networkd = []
+
+  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
+
+    interface = node['environment_v2']['host'][host]['if'][i]
+    if !interface.nil?
+
+      networkd << {
+        "name" => "#{interface}.network",
+        "contents" => {
+          "Match" => {
+            "Name" => interface
+          },
+          "Network" => {
+            "LinkLocalAddressing" => "no",
+            "DHCP" => "yes",
+          },
+          "DHCP" => {
+            "UseDNS" => "true",
+            "RouteMetric" => 500,
+            # "UseHostname" => "%m"
+          }
         }
       }
-    }
-  ]
+    end
+  end
 
 
   systemd = [

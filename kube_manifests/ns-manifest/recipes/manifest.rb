@@ -23,5 +23,5 @@ unbound_manifest = {
 }
 
 node['environment_v2']['set']['ns']['hosts'].each do |host|
-  node.default['kubernetes']['static_pods'][host]['unbound.yaml'] = unbound_manifest
+  node.default['kubernetes']['static_pods'][host]['unbound'] = unbound_manifest
 end
