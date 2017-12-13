@@ -93,7 +93,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       'DNS.3' => 'kubernetes.default.svc',
       'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
       'IP.1' => node['kubernetes']['cluster_service_ip'],
-      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['lan']
+      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store']
     }
   )
 

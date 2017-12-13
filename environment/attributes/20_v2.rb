@@ -49,7 +49,7 @@ node.default['environment_v2']['set']['haproxy'] = {
     'kube-master',
   ],
   'vip' => {
-    'lan' => "192.168.62.242",
+    'store' => "192.168.126.242",
   }
 }
 
@@ -137,7 +137,7 @@ node.default['environment_v2']['host']['gateway2'] = {
 
 node.default['environment_v2']['host']['etcd1'] = {
   'if' => {
-    'lan' => "eth0",
+    'store' => "eth0",
   },
   'memory' => 4096,
   'vcpu' => 2
@@ -145,7 +145,7 @@ node.default['environment_v2']['host']['etcd1'] = {
 
 node.default['environment_v2']['host']['etcd2'] = {
   'if' => {
-    'lan' => "eth0",
+    'store' => "eth0",
   },
   'memory' => 4096,
   'vcpu' => 2
@@ -154,7 +154,7 @@ node.default['environment_v2']['host']['etcd2'] = {
 
 node.default['environment_v2']['host']['kube-master'] = {
   'if' => {
-    'lan' => "eth0",
+    'store' => "eth0",
   },
   'memory' => 8192,
   'vcpu' => 2
@@ -162,7 +162,7 @@ node.default['environment_v2']['host']['kube-master'] = {
 
 node.default['environment_v2']['host']['kube-worker'] = {
   'if' => {
-    'lan' => "eth0",
+    'store' => "eth0",
   },
   'memory' => 8192,
   'vcpu' => 6
@@ -175,7 +175,6 @@ node.default['environment_v2']['host']['kube-worker'] = {
 
 node.default['environment_v2']['host']['vm1'] = {
   'ip' => {
-    'lan' => '192.168.62.251',
     'store' => '192.168.126.251',
   },
   'if' => {
@@ -200,7 +199,6 @@ node.default['environment_v2']['host']['vm1'] = {
 
 node.default['environment_v2']['host']['vm2'] = {
   'ip' => {
-    'lan' => '192.168.62.252',
     'store' => '192.168.126.252',
   },
   'if' => {
