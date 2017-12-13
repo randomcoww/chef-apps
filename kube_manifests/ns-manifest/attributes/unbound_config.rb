@@ -3,82 +3,62 @@ cname_records = []
 srv_records = []
 
 node['environment_v2']['host'].each do |hostname, d|
-  if !d['ip_lan'].nil?
-    a_records << {
-        name: [
-          hostname,
-          node['environment_v2']['domain']['host_lan'],
-          node['environment_v2']['domain']['top']
-        ].join('.'),
-        ttl: 300,
-        host: d['ip_lan']
-      }
-  end
+  if d['ip'].is_a?(Hash)
 
-  if !d['ip_store'].nil?
-    a_records << {
-        name: [
-          hostname,
-          node['environment_v2']['domain']['host_store'],
-          node['environment_v2']['domain']['top']
-        ].join('.'),
-        ttl: 300,
-        host: d['ip_store']
-      }
+    d['ip'].each do |i, addr|
+      a_records << {
+          name: [
+            hostname,
+            node['environment_v2']['domain']['host'],
+            node['environment_v2']['domain']['top']
+          ].join('.'),
+          ttl: 300,
+          host: addr
+        }
+    end
   end
 end
 
-node['environment_v2']['set'].each do |set, d|
-  if !d['vip_lan'].nil?
-    a_records << {
-        name: [
-          set,
-          node['environment_v2']['domain']['vip_lan'],
-          node['environment_v2']['domain']['top']
-        ].join('.'),
-        ttl: 300,
-        host: d['vip_lan']
-      }
-  end
+node['environment_v2']['set'].each do |hostname, d|
+  if d['vip'].is_a?(Hash)
 
-  if !d['alias'].nil? &&
-    d['hosts'].is_a?(Array)
-
-    d['hosts'].each do |hostname|
-      cname_records << {
-        name: [
-          d['alias'],
-          node['environment_v2']['domain']['vip_lan'],
-          node['environment_v2']['domain']['top']
-        ].join('.'),
-        ttl: 300,
-        host: [
-          hostname,
-          node['environment_v2']['domain']['host_lan'],
-          node['environment_v2']['domain']['top']
-        ].join('.')
-      }
+    d['vip'].each do |i, addr|
+      a_records << {
+          name: [
+            hostname,
+            node['environment_v2']['domain']['vip'],
+            node['environment_v2']['domain']['top']
+          ].join('.'),
+          ttl: 300,
+          host: addr
+        }
     end
   end
 
-  if d['services'].is_a?(Hash)
+  if d['services'].is_a?(Hash) &&
+    d['hosts'].is_a?(Array)
+
     d['services'].each do |service, c|
-      d['hosts'].each do |host|
+
+      port = c['port']
+      next if !port.is_a?(Integer)
+
+      d['hosts'].each do |hostname|
 
         srv_records << {
           name: [
             "_#{service}",
-            "_#{c['proto']}",
-            node['environment_v2']['domain']['host_lan'],
+            "_#{c['proto'] || 'tcp'}",
+            node['environment_v2']['domain']['host'],
             node['environment_v2']['domain']['top']
           ].join('.'),
-          ttl: c["ttl"] || 300,
-          priority: 0,
-          weight: 0,
-          port: c["port"],
+          ttl: c['ttl'] || 300,
+          priority: c['priority'] || 0,
+          weight: c['weight'] || 0,
+          port: port,
           host: [
-            host,
-            node['environment_v2']['domain']['host_lan'],
+            hostname,
+            node['environment_v2']['domain']['host'],
             node['environment_v2']['domain']['top']
           ].join('.')
         }
@@ -107,7 +87,7 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
     }).map { |r| %Q{"#{r}"} },
     'local-zone' => [
       "#{node['environment_v2']['domain']['top']} nodefault",
-      "#{node['environment_v2']['domain']['rev_lan']} nodefault",
+      "#{node['environment_v2']['domain']['rev']} nodefault",
     ],
     "private-domain" => [
       node['environment_v2']['domain']['top'],
@@ -125,7 +105,7 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
       'stub-addr' => "127.0.0.1@53530"
     },
     {
-      'name' => node['environment_v2']['domain']['rev_lan'],
+      'name' => node['environment_v2']['domain']['rev'],
       'stub-addr' => "127.0.0.1@53530"
     }
   ]

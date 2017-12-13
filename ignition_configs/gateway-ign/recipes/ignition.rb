@@ -43,7 +43,9 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
 
   networkd = []
 
-  wan_interface = node['environment_v2']['host'][host]['if']['wan']
+  interfaces = node['environment_v2']['host'][host]['if'].to_hash.dup
+
+  wan_interface = interfaces.delete('wan')
   if !wan_interface.nil?
 
     networkd << {
@@ -75,9 +77,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
   end
 
 
-  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
+  interfaces.each do |i, interface|
 
-    interface = node['environment_v2']['host'][host]['if'][i]
     addr = node['environment_v2']['host'][host]['ip'][i]
     vip_route = node['environment_v2']['set']['gateway']['vip'][i]
 

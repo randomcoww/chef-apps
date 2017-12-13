@@ -11,14 +11,10 @@ end
 
 
 guests.values.uniq.each do |host|
-  [
-    "if_lan",
-    'if_store',
-    "if_wan",
-  ].each do |i|
+  host_config = node['environment_v2']['host'][host]
 
-    if_name = node['environment_v2']['host'][host][i]
-    if !if_name.nil?
+  if host['if'].is_a?(Hash)
+    host['if'].each_key do |i, interface|
 
       node.default['qemu']['configs']["net-#{host}-#{i}"] = LibvirtConfig::ConfigGenerator.generate_from_hash({
         "network"=>{
@@ -30,7 +26,7 @@ guests.values.uniq.each do |host|
             },
             "pf"=>{
               "#attributes"=>{
-                "dev"=>if_name
+                "dev"=>interface
               }
             },
             "driver"=>{
@@ -49,6 +45,8 @@ end
 guests.each do |guest, host|
 
   host_config = node['environment_v2']['host'][host]
+  next if !host_config['if'].is_a?(Hash)
+
   guest_config = node['environment_v2']['host'][guest]
 
   memory = guest_config['memory']
@@ -56,21 +54,19 @@ guests.each do |guest, host|
 
   networks = []
 
-  [
-    ['if_lan', 'mac_lan'],
-    ['if_store', 'mac_store'],
-    ['if_wan', 'mac_wan']
-  ].each do |if_key, mac|
+  if guest_config['if'].is_a?(Hash)
+    guest_config['if'].each do |i, interface|
 
-    if guest_config.has_key?(if_key) &&
-      host_config.has_key?(if_key)
+      next if host_config['if'][i].nil?
 
       mac_hash = {}
-      if guest_config.has_key?(mac)
+      if guest_config['mac'].is_a?(Hash) &&
+        !guest_config['mac'][i].nil?
+
         mac_hash = {
           "mac"=>{
             "#attributes"=>{
-              "address"=>guest_config[mac]
+              "address"=>guest_config['mac'][i]
             }
           }
         }
@@ -101,7 +97,7 @@ guests.each do |guest, host|
         },
         "source"=>{
           "#attributes"=>{
-            "dev"=>host_config[if_key],
+            "dev"=>host_config['if'][i],
             "mode"=>"bridge"
           }
         },

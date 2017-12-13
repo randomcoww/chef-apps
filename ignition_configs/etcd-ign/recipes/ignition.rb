@@ -11,7 +11,7 @@ base = {
 }
 
 domain = [
-  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['host'],
   node['environment_v2']['domain']['top']
 ].join('.')
 
@@ -116,11 +116,9 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   networkd = []
 
-  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
+  node['environment_v2']['host'][host]['if'].each do |i, interface|
 
-    interface = node['environment_v2']['host'][host]['if'][i]
     if !interface.nil?
-
       networkd << {
         "name" => "#{interface}.network",
         "contents" => {

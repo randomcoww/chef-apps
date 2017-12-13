@@ -18,47 +18,46 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       "password" => node['mysql_credentials']['kea']['password'],
       "persist" => true
     },
-    "subnet4" => [
+    "subnet4" => node['environment_v2']['subnet'].map { |i, subnet|
+
+      options = []
+
+      if !node['environment_v2']['set']['gateway']['vip'][i].nil?
+        options << {
+          "name" => "routers",
+          "data" => node['environment_v2']['set']['gateway']['vip'][i]
+        }
+      end
+
+      if !node['environment_v2']['set']['ns']['vip'][i].nil?
+        options << {
+          "name" => "domain-name-servers",
+          # "data" => (node['environment_v2']['set']['ns']['hosts'].map { |e|
+          #   node['environment_v2']['host'][e]['ip_lan']
+          # } + [ '8.8.8.8' ]).join(','),
+          "data" => [
+            node['environment_v2']['set']['ns']['vip'][i],
+            '8.8.8.8'
+          ].join(','),
+          "csv-format" => true
+        }
+      end
+
       {
-        "subnet" => node['environment_v2']['subnet']['lan'],
-        "option-data" => [
-          {
-            "name" => "routers",
-            "data" => node['environment_v2']['set']['gateway']['vip_lan']
-          },
-          {
-            "name" => "domain-name-servers",
-            # "data" => (node['environment_v2']['set']['ns']['hosts'].map { |e|
-            #   node['environment_v2']['host'][e]['ip_lan']
-            # } + [ '8.8.8.8' ]).join(','),
-            "data" => [
-              node['environment_v2']['set']['ns']['vip_lan'],
-              '8.8.8.8'
-            ].join(','),
-            "csv-format" => true
-          }
-        ],
+        "subnet" => subnet,
+        "option-data" => options,
         "pools" => [
           {
-           "pool" => node['environment_v2']['subnet']['dhcp_pool_lan']
+           "pool" => node['environment_v2']['dhcp_pool'][i]
           }
         ],
-        "reservations" => host_lan_reservations
-      },
-      {
-        "subnet" => node['environment_v2']['subnet']['store'],
-        "pools" => [
-          {
-           "pool" => node['environment_v2']['subnet']['dhcp_pool_store']
-          }
-        ],
-        "reservations" => host_store_reservations
+        "reservations" => []
       }
-    ],
+    },
     "dhcp-ddns" => {
       "enable-updates" => true,
       "qualifying-suffix" => [
-        node['environment_v2']['domain']['host_lan'],
+        node['environment_v2']['domain']['host'],
         node['environment_v2']['domain']['top'],
         ''
       ].join('.'),

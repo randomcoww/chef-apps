@@ -7,8 +7,7 @@ node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.32/27"
 node.default['environment_v2']['domain']['rev'] = '168.192.in-addr.arpa'
 node.default['environment_v2']['domain']['top'] = 'internal'
 node.default['environment_v2']['domain']['vip'] = 'svc'
-node.default['environment_v2']['domain']['lan'] = 'lan'
-node.default['environment_v2']['domain']['store'] = 'san'
+node.default['environment_v2']['domain']['host'] = 'host'
 
 
 ##
@@ -22,6 +21,7 @@ node.default['environment_v2']['set']['gateway'] = {
   ],
   'vip' => {
     'lan' => "192.168.62.240",
+    'store' => "192.168.126.240",
   }
 }
 
@@ -32,6 +32,7 @@ node.default['environment_v2']['set']['ns'] = {
   ],
   'vip' => {
     'lan' => "192.168.62.241",
+    'store' => "192.168.126.241",
   }
 }
 
@@ -102,11 +103,13 @@ node.default['environment_v2']['set']['flannel'] = {
 
 node.default['environment_v2']['host']['gateway1'] = {
   'ip' => {
-    'lan' => "192.168.62.217"
+    'lan' => "192.168.62.217",
+    'store' => "192.168.126.217",
   },
   'if' => {
     'lan' => "eth0",
-    'wan' => "eth1",
+    'store' => "eth1",
+    'wan' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
@@ -117,11 +120,13 @@ node.default['environment_v2']['host']['gateway1'] = {
 
 node.default['environment_v2']['host']['gateway2'] = {
   'ip' => {
-    'lan' => "192.168.62.218"
+    'lan' => "192.168.62.218",
+    'store' => "192.168.126.218",
   },
   'if' => {
     'lan' => "eth0",
-    'wan' => "eth1",
+    'store' => "eth1",
+    'wan' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"

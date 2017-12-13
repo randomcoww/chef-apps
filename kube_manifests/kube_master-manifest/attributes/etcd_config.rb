@@ -1,7 +1,7 @@
 services = {}
 
 lan_domain = [
-  node['environment_v2']['domain']['host_lan'],
+  node['environment_v2']['domain']['host'],
   node['environment_v2']['domain']['top']
 ].join('.')
 

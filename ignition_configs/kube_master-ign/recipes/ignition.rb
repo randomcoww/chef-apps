@@ -23,12 +23,6 @@ etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
 etcd_ca = etcd_cert_generator.root_ca
 
 
-# domain = [
-#   node['environment_v2']['domain']['host_lan'],
-#   node['environment_v2']['domain']['top']
-# ].join('.')
-
-
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -98,8 +92,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       'DNS.2' => 'kubernetes.default',
       'DNS.3' => 'kubernetes.default.svc',
       'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
-      # 'DNS.5' => [host, domain].join('.'),
-      # 'DNS.5' => ['*', domain].join('.'),
       'IP.1' => node['kubernetes']['cluster_service_ip'],
       'IP.2' => node['environment_v2']['set']['haproxy']['vip']['lan']
     }
@@ -173,9 +165,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   networkd = []
 
-  node['environment_v2']['host'][host]['if'].except('wan').each do |i|
-
-    interface = node['environment_v2']['host'][host]['if'][i]
+  node['environment_v2']['host'][host]['if'].each do |i, interface|
     if !interface.nil?
 
       networkd << {

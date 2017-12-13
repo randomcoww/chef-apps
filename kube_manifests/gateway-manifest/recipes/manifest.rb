@@ -1,10 +1,10 @@
 nftables_rules = []
 
 node['environment_v2']['subnet'].each do |e, v|
-  nftables_rules << "define subnet_#{e} = v"
+  nftables_rules << "define subnet_#{e} = #{v}"
 end
 
-node['environment_v2']['set'].each do |e, s|
+node['environment_v2']['set'].each do |e, v|
   if v['vip'].is_a?(Hash)
     v['vip'].each do |i, v|
 
@@ -20,9 +20,6 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
   end
 
   nftables_rules << ''
-
-  nftables_rules = nftables_rules.join($/) +
-    node['kube_manifests']['gateway']['nftables_config']
 
 
   gateway_manifest = {
@@ -48,7 +45,8 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
           "env" => [
             {
               "name" => "CONFIG",
-              "value" => nftables_rules
+              "value" => nftables_rules.join($/) +
+                node['kube_manifests']['gateway']['nftables_config']
             }
           ]
         }

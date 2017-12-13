@@ -4,7 +4,7 @@ host_to_set_map = {}
 
 node['environment_v2']['set'].each do |k, v|
 
-  if k['vip'].is_a?(Hash)
+  if v['vip'].is_a?(Hash)
 
     if v['hosts'].is_a?(Array)
       v['hosts'].each do |h|
@@ -13,7 +13,7 @@ node['environment_v2']['set'].each do |k, v|
         host_to_vip_map[h] ||= {}
 
         ## combine like interfaces
-        k['vip'].each do |i, addr|
+        v['vip'].each do |i, addr|
           host_to_vip_map[h][i] ||= []
           host_to_vip_map[h][i] << addr
         end
@@ -25,16 +25,16 @@ end
 
 keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 
-host_to_vip_map.each do |h, m|
+host_to_vip_map.each do |host, m|
 
   config = {}
   m.each do |i, addrs|
 
-    set = "#{h}_#{i}"
+    set = "#{host}_#{i}"
     subnet_mask = node['environment_v2']['subnet'][i].split('/').last
     id = keepalived_bag.get_or_create("VI_#{set}_id", rand(255))
     password = keepalived_bag.get_or_create("VI_#{set}_password", SecureRandom.base64(6))
-    interface = node['environment_v2']['host']['if'][i]
+    interface = node['environment_v2']['host'][host]['if'][i]
 
 
     config["vrrp_sync_group VG_#{set}"] = [
@@ -45,7 +45,7 @@ host_to_vip_map.each do |h, m|
       }
     ]
 
-    config["vrrp_sync_group VG_#{set}"] = [
+    config["vrrp_instance VI_#{set}"] = [
       {
         'state' => 'BACKUP',
         'virtual_router_id' => id,
@@ -68,6 +68,7 @@ host_to_vip_map.each do |h, m|
     "apiVersion" => "v1",
     "kind" => "Pod",
     "metadata" => {
+      "namespace" => "kube-system",
       "name" => "keepalived"
     },
     "spec" => {
