@@ -9,7 +9,9 @@ node['environment_v2']['set'].each do |k, v|
     if v['hosts'].is_a?(Array)
       v['hosts'].each do |h|
 
-        host_to_set_map[h] = k
+        host_to_set_map[h] ||= []
+        host_to_set_map[h] << k
+
         host_to_vip_map[h] ||= {}
 
         ## combine like interfaces
@@ -27,10 +29,12 @@ keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
 
 host_to_vip_map.each do |host, m|
 
+  key = host_to_set_map[host].sort.join('_')
+
   config = {}
   m.each do |i, addrs|
 
-    set = "#{host}_#{i}"
+    set = "#{key}_#{i}"
     subnet_mask = node['environment_v2']['subnet'][i].split('/').last
     id = keepalived_bag.get_or_create("VI_#{set}_id", rand(255))
     password = keepalived_bag.get_or_create("VI_#{set}_password", SecureRandom.base64(6))

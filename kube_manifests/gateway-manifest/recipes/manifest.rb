@@ -15,11 +15,13 @@ end
 
 
 node['environment_v2']['set']['gateway']['hosts'].each do |host|
-  node['environment_v2']['host'][host]['if'].each do |i, v|
-    nftables_rules << "define host_if_#{i} = #{v}"
+
+  rules = nftables_rules +
+  node['environment_v2']['host'][host]['if'].map do |i, v|
+    "define host_if_#{i} = #{v}"
   end
 
-  nftables_rules << ''
+  rules << ''
 
 
   gateway_manifest = {
@@ -45,7 +47,7 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
           "env" => [
             {
               "name" => "CONFIG",
-              "value" => nftables_rules.join($/) +
+              "value" => rules.join($/) +
                 node['kube_manifests']['gateway']['nftables_config']
             }
           ]

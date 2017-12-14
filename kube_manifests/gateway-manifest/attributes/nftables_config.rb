@@ -6,13 +6,14 @@ table ip filter {
     ct state {established, related} accept;
     ct state invalid drop;
 
-    iifname {lo, $host_if_lan} accept;
+    iifname {lo, $host_if_lan, $host_if_store} accept;
     iifname != "lo" ip daddr 127.0.0.1/8 drop;
 
-    iifname $host_if_lan ip protocol icmp accept;
-    iifname $host_if_lan udp sport bootps udp dport bootpc accept;
-    iifname $host_if_lan pkttype multicast accept;
-    iifname $host_if_lan tcp dport ssh accept;
+    iifname {$host_if_lan, $host_if_store} ip protocol icmp accept;
+    iifname {$host_if_lan, $host_if_store} udp sport bootps udp dport bootpc accept;
+    iifname {$host_if_lan, $host_if_store} pkttype multicast accept;
+
+    iifname {$host_if_lan, $host_if_store} tcp dport ssh accept;
   }
 
   chain output {
@@ -21,10 +22,10 @@ table ip filter {
 
   chain forward {
     type filter hook forward priority 0; policy drop;
-    iifname $host_if_lan oifname $host_if_wan accept;
-    iifname $host_if_wan oifname $host_if_lan ct state {established, related} accept;
+    iifname {$host_if_lan, $host_if_store} oifname $host_if_wan accept;
+    iifname $host_if_wan oifname {$host_if_lan, $host_if_store} ct state {established, related} accept;
 
-    iifname $host_if_wan oifname $host_if_lan ip daddr $vip_haproxy_store tcp dport 2222 ct state new accept;
+    iifname $host_if_wan oifname $host_if_store ip daddr $vip_haproxy_store tcp dport 2222 ct state new accept;
   }
 }
 
