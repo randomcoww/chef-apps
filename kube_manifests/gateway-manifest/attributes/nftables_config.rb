@@ -26,6 +26,9 @@ table ip filter {
     iifname $host_if_wan oifname {$host_if_lan, $host_if_store} ct state {established, related} accept;
 
     iifname $host_if_wan oifname $host_if_store ip daddr $vip_haproxy_store tcp dport 2222 ct state new accept;
+
+    iifname $host_if_store oifname $host_if_lan accept;
+    iifname $host_if_lan oifname $host_if_store accept;
   }
 }
 
