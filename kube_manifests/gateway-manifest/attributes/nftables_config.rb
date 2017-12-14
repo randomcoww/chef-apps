@@ -24,7 +24,7 @@ table ip filter {
     iifname $host_if_lan oifname $host_if_wan accept;
     iifname $host_if_wan oifname $host_if_lan ct state {established, related} accept;
 
-    iifname $host_if_wan oifname $host_if_lan ip daddr $vip_haproxy_lan tcp dport 2222 ct state new accept;
+    iifname $host_if_wan oifname $host_if_lan ip daddr $vip_haproxy_store tcp dport 2222 ct state new accept;
   }
 }
 
@@ -32,7 +32,7 @@ table ip nat {
   chain prerouting {
     type nat hook prerouting priority 0; policy accept;
 
-    iifname $host_if_wan tcp dport 2222 dnat $vip_haproxy_lan:2222;
+    iifname $host_if_wan tcp dport 2222 dnat $vip_haproxy_store:2222;
   }
 
   chain input {
