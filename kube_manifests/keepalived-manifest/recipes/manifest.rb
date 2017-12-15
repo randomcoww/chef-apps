@@ -32,6 +32,14 @@ host_to_vip_map.each do |host, m|
   key = host_to_set_map[host].sort.join('_')
 
   config = {}
+  sync_group = []
+
+  config["vrrp_sync_group VG_#{key}"] = [
+    {
+      'group' => sync_group
+    }
+  ]
+
   m.each do |i, addrs|
 
     set = "#{key}_#{i}"
@@ -40,14 +48,7 @@ host_to_vip_map.each do |host, m|
     password = keepalived_bag.get_or_create("VI_#{set}_password", SecureRandom.base64(6))
     interface = node['environment_v2']['host'][host]['if'][i]
 
-
-    config["vrrp_sync_group VG_#{set}"] = [
-      {
-        'group' => [
-          "VI_#{set}"
-        ]
-      }
-    ]
+    sync_group << "VI_#{set}"
 
     config["vrrp_instance VI_#{set}"] = [
       {

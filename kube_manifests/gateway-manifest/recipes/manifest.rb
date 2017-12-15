@@ -1,28 +1,89 @@
-nftables_rules = []
-
-node['environment_v2']['subnet'].each do |e, v|
-  nftables_rules << "define subnet_#{e} = #{v}"
-end
-
-node['environment_v2']['set'].each do |e, v|
-  if v['vip'].is_a?(Hash)
-    v['vip'].each do |i, v|
-
-      nftables_rules << "define vip_#{e}_#{i} = #{v}"
-    end
-  end
-end
-
-
 node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
-  rules = nftables_rules +
-  node['environment_v2']['host'][host]['if'].map do |i, v|
-    "define host_if_#{i} = #{v}"
-  end
+  if_lan = node['environment_v2']['host'][host]['if']['lan']
+  if_store = node['environment_v2']['host'][host]['if']['store']
+  if_wan = node['environment_v2']['host'][host]['if']['wan']
+  vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
 
-  rules << ''
+  ##https://stosb.com/blog/explaining-my-configs-nftables/
 
+  nftables_rules =
+<<-EOF
+define if_store = #{if_store}
+define if_lan = #{if_lan}
+define if_internal = {#{if_lan}, #{if_store}}
+define if_external = #{if_wan}
+define ip_lb = #{vip_haproxy}
+
+
+table ip filter {
+
+  chain base_checks {
+    ct state {established, related} accept;
+    ct state invalid drop;
+  }
+
+  chain input {
+    type filter hook input priority 0; policy drop;
+
+    jump base_checks;
+
+    iifname "lo" accept;
+    iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+    ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+    iifname $if_internal tcp dport domain accept;
+    iifname $if_internal udp dport domain accept;
+    iifname $if_internal udp sport bootps udp dport bootpc accept;
+    iifname $if_internal pkttype multicast accept;
+    iifname $if_internal tcp dport ssh accept;
+
+    tcp dport 2222 accept;
+  }
+
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+
+    jump base_checks;
+
+    ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+    iifname $if_internal oifname $if_external accept;
+    iifname $if_internal tcp dport ssh accept;
+    iifname $if_internal ip daddr $ip_lb accept;
+
+    ip daddr $ip_lb ct status dnat accept;
+  }
+
+  chain output {
+    type filter hook output priority 100; policy accept;
+  }
+}
+
+table ip nat {
+  chain prerouting {
+    type nat hook prerouting priority 0; policy accept;
+
+    tcp dport 2222 dnat $ip_lb;
+  }
+
+  chain input {
+    type nat hook input priority 0; policy accept;
+  }
+
+  chain output {
+    type nat hook output priority 0; policy accept;
+  }
+
+  chain postrouting {
+    type nat hook postrouting priority 100; policy accept;
+
+    oifname $if_external masquerade;
+  }
+}
+;
+EOF
 
   gateway_manifest = {
     "apiVersion" => "v1",
@@ -47,8 +108,7 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
           "env" => [
             {
               "name" => "CONFIG",
-              "value" => rules.join($/) +
-                node['kube_manifests']['gateway']['nftables_config']
+              "value" => nftables_rules
             }
           ]
         }
