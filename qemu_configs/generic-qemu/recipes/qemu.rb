@@ -10,42 +10,36 @@ node['environment_v2']['host'].each do |h, v|
 end
 
 
-guests.values.uniq.each do |host|
-  host_config = node['environment_v2']['host'][host]
-
-  if host['if'].is_a?(Hash)
-    host['if'].each_key do |i, interface|
-
-      node.default['qemu']['configs']["net-#{host}-#{i}"] = LibvirtConfig::ConfigGenerator.generate_from_hash({
-        "network"=>{
-          "name"=>i,
-          "forward"=>{
-            "#attributes"=>{
-              "mode"=>"hostdev",
-              "managed"=>"yes"
-            },
-            "pf"=>{
-              "#attributes"=>{
-                "dev"=>interface
-              }
-            },
-            "driver"=>{
-              "#attributes"=>{
-                "name"=>"vfio"
-              }
-            }
-          }
-        }
-      })
-    end
-  end
-end
-
-
 guests.each do |guest, host|
 
   host_config = node['environment_v2']['host'][host]
   next if !host_config['if'].is_a?(Hash)
+
+  ## sriov networks
+  host_config['if'].each do |i, interface|
+    node.default['qemu']['configs']["net-#{host}-#{i}"] = LibvirtConfig::ConfigGenerator.generate_from_hash({
+      "network"=>{
+        "name"=>i,
+        "forward"=>{
+          "#attributes"=>{
+            "mode"=>"hostdev",
+            "managed"=>"yes"
+          },
+          "pf"=>{
+            "#attributes"=>{
+              "dev"=>interface
+            }
+          },
+          "driver"=>{
+            "#attributes"=>{
+              "name"=>"vfio"
+            }
+          }
+        }
+      }
+    })
+  end
+
 
   guest_config = node['environment_v2']['host'][guest]
 
@@ -73,32 +67,13 @@ guests.each do |guest, host|
       end
 
       ## sriov
-      # networks << {
-      #   "#attributes"=>{
-      #     "type"=>"network"
-      #   },
-      #   "source"=>{
-      #     "#attributes"=>{
-      #       "network"=>if_key
-      #     }
-      #   },
-      #   "model"=>{
-      #     "#attributes"=>{
-      #       "type"=>"virtio-net"
-      #     }
-      #   }
-      # }.merge(mac_hash)
-
-      ## macvtap
       networks << {
         "#attributes"=>{
-          "type"=>"direct",
-          "trustGuestRxFilters"=>"yes"
+          "type"=>"network"
         },
         "source"=>{
           "#attributes"=>{
-            "dev"=>host_config['if'][i],
-            "mode"=>"bridge"
+            "network"=>i
           }
         },
         "model"=>{
@@ -107,11 +82,30 @@ guests.each do |guest, host|
           }
         }
       }.merge(mac_hash)
+
+      ## macvtap
+      # networks << {
+      #   "#attributes"=>{
+      #     "type"=>"direct",
+      #     "trustGuestRxFilters"=>"yes"
+      #   },
+      #   "source"=>{
+      #     "#attributes"=>{
+      #       "dev"=>host_config['if'][i],
+      #       "mode"=>"bridge"
+      #     }
+      #   },
+      #   "model"=>{
+      #     "#attributes"=>{
+      #       "type"=>"virtio-net"
+      #     }
+      #   }
+      # }.merge(mac_hash)
     end
   end
 
 
-  node.default['qemu']['configs'][guest] = LibvirtConfig::ConfigGenerator.generate_from_hash({
+  node.default['qemu']['configs']["#{host}-#{guest}"] = LibvirtConfig::ConfigGenerator.generate_from_hash({
     "domain"=>{
       "#attributes"=>{
         "type"=>"kvm"
@@ -121,9 +115,9 @@ guests.each do |guest, host|
         "#attributes"=>{
           "unit"=>"MiB"
         },
-        "#text"=>memory
+        "#text"=>2048
       },
-      "currentMemory"=>{
+      "maxMemory"=>{
         "#attributes"=>{
           "unit"=>"MiB"
         },
