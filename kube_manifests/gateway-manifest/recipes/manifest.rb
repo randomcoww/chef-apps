@@ -9,12 +9,9 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   nftables_rules =
 <<-EOF
-define if_store = #{if_store}
-define if_lan = #{if_lan}
 define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
 define ip_lb = #{vip_haproxy}
-
 
 table ip filter {
 
