@@ -114,6 +114,11 @@ node.default['environment_v2']['host']['gateway1'] = {
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
   },
+  'sriov' => {
+    'lan' => true,
+    'store' => true,
+    'wan' => true,
+  },
   'memory' => 6144,
   'vcpu' => 4
 }
@@ -130,6 +135,11 @@ node.default['environment_v2']['host']['gateway2'] = {
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"
+  },
+  'sriov' => {
+    'lan' => true,
+    'store' => true,
+    'wan' => true,
   },
   'memory' => 6144,
   'vcpu' => 4
@@ -232,7 +242,3 @@ node.default['environment_v2']['host']['sw'] = {
     'lan' => '192.168.63.95'
   }
 }
-
-## load current host under 'current_host'
-# node.default['environment_v2']['node_name'] = ENV['NODE_NAME']
-# node.default['environment_v2']['node_host'] = node['environment_v2']['host'][node['environment_v2']['node_name']]

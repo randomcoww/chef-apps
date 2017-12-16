@@ -66,41 +66,47 @@ guests.each do |guest, host|
         }
       end
 
-      ## sriov
-      # networks << {
-      #   "#attributes"=>{
-      #     "type"=>"network"
-      #   },
-      #   "source"=>{
-      #     "#attributes"=>{
-      #       "network"=>i
-      #     }
-      #   },
-      #   "model"=>{
-      #     "#attributes"=>{
-      #       "type"=>"virtio-net"
-      #     }
-      #   }
-      # }.merge(mac_hash)
+      if guest_config['sriov'].is_a?(Hash) &&
+        guest_config['sriov'][i] == true
 
-      ## macvtap
-      networks << {
-        "#attributes"=>{
-          "type"=>"direct",
-          "trustGuestRxFilters"=>"yes"
-        },
-        "source"=>{
+        ## sriov
+        networks << {
           "#attributes"=>{
-            "dev"=>host_config['if'][i],
-            "mode"=>"bridge"
+            "type"=>"network"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "network"=>i
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
           }
-        },
-        "model"=>{
+        }.merge(mac_hash)
+
+      else
+
+        ## macvtap
+        networks << {
           "#attributes"=>{
-            "type"=>"virtio-net"
+            "type"=>"direct",
+            "trustGuestRxFilters"=>"yes"
+          },
+          "source"=>{
+            "#attributes"=>{
+              "dev"=>host_config['if'][i],
+              "mode"=>"bridge"
+            }
+          },
+          "model"=>{
+            "#attributes"=>{
+              "type"=>"virtio-net"
+            }
           }
-        }
-      }.merge(mac_hash)
+        }.merge(mac_hash)
+      end
     end
   end
 
