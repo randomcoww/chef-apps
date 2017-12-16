@@ -48,7 +48,9 @@ guests.each do |guest, host|
 
   networks = []
 
-  if guest_config['if'].is_a?(Hash)
+  if guest_config['if'].is_a?(Hash) &&
+    guest_config['if_type'].is_a?(Hash)
+
     guest_config['if'].each do |i, interface|
 
       next if host_config['if'][i].nil?
@@ -66,9 +68,9 @@ guests.each do |guest, host|
         }
       end
 
-      if guest_config['sriov'].is_a?(Hash) &&
-        guest_config['sriov'][i] == true
+      case guest_config['if_type'][i]
 
+      when 'sriov'
         ## sriov
         networks << {
           "#attributes"=>{
@@ -86,8 +88,7 @@ guests.each do |guest, host|
           }
         }.merge(mac_hash)
 
-      else
-
+      when 'macvlan'
         ## macvtap
         networks << {
           "#attributes"=>{
@@ -106,6 +107,7 @@ guests.each do |guest, host|
             }
           }
         }.merge(mac_hash)
+
       end
     end
   end
