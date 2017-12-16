@@ -1,8 +1,8 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 
-node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.0/25"
-node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.0/25"
+node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.64/26"
+node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.64/26"
 
 node.default['environment_v2']['domain']['rev'] = '168.192.in-addr.arpa'
 node.default['environment_v2']['domain']['top'] = 'internal'
@@ -114,8 +114,8 @@ node.default['environment_v2']['host']['gateway1'] = {
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
   },
-  'memory' => 8192,
-  'vcpu' => 2
+  'memory' => 6144,
+  'vcpu' => 4
 }
 
 node.default['environment_v2']['host']['gateway2'] = {
@@ -131,15 +131,15 @@ node.default['environment_v2']['host']['gateway2'] = {
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"
   },
-  'memory' => 8192,
-  'vcpu' => 2
+  'memory' => 6144,
+  'vcpu' => 4
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
   'if' => {
     'store' => "eth0",
   },
-  'memory' => 4096,
+  'memory' => 2048,
   'vcpu' => 2
 }
 
@@ -147,7 +147,7 @@ node.default['environment_v2']['host']['etcd2'] = {
   'if' => {
     'store' => "eth0",
   },
-  'memory' => 4096,
+  'memory' => 2048,
   'vcpu' => 2
 }
 
@@ -157,7 +157,7 @@ node.default['environment_v2']['host']['kube-master'] = {
     'store' => "eth0",
   },
   'memory' => 8192,
-  'vcpu' => 2
+  'vcpu' => 4
 }
 
 node.default['environment_v2']['host']['kube-worker'] = {
@@ -165,7 +165,7 @@ node.default['environment_v2']['host']['kube-worker'] = {
     'store' => "eth0",
   },
   'memory' => 8192,
-  'vcpu' => 6
+  'vcpu' => 4
 }
 
 

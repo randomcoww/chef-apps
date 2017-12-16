@@ -9,6 +9,8 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   nftables_rules =
 <<-EOF
+define if_lan = #{if_lan}
+define if_store = #{if_store}
 define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
 define ip_lb = #{vip_haproxy}
@@ -30,10 +32,12 @@ table ip filter {
 
     ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
+    iifname $if_store accept;
+
     iifname $if_internal tcp dport domain accept;
     iifname $if_internal udp dport domain accept;
     iifname $if_internal udp sport bootps udp dport bootpc accept;
-    iifname $if_internal pkttype multicast accept;
+    # iifname $if_internal pkttype multicast accept;
     iifname $if_internal tcp dport ssh accept;
 
     tcp dport 2222 accept;
