@@ -1,74 +1,58 @@
-## host to vip mapping
-host_to_vip_map = {}
-host_to_set_map = {}
+keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
+configs = {}
 
-node['environment_v2']['set'].each do |k, v|
+node['environment_v2']['set'].each do |set, c|
 
-  if v['vip'].is_a?(Hash)
+  if !c['hosts'].is_a?(Array) ||
+    !c['vip'].is_a?(Hash)
 
-    if v['hosts'].is_a?(Array)
-      v['hosts'].each do |h|
+    next
+  end
 
-        host_to_set_map[h] ||= []
-        host_to_set_map[h] << k
+  c['hosts'].each do |host|
 
-        host_to_vip_map[h] ||= {}
+    configs[host] ||= {}
+    sync_groups = []
 
-        ## combine like interfaces
-        v['vip'].each do |i, addr|
-          host_to_vip_map[h][i] ||= []
-          host_to_vip_map[h][i] << addr
-        end
-      end
+    configs[host]["vrrp_sync_group VG_#{set}"] = [
+      {
+        'group' => sync_groups
+      }
+    ]
+
+    c['vip'].each do |i, addr|
+      key = "#{set}_#{i}"
+      interface = node['environment_v2']['host'][host]['if'][i]
+      subnet_mask = node['environment_v2']['subnet'][i].split('/').last
+
+      id = keepalived_bag.get_or_create("VI_#{key}_id", rand(255))
+      password = keepalived_bag.get_or_create("VI_#{key}_password", SecureRandom.base64(6))
+
+      sync_groups << "VI_#{key}"
+
+      configs[host]["vrrp_instance VI_#{key}"] = [
+        {
+          'state' => 'BACKUP',
+          'virtual_router_id' => id,
+          'interface' => interface,
+          'priority' => 100,
+          'authentication' => [
+            {
+              'auth_type' => 'AH',
+              'auth_pass' => password
+            }
+          ],
+          'virtual_ipaddress' => [
+            "#{addr}/#{subnet_mask}"
+          ]
+        }
+      ]
     end
   end
 end
 
 
-keepalived_bag = Dbag::Keystore.new('deploy_config', 'keepalived')
-
-host_to_vip_map.each do |host, m|
-
-  key = host_to_set_map[host].sort.join('_')
-
-  config = {}
-  sync_group = []
-
-  config["vrrp_sync_group VG_#{key}"] = [
-    {
-      'group' => sync_group
-    }
-  ]
-
-  m.each do |i, addrs|
-
-    set = "#{key}_#{i}"
-    subnet_mask = node['environment_v2']['subnet'][i].split('/').last
-    id = keepalived_bag.get_or_create("VI_#{set}_id", rand(255))
-    password = keepalived_bag.get_or_create("VI_#{set}_password", SecureRandom.base64(6))
-    interface = node['environment_v2']['host'][host]['if'][i]
-
-    sync_group << "VI_#{set}"
-
-    config["vrrp_instance VI_#{set}"] = [
-      {
-        'state' => 'BACKUP',
-        'virtual_router_id' => id,
-        'interface' => interface,
-        'priority' => 100,
-        'authentication' => [
-          {
-            'auth_type' => 'AH',
-            'auth_pass' => password
-          }
-        ],
-        'virtual_ipaddress' => addrs.map { |e|
-          "#{e}/#{subnet_mask}"
-        }
-      }
-    ]
-  end
-
+configs.each do |host, config|
   keepalived_manifest = {
     "apiVersion" => "v1",
     "kind" => "Pod",
