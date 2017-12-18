@@ -15,11 +15,27 @@ define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
 define ip_lb = #{vip_haproxy}
 
+
 table ip filter {
 
   chain base_checks {
     ct state {established, related} accept;
     ct state invalid drop;
+  }
+
+  set tcp_fwd {
+    type inet_service; flags interval;
+    elements = {
+      ssh,
+      sunrpc,nfs
+    }
+  }
+
+  set udp_fwd {
+    type inet_service; flags interval;
+    elements = {
+      sunrpc,nfs
+    }
   }
 
   chain input {
@@ -39,8 +55,6 @@ table ip filter {
     iifname $if_internal udp sport bootps udp dport bootpc accept;
     # iifname $if_internal pkttype multicast accept;
     iifname $if_internal tcp dport ssh accept;
-
-    tcp dport 2222 accept;
   }
 
   chain forward {
@@ -51,9 +65,11 @@ table ip filter {
     ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
     iifname $if_internal oifname $if_external accept;
-    iifname $if_internal tcp dport ssh accept;
-    iifname $if_internal ip daddr $ip_lb accept;
 
+    iifname $if_internal tcp dport @tcp_fwd accept;
+    iifname $if_internal udp dport @udp_fwd accept;
+
+    iifname $if_internal ip daddr $ip_lb accept;
     ip daddr $ip_lb ct status dnat accept;
   }
 
@@ -62,11 +78,20 @@ table ip filter {
   }
 }
 
+
 table ip nat {
+
+  set tcp_dnat {
+    type inet_service; flags interval;
+    elements = {
+      2222
+    }
+  }
+
   chain prerouting {
     type nat hook prerouting priority 0; policy accept;
 
-    tcp dport 2222 dnat $ip_lb;
+    tcp dport @tcp_dnat dnat $ip_lb;
   }
 
   chain input {
