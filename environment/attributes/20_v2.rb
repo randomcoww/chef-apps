@@ -119,7 +119,7 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => 'sriov',
     'wan' => 'sriov',
   },
-  'memory' => 6144,
+  'memory' => 4096,
   'vcpu' => 4
 }
 
@@ -141,7 +141,7 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => 'sriov',
     'wan' => 'sriov',
   },
-  'memory' => 6144,
+  'memory' => 4096,
   'vcpu' => 4
 }
 
@@ -175,7 +175,7 @@ node.default['environment_v2']['host']['kube-master'] = {
   'if_type' => {
     'store' => 'macvlan',
   },
-  'memory' => 8192,
+  'memory' => 4096,
   'vcpu' => 4
 }
 
