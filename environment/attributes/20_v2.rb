@@ -1,5 +1,6 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
+# node.default['environment_v2']['subnet']['zfs'] = "192.168.126.0/23"
 
 node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.64/26"
 node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.64/26"
@@ -202,7 +203,7 @@ node.default['environment_v2']['host']['vm1'] = {
   'if' => {
     'lan' => "eno1",
     'wan' => "eno2",
-    'store' => "ens1",
+    'store' => "ens1f0",
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -226,7 +227,7 @@ node.default['environment_v2']['host']['vm2'] = {
   'if' => {
     'lan' => "eno1",
     'wan' => "eno2",
-    'store' => "ens1",
+    'store' => "ens1f0",
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
