@@ -51,6 +51,7 @@ node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['ssl_pat
 node.default['kubernetes']['manifests_path'] = '/config/manifests'
 # node.default['kubernetes']['addons_path'] = '/etc/kubernetes/addons'
 
+node.default['kubernetes']['manifests_extra_path'] = '/config/manifests_extra'
 
 ## kubernetes download
 # node.default['kubernetes']['kubelet']['remote_file'] = "https://storage.googleapis.com/kubernetes-release/release/v#{node['kubernetes']['version']}/bin/linux/amd64/kubelet"
@@ -92,8 +93,9 @@ node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:201
 node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.1-amd64"
 # node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
 
-# node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
-# node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
-# node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"
-# node.default['kube']['images']['transmission'] = "randomcoww/transmission:20171201.01"
-# node.default['kube']['images']['mpd'] = "randomcoww/mpd:20171201.01"
+node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
+node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
+node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"
+node.default['kube']['images']['transmission'] = "randomcoww/transmission:20171201.01"
+node.default['kube']['images']['mpd'] = "randomcoww/mpd:20171201.01"
+node.default['kube']['images']['unifi'] = "randomcoww/unifi:20171217.05"

@@ -90,11 +90,10 @@ node.default['environment_v2']['set']['etcd'] = {
   }
 }
 
-node.default['environment_v2']['set']['flannel'] = {
-  'hosts' => [
-    'kube-master',
-    'kube-worker'
-  ]
+node.default['environment_v2']['set']['nfs'] = {
+  'vip' => {
+    'store' => "192.168.126.251",
+  }
 }
 
 
