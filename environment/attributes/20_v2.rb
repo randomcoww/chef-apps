@@ -108,8 +108,8 @@ node.default['environment_v2']['host']['gateway1'] = {
   },
   'if' => {
     'lan' => "eth0",
-    'store' => "eth1",
-    'wan' => "eth2",
+    'wan' => "eth1",
+    'store' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
@@ -130,8 +130,8 @@ node.default['environment_v2']['host']['gateway2'] = {
   },
   'if' => {
     'lan' => "eth0",
-    'store' => "eth1",
-    'wan' => "eth2",
+    'wan' => "eth1",
+    'store' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"
