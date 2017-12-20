@@ -24,6 +24,10 @@ deploy_config = {
           {
             "name" => "sshd",
             "image" => node['kube']['images']['sshd'],
+            "args" => [
+              "-p",
+              "2222"
+            ],
             "env" => [
               {
                 "name" => "AUTHORIZED_KEYS",
@@ -37,7 +41,7 @@ deploy_config = {
             "ports" => [
               {
                 "protocol" => "TCP",
-                "containerPort" => 22
+                "containerPort" => 2222
               }
             ]
           }
@@ -63,7 +67,7 @@ service_config = {
     "ports" => [
       {
         "port" => 2222,
-        "targetPort" => 22
+        "targetPort" => 2222
       }
     ],
     "selector" => {
