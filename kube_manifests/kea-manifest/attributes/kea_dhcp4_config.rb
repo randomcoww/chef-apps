@@ -43,6 +43,14 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
         }
       end
 
+      options << {
+        "name" => "domain-name",
+        "data" => [
+          node['environment_v2']['domain']['host'],
+          node['environment_v2']['domain']['top']
+        ].join('.')
+      }
+
       {
         "subnet" => subnet,
         "option-data" => options,

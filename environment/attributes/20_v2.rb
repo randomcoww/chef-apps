@@ -190,6 +190,13 @@ node.default['environment_v2']['host']['kube-worker'] = {
   'vcpu' => 4
 }
 
+## dns record only for unifi provision
+node.default['environment_v2']['host']['unifi'] = {
+  'ip' => {
+    'lan' => node['environment_v2']['set']['haproxy']['vip']['store']
+  }
+}
+
 
 ##
 ## hardware
