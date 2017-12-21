@@ -17,7 +17,9 @@ node.default['kube_manifests']['transmission']['openvpn_config'] = OpenvpnHelper
   "verb" => 3,
   "reneg-sec" => 0,
   "keepalive" => [10, 30],
-  "fast-io" => true
+  "fast-io" => true,
+  "route-nopull" => true,
+  "redirect-gateway" => true
 })
 
 node.default['kube_manifests']['transmission']['openvpn_crl'] = <<-EOF
