@@ -18,7 +18,7 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       "password" => node['mysql_credentials']['kea']['password'],
       "persist" => true
     },
-    "subnet4" => node['environment_v2']['subnet'].map { |i, subnet|
+    "subnet4" => node['environment_v2']['dhcp_pool'].map { |i, pool|
 
       options = []
 
@@ -52,11 +52,11 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       }
 
       {
-        "subnet" => subnet,
+        "subnet" => node['environment_v2']['subnet'][i],
         "option-data" => options,
         "pools" => [
           {
-           "pool" => node['environment_v2']['dhcp_pool'][i]
+           "pool" => pool
           }
         ],
         "reservations" => []
