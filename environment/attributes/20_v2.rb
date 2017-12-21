@@ -1,6 +1,6 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
-# node.default['environment_v2']['subnet']['zfs'] = "192.168.126.0/23"
+node.default['environment_v2']['subnet']['zfssync'] = "10.255.255.0/29"
 
 node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.64/26"
 node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.64/26"
@@ -205,11 +205,13 @@ node.default['environment_v2']['host']['unifi'] = {
 node.default['environment_v2']['host']['vm1'] = {
   'ip' => {
     'store' => '192.168.126.251',
+    'zfssync' => '10.255.255.1'
   },
   'if' => {
     'lan' => "eno1",
     'wan' => "eno2",
     'store' => "ens1f0",
+    'zfssync' => "ens1f1"
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -229,11 +231,13 @@ node.default['environment_v2']['host']['vm1'] = {
 node.default['environment_v2']['host']['vm2'] = {
   'ip' => {
     'store' => '192.168.126.252',
+    'zfssync' => '10.255.255.2'
   },
   'if' => {
     'lan' => "eno1",
     'wan' => "eno2",
     'store' => "ens1f0",
+    'zfssync' => "ens1f1"
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
