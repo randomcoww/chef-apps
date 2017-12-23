@@ -16,6 +16,9 @@ unbound_manifest = {
             "name" => "CONFIG",
             "value" => node['kube_manifests']['ns']['unbound_config']
           }
+        ],
+        "args" => [
+          "-vvv"
         ]
       }
     ]
