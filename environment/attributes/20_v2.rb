@@ -107,9 +107,9 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => "192.168.126.217",
   },
   'if' => {
-    'lan' => "eth0",
-    'wan' => "eth1",
-    'store' => "eth2",
+    'lan' => "ens2",
+    'wan' => "ens3",
+    'store' => "ens4",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
@@ -119,7 +119,7 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => 'sriov',
     'wan' => 'sriov',
   },
-  'memory' => 4096,
+  'memory' => 6144,
   'vcpu' => 4
 }
 
@@ -129,9 +129,9 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => "192.168.126.218",
   },
   'if' => {
-    'lan' => "eth0",
-    'wan' => "eth1",
-    'store' => "eth2",
+    'lan' => "ens2",
+    'wan' => "ens3",
+    'store' => "ens4",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"
@@ -141,7 +141,7 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => 'sriov',
     'wan' => 'sriov',
   },
-  'memory' => 4096,
+  'memory' => 6144,
   'vcpu' => 4
 }
 
@@ -175,7 +175,7 @@ node.default['environment_v2']['host']['kube-master'] = {
   'if_type' => {
     'store' => 'macvlan',
   },
-  'memory' => 4096,
+  'memory' => 6144,
   'vcpu' => 4
 }
 
@@ -186,7 +186,7 @@ node.default['environment_v2']['host']['kube-worker'] = {
   'if_type' => {
     'store' => 'macvlan',
   },
-  'memory' => 8192,
+  'memory' => 6144,
   'vcpu' => 4
 }
 

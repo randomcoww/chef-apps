@@ -104,6 +104,14 @@ deploy_config = {
       "spec" => {
         "restartPolicy" => "Always",
         "dnsPolicy" => "ClusterFirst",
+        ## use this when available
+        # "dnsPolicy" => "None",
+        # "dnsConfig" => {
+        #   "nameservers" => [
+        #     "8.8.8.8",
+        #     "8.8.4.4"
+        #   ]
+        # },
         "volumes" => [
           {
             "name" => "torrent-data",

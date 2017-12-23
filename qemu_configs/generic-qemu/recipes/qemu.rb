@@ -51,10 +51,20 @@ guests.each do |guest, host|
   if guest_config['if'].is_a?(Hash) &&
     guest_config['if_type'].is_a?(Hash)
 
+    ##
+    ## consistent interface names in VM
+    ##
+    ## this becomes interface "ens#{hardware_slot_index}" in KVM
+    ## make sure nics are always 2, 3, 4.. in order they are configured
+    hardware_slot_index = 2
+
     guest_config['if'].each do |i, interface|
 
       next if host_config['if'][i].nil?
 
+      ##
+      ## mac if provided
+      ##
       mac_hash = {}
       if guest_config['mac'].is_a?(Hash) &&
         !guest_config['mac'][i].nil?
@@ -68,8 +78,27 @@ guests.each do |guest, host|
         }
       end
 
-      case guest_config['if_type'][i]
+      ##
+      ## vm slot address
+      ##
+      address_hash = {
+        "address"=>{
+          "#attributes"=>{
+            'type'=>'pci',
+            'domain'=>0,
+            'bus'=>0,
+            'slot'=>hardware_slot_index,
+            'function'=>0,
+          }
+        }
+      }
 
+      hardware_slot_index += 1
+
+      ##
+      ## host nic type sriov or macvlan
+      ##
+      case guest_config['if_type'][i]
       when 'sriov'
         ## sriov
         networks << {
@@ -86,7 +115,7 @@ guests.each do |guest, host|
               "type"=>"virtio-net"
             }
           }
-        }.merge(mac_hash)
+        }.merge(mac_hash).merge(address_hash)
 
       when 'macvlan'
         ## macvtap
@@ -106,7 +135,7 @@ guests.each do |guest, host|
               "type"=>"virtio-net"
             }
           }
-        }.merge(mac_hash)
+        }.merge(mac_hash).merge(address_hash)
 
       end
     end
@@ -163,7 +192,7 @@ guests.each do |guest, host|
           "#text"=>[
             "coreos.first_boot=1",
             "coreos.config.url=#{node['environment_v2']['url']['ignition']}/#{guest}",
-            "net.ifnames=0",
+            # "net.ifnames=0",
             "console=hvc0",
             "elevator=noop"
           ].join(' '),

@@ -116,28 +116,28 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   networkd = []
 
-  node['environment_v2']['host'][host]['if'].each do |i, interface|
-
-    if !interface.nil?
-      networkd << {
-        "name" => "#{interface}.network",
-        "contents" => {
-          "Match" => {
-            "Name" => interface
-          },
-          "Network" => {
-            "LinkLocalAddressing" => "no",
-            "DHCP" => "yes",
-          },
-          "DHCP" => {
-            "UseDNS" => "true",
-            "RouteMetric" => 500,
-            # "UseHostname" => "%m"
-          }
-        }
-      }
-    end
-  end
+  # node['environment_v2']['host'][host]['if'].each do |i, interface|
+  #
+  #   if !interface.nil?
+  #     networkd << {
+  #       "name" => "#{interface}.network",
+  #       "contents" => {
+  #         "Match" => {
+  #           "Name" => interface
+  #         },
+  #         "Network" => {
+  #           "LinkLocalAddressing" => "no",
+  #           "DHCP" => "yes",
+  #         },
+  #         "DHCP" => {
+  #           "UseDNS" => "true",
+  #           "RouteMetric" => 500,
+  #           # "UseHostname" => "%m"
+  #         }
+  #       }
+  #     }
+  #   end
+  # end
 
 
   # etcd_environment = {
