@@ -65,7 +65,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         "DHCP" => {
           "UseDNS" => "false",
           "UseNTP" => "false",
-          "Anonymize" => "true",
+          ## failing with new coreos
+          # "Anonymize" => "true",
           "SendHostname" => "false",
           "UseHostname" => "false",
           "UseDomains" => "false",
