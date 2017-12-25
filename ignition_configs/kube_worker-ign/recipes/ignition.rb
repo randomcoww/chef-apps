@@ -191,7 +191,8 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--tls-cert-file=#{node['kubernetes']['cert_path']}",
             "--tls-private-key-file=#{node['kubernetes']['key_path']}",
-            "--docker-disable-shared-pid=false"
+            "--docker-disable-shared-pid=false",
+            # "--feature-gates=CustomPodDNS=true"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

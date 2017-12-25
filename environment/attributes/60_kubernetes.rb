@@ -89,9 +89,9 @@ node.default['kube']['images']['keepalived'] = "randomcoww/keepalived:20171201.0
 node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171223.02"
 node.default['kube']['images']['nftables'] = "randomcoww/nftables:20171215.01"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:20171216.01"
-node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20171221.01"
+node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20171224.02"
 node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.1-amd64"
-node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
+# node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 # node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
 
 node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"

@@ -16,7 +16,7 @@ node['environment_v2']['set'].each_value do |set|
         }
 
         services["backend #{service}"] = {
-          "{{range $node, $host := $.Nodes}}server" => "{{$node.NodeName}} {{$host.InternalIP}}:#{c['port']} check
+          "{{range $nodename, $n := $.Nodes}}server" => "{{$nodename}} {{$n.Address}}:#{c['port']} check
   {{end}}"
         }
       end
@@ -59,13 +59,12 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
 
 
 haproxy_template = <<-EOF
-{{range $service, $ports := $.Services}}{{if $ports.NodePort}}
-frontend {{$service.ServiceName}}_{{$service.PortName}}
-  default_backend {{$service.ServiceName}}_{{$service.PortName}}
-  bind *:{{$ports.Port}}
+{{range $name, $s := $.Services}}{{range $portname, $p := $s.Ports}}frontend {{$name}}_{{$portname}}
+  default_backend {{$name}}_{{$portname}}
+  bind *:{{$p.TargetPort}}
   maxconn 2000
-backend {{$service.ServiceName}}_{{$service.PortName}}
-  {{range $node, $host := $.Nodes}}server {{$node.NodeName}} {{$host.InternalIP}}:{{$ports.NodePort}} check
+backend {{$name}}_{{$portname}}
+  {{range $nodename, $n := $.Nodes}}server {{$nodename}} {{$n.Address}}:{{$p.NodePort}} check
   {{end}}
 {{end}}{{end}}
 EOF
