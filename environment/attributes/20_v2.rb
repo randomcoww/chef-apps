@@ -90,13 +90,6 @@ node.default['environment_v2']['set']['etcd'] = {
   }
 }
 
-node.default['environment_v2']['set']['nfs'] = {
-  'vip' => {
-    'store' => "192.168.126.251",
-  }
-}
-
-
 ##
 ## hosts
 ##
@@ -190,14 +183,6 @@ node.default['environment_v2']['host']['kube-worker'] = {
   'vcpu' => 4
 }
 
-## dns record only for unifi provision
-node.default['environment_v2']['host']['unifi'] = {
-  'ip' => {
-    'lan' => node['environment_v2']['set']['haproxy']['vip']['store']
-  }
-}
-
-
 ##
 ## hardware
 ##
@@ -263,5 +248,27 @@ node.default['environment_v2']['host']['vm2-ipmi'] = {
 node.default['environment_v2']['host']['sw'] = {
   'ip' => {
     'lan' => '192.168.63.95'
+  }
+}
+
+##
+## aliases
+##
+
+node.default['environment_v2']['set']['nfs'] = {
+  'vip' => {
+    'store' => node['environment_v2']['host']['vm1']['ip']['store'],
+  }
+}
+
+node.default['environment_v2']['set']['tr'] = {
+  'vip' => {
+    'store' => node['environment_v2']['set']['haproxy']['vip']['store']
+  }
+}
+
+node.default['environment_v2']['host']['unifi'] = {
+  'ip' => {
+    'lan' => node['environment_v2']['set']['haproxy']['vip']['store']
   }
 }
