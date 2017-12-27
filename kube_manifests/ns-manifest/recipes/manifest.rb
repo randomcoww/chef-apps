@@ -17,9 +17,18 @@ unbound_manifest = {
             "value" => node['kube_manifests']['ns']['unbound_config']
           }
         ],
-        "args" => [
-          "-vvv"
-        ]
+        # "ports" => [
+        #   {
+        #     "containerPort" => 53,
+        #     "hostPort" => 53,
+        #     "protocol" => "TCP"
+        #   },
+        #   {
+        #     "containerPort" => 53,
+        #     "hostPort" => 53,
+        #     "protocol" => "UDP"
+        #   }
+        # ]
       }
     ]
   }

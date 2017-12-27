@@ -2,7 +2,7 @@
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.9.0'
+node.default['kubernetes']['version'] = '1.8.5'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -86,7 +86,7 @@ node.default['kube']['images']['mysql_cluster'] = "randomcoww/mysql_cluster:2017
 node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:20171201.05"
 node.default['kube']['images']['haproxy'] = "haproxy:1.8.0-alpine"
 node.default['kube']['images']['keepalived'] = "randomcoww/keepalived:20171201.08"
-node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171223.02"
+node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171226.02"
 node.default['kube']['images']['nftables'] = "randomcoww/nftables:20171215.01"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:20171216.01"
 node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20171224.02"
@@ -94,9 +94,9 @@ node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.1-amd64
 # node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 # node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
 
-node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
-node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
-node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"
-node.default['kube']['images']['transmission'] = "randomcoww/transmission:20171201.01"
-node.default['kube']['images']['mpd'] = "randomcoww/mpd:20171201.01"
-node.default['kube']['images']['unifi'] = "randomcoww/unifi:20171217.05"
+# node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
+# node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
+# node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"
+# node.default['kube']['images']['transmission'] = "randomcoww/transmission:20171201.01"
+# node.default['kube']['images']['mpd'] = "randomcoww/mpd:20171201.01"
+# node.default['kube']['images']['unifi'] = "randomcoww/unifi:20171217.05"

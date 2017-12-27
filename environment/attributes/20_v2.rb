@@ -100,17 +100,20 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => "192.168.126.217",
   },
   'if' => {
-    'lan' => "ens2",
-    'wan' => "ens3",
-    'store' => "ens4",
+    # 'lan' => "ens2",
+    # 'store' => "ens3",
+    # 'wan' => "ens4",
+    'lan' => "eth0",
+    'store' => "eth1",
+    'wan' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b0"
   },
   'if_type' => {
-    'lan' => 'sriov',
-    'store' => 'sriov',
-    'wan' => 'sriov',
+    'lan' => 'macvlan',
+    'store' => 'macvlan',
+    'wan' => 'macvlan',
   },
   'memory' => 6144,
   'vcpu' => 4
@@ -122,17 +125,20 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => "192.168.126.218",
   },
   'if' => {
-    'lan' => "ens2",
-    'wan' => "ens3",
-    'store' => "ens4",
+    # 'lan' => "ens2",
+    # 'store' => "ens3",
+    # 'wan' => "ens4",
+    'lan' => "eth0",
+    'store' => "eth1",
+    'wan' => "eth2",
   },
   'mac' => {
     "wan" => "52:54:00:63:6e:b1"
   },
   'if_type' => {
-    'lan' => 'sriov',
-    'store' => 'sriov',
-    'wan' => 'sriov',
+    'lan' => 'macvlan',
+    'store' => 'macvlan',
+    'wan' => 'macvlan',
   },
   'memory' => 6144,
   'vcpu' => 4
@@ -261,7 +267,7 @@ node.default['environment_v2']['set']['nfs'] = {
   }
 }
 
-node.default['environment_v2']['set']['tr'] = {
+node.default['environment_v2']['set']['transmission'] = {
   'vip' => {
     'store' => node['environment_v2']['set']['haproxy']['vip']['store']
   }
