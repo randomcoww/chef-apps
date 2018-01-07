@@ -199,10 +199,10 @@ node.default['environment_v2']['host']['vm1'] = {
     # 'zfssync' => '10.255.255.1'
   },
   'if' => {
-    'lan' => "eno1",
-    'wan' => "eno2",
-    'store' => "ens1f0",
-    'zfssync' => "ens1f1"
+    'lan' => "eno2",
+    'wan' => "wan",
+    'store' => "eno1",
+    'zfssync' => "ens1f0"
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -225,10 +225,10 @@ node.default['environment_v2']['host']['vm2'] = {
     # 'zfssync' => '10.255.255.2'
   },
   'if' => {
-    'lan' => "eno1",
-    'wan' => "eno2",
-    'store' => "ens1f0",
-    'zfssync' => "ens1f1"
+    'lan' => "eno2",
+    'wan' => "wan",
+    'store' => "eno1",
+    'zfssync' => "ens1f0"
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
@@ -237,23 +237,26 @@ node.default['environment_v2']['host']['vm2'] = {
   #   'function' => "0x0",
   #   'file' => "/data/kvm/firmware/mptsas3.rom"
   # }
+  'guests' => [
+    'gateway1', 'gateway2',
+  ]
 }
 
 node.default['environment_v2']['host']['vm1-ipmi'] = {
   'ip' => {
-    'lan' => '192.168.63.61'
+    'lan' => '192.168.127.61'
   }
 }
 
 node.default['environment_v2']['host']['vm2-ipmi'] = {
   'ip' => {
-    'lan' => '192.168.63.62'
+    'lan' => '192.168.127.62'
   }
 }
 
 node.default['environment_v2']['host']['sw'] = {
   'ip' => {
-    'lan' => '192.168.63.95'
+    'lan' => '192.168.127.95'
   }
 }
 
