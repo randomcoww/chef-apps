@@ -1,0 +1,77 @@
+install
+text
+shutdown
+skipx
+url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+lang en_US.UTF-8
+keyboard us
+timezone --utc Etc/UTC
+rootpw --lock password
+firewall --disabled
+network --hostname=<%= @hostname %>
+
+## user
+user --name=<%= @username %> --password=<%= @password %> --plaintext --groups <%= @groups.join(',') %>
+<%= @sshkeys %>
+
+## disk
+zerombr
+autopart --type=plain
+clearpart --all --initlabel
+bootloader --timeout=1 --append="<%= @boot_params.join(' ') %>"
+
+## packages
+%packages --excludeWeakdeps --excludedocs
+<% @packages_install.each do |p| %>
+<%= p %>
+<% end %>
+<% @packages_remove.each do |p| %>
+-<%= p %>
+<% end %>
+%end
+
+##
+## post config
+##
+
+%post --erroronfail
+
+## systemd resolved
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## systemd networkd
+<% @networks.each do |f, n| %>
+cat <<EOF > /etc/systemd/network/50-<%= f %>
+<%= SystemdHelper::ConfigGenerator.generate_from_hash(n.to_hash) %>EOF
+
+<% end %>
+## enable services
+systemctl enable <%= @services_enable.join(' ') %>
+
+## sshd options
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
+## dnf automatic
+cat <<EOF > /etc/dnf/automatic.conf
+[commands]
+upgrade_type = security
+[emitters]
+emit_via = motd
+EOF
+
+## cleanup
+echo -n > /var/lib/dbus/machine-id
+echo -n > /etc/machine-id
+
+%end

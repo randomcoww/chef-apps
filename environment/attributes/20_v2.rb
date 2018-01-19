@@ -90,6 +90,20 @@ node.default['environment_v2']['set']['etcd'] = {
   }
 }
 
+node.default['environment_v2']['set']['vmhost'] = {
+  'hosts' => [
+    'vm1',
+    'vm2',
+  ]
+}
+
+node.default['environment_v2']['set']['mgm'] = {
+  'hosts' => [
+    'chromebook',
+  ]
+}
+
+
 ##
 ## hosts
 ##
@@ -196,7 +210,7 @@ node.default['environment_v2']['host']['kube-worker'] = {
 node.default['environment_v2']['host']['vm1'] = {
   'ip' => {
     'store' => '192.168.126.251',
-    # 'zfssync' => '10.255.255.1'
+    'zfssync' => '10.255.255.1'
   },
   'if' => {
     'lan' => "eno2",
@@ -222,7 +236,7 @@ node.default['environment_v2']['host']['vm1'] = {
 node.default['environment_v2']['host']['vm2'] = {
   'ip' => {
     'store' => '192.168.126.252',
-    # 'zfssync' => '10.255.255.2'
+    'zfssync' => '10.255.255.2'
   },
   'if' => {
     'lan' => "eno2",
@@ -258,6 +272,15 @@ node.default['environment_v2']['host']['sw'] = {
   'ip' => {
     'lan' => '192.168.127.95'
   }
+}
+
+node.default['environment_v2']['host']['chromebook'] = {
+  'ip' => {
+    'store' => '192.168.127.96',
+  },
+  'if' => {
+    'store' => "enp4s0",
+  },
 }
 
 ##
