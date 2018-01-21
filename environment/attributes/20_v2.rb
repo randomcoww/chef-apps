@@ -226,8 +226,10 @@ node.default['environment_v2']['host']['vm1'] = {
   #   'file' => "/data/kvm/firmware/mptsas3.rom"
   # }
   'guests' => [
-    'gateway1', 'gateway2',
-    'etcd1', 'etcd2',
+    'gateway1',
+    # 'gateway2',
+    'etcd1',
+    'etcd2',
     'kube-master',
     'kube-worker'
   ]
@@ -252,7 +254,8 @@ node.default['environment_v2']['host']['vm2'] = {
   #   'file' => "/data/kvm/firmware/mptsas3.rom"
   # }
   'guests' => [
-    'gateway1', 'gateway2',
+    # 'gateway1',
+    'gateway2',
   ]
 }
 
