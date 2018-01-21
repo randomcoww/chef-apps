@@ -8,6 +8,8 @@
 end
 
 
+subnet = node['environment_v2']['subnet']
+
 node['environment_v2']['set']['mgm']['hosts'].each do |host|
 
   interfaces = node['environment_v2']['host'][host]['if']
@@ -23,7 +25,7 @@ node['environment_v2']['set']['mgm']['hosts'].each do |host|
         "DHCP" => "yes",
       },
       "Address" => {
-        "Address" => ips['store']
+        "Address" => "#{ips['store']}/#{subnet['store'].split('/').last}"
       }
     },
 

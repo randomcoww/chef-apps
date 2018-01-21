@@ -24,7 +24,6 @@ node.default['kickstart']['vmhost']['packages_install'] = %w{
   qemu-kvm
   openssh
   gnupg
-  ntp
   ksm
   nfs-utils
   pciutils

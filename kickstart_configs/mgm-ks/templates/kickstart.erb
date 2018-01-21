@@ -71,6 +71,9 @@ emit_via = motd
 EOF
 
 ## cleanup
+dnf -y autoremove
+dnf -y clean all
+
 echo -n > /var/lib/dbus/machine-id
 echo -n > /etc/machine-id
 

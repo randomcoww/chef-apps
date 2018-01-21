@@ -37,9 +37,10 @@ bootloader --timeout=1 --append="<%= @boot_params.join(' ') %>"
 %post --erroronfail
 
 ## ZFS
-dnf -y install http://download.zfsonlinux.org/fedora/zfs-release$(rpm -E %dist).noarch.rpm
-gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux
-dnf -y install "kernel-devel-uname-r == $(uname -r)" zfs
+dnf -y install http://download.zfsonlinux.org/fedora/zfs-release$(rpm -E %dist).noarch.rpm && \
+gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux && \
+dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
+dnf -y swap zfs-fuse zfs
 
 ## systemd resolved
 cat <<EOF > /etc/systemd/resolved.conf
@@ -101,6 +102,9 @@ EOF
 grub2-mkconfig -o /boot/grub2/grub.cfg
 
 ## cleanup
+dnf -y autoremove
+dnf -y clean all
+
 echo -n > /var/lib/dbus/machine-id
 echo -n > /etc/machine-id
 

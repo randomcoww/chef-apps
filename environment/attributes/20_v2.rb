@@ -1,6 +1,6 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
-# node.default['environment_v2']['subnet']['zfssync'] = "10.255.255.0/29"
+node.default['environment_v2']['subnet']['zfssync'] = "10.255.255.0/29"
 
 node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.64/26"
 node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.64/26"

@@ -16,7 +16,6 @@ node.default['kickstart']['mgm']['packages_install'] = %w{
   ipmitool
   openssh
   gnupg
-  ntp
   pciutils
   screen
   dnf-automatic
