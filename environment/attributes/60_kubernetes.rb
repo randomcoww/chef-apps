@@ -83,8 +83,8 @@ node.default['environment_v2']['url']['manifests'] = 'https://raw.githubusercont
 ##
 node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
 node.default['kube']['images']['mysql_cluster'] = "randomcoww/mysql_cluster:7.5.9-1"
-node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:20171201.05"
-node.default['kube']['images']['haproxy'] = "haproxy:1.8.0-alpine"
+node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:1_3_0"
+node.default['kube']['images']['haproxy'] = "haproxy:1.8.3-alpine"
 node.default['kube']['images']['keepalived'] = "randomcoww/keepalived:20171201.08"
 node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171226.02"
 node.default['kube']['images']['nftables'] = "randomcoww/nftables:20171215.01"
