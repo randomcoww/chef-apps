@@ -29,6 +29,17 @@ unbound_manifest = {
         #     "protocol" => "UDP"
         #   }
         # ]
+      },
+      {
+        "name" => "dnsdist",
+        "image" => node['kube']['images']['dnsdist'],
+        "args" => [
+          "-v",
+          "-l",
+          "0.0.0.0:53",
+        ] + node['environment_v2']['set']['gateway']['hosts'].map { |e|
+          "#{node['environment_v2']['host'][e]['ip']['store']}:53531"
+        }
       }
     ]
   }

@@ -3,9 +3,9 @@ host_store_reservations = []
 
 node.default['kube_manifests']['kea']['dhcp4_config'] = {
   "Dhcp4" => {
-    "valid-lifetime" => 3600,
-    "renew-timer" => 3600,
-    "rebind-timer" => 3600,
+    "valid-lifetime" => 300,
+    "renew-timer" => 300,
+    "rebind-timer" => 300,
     "interfaces-config" => {
       "interfaces" => [ '*' ]
     },
@@ -25,7 +25,10 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       if !node['environment_v2']['set']['gateway']['vip'][i].nil?
         options << {
           "name" => "routers",
-          "data" => node['environment_v2']['set']['gateway']['vip'][i]
+          # "data" => node['environment_v2']['set']['gateway']['vip'][i]
+          "data" => node['environment_v2']['set']['gateway']['hosts'].map { |e|
+            node['environment_v2']['host'][e]['ip']['store']
+          }.join(','),
         }
       end
 
@@ -33,7 +36,7 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
         options << {
           "name" => "domain-name-servers",
           # "data" => (node['environment_v2']['set']['ns']['hosts'].map { |e|
-          #   node['environment_v2']['host'][e]['ip_lan']
+          #   node['environment_v2']['host'][e]['ip']['lan']
           # } + [ '8.8.8.8' ]).join(','),
           "data" => [
             node['environment_v2']['set']['ns']['vip'][i],

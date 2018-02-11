@@ -71,6 +71,7 @@ end
 node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::ConfigGenerator.generate_from_hash({
   'server' => {
     'interface-automatic' => true,
+    'port' => 53531,
     'interface' => '0.0.0.0',
     'num-threads' => 2,
     'do-ip6' => false,
