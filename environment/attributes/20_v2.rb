@@ -21,8 +21,8 @@ node.default['environment_v2']['set']['gateway'] = {
     'gateway2'
   ],
   'vip' => {
-    'lan' => "192.168.62.240",
     'store' => "192.168.126.240",
+    'lan' => "192.168.62.240",
   }
 }
 
@@ -33,8 +33,8 @@ node.default['environment_v2']['set']['dns'] = {
     'ns3',
   ],
   'vip' => {
-    'lan' => "192.168.62.241",
-    'store' => "192.168.126.241",
+    'store' => "192.168.126.244",
+    'lan' => "192.168.62.244",
   }
 }
 
@@ -44,7 +44,7 @@ node.default['environment_v2']['set']['kea'] = {
     'ns2'
   ],
   'vip' => {
-    'store' => "192.168.126.243",
+    'store' => "192.168.126.245",
   }
 }
 
@@ -126,8 +126,8 @@ node.default['environment_v2']['set']['mgm'] = {
 
 node.default['environment_v2']['host']['gateway1'] = {
   'ip' => {
-    'lan' => "192.168.62.217",
     'store' => "192.168.126.217",
+    'lan' => "192.168.62.217",
   },
   'if' => {
     # 'lan' => "ens2",
@@ -151,8 +151,8 @@ node.default['environment_v2']['host']['gateway1'] = {
 
 node.default['environment_v2']['host']['gateway2'] = {
   'ip' => {
-    'lan' => "192.168.62.218",
     'store' => "192.168.126.218",
+    'lan' => "192.168.62.218",
   },
   'if' => {
     # 'lan' => "ens2",
@@ -176,8 +176,8 @@ node.default['environment_v2']['host']['gateway2'] = {
 
 node.default['environment_v2']['host']['ns1'] = {
   'ip' => {
-    'lan' => "192.168.62.219",
     'store' => "192.168.126.219",
+    'lan' => "192.168.62.219",
   },
   'if' => {
     'lan' => "eth0",
@@ -193,8 +193,8 @@ node.default['environment_v2']['host']['ns1'] = {
 
 node.default['environment_v2']['host']['ns2'] = {
   'ip' => {
-    'lan' => "192.168.62.220",
     'store' => "192.168.126.220",
+    'lan' => "192.168.62.220",
   },
   'if' => {
     'lan' => "eth0",
@@ -210,8 +210,8 @@ node.default['environment_v2']['host']['ns2'] = {
 
 node.default['environment_v2']['host']['ns3'] = {
   'ip' => {
-    'lan' => "192.168.62.221",
     'store' => "192.168.126.221",
+    'lan' => "192.168.62.221",
   },
   'if' => {
     'lan' => "eth0",
