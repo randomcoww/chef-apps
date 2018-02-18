@@ -48,19 +48,47 @@ guests.each do |guest, host|
 
   networks = []
 
+  # kernel boot option
+  ignition_ip_config = []
+
   if guest_config['if'].is_a?(Hash) &&
     guest_config['if_type'].is_a?(Hash)
 
     ##
     ## consistent interface names in VM
     ##
-    ## this becomes interface "ens#{hardware_slot_index}" in KVM
+    ## this becomes interface "ens#{hardware_slot_index}" in guest with sriov
     ## make sure nics are always 2, 3, 4.. in order they are configured
     hardware_slot_index = 2
+
+    # add static config to ignition if static ip configured
+    # skip if there are any dhcp configured interfaces
+    use_ignition_ip_config = guest_config['ip'].is_a?(Hash) &&
+        guest_config['ip'].length == guest_config['if'].length
+
 
     guest_config['if'].each do |i, interface|
 
       next if host_config['if'][i].nil?
+
+      ##
+      ## if static ip
+      ##
+      if use_ignition_ip_config &&
+        !guest_config['ip'][i].nil?
+
+        ignition_ip_config << "ip=" + [
+          guest_config['ip'][i],
+          '',
+          node['environment_v2']['set']['gateway']['vip'][i],
+          node['environment_v2']['netmask'][i],
+          '',
+          guest_config['if'][i],
+          'none',
+          node['environment_v2']['set']['dns']['vip'][i],
+          '8.8.8.8',
+        ].join(':')
+      end
 
       ##
       ## mac if provided
@@ -189,13 +217,13 @@ guests.each do |guest, host|
           "#text"=>node['qemu']['pxe_initrd_path']
         },
         "cmdline"=>{
-          "#text"=>[
+          "#text"=>([
             "coreos.first_boot=1",
             "coreos.config.url=#{node['environment_v2']['url']['ignition']}/#{guest}",
             # "net.ifnames=0",
             "console=hvc0",
-            "elevator=noop"
-          ].join(' '),
+            "elevator=noop",
+          ] + ignition_ip_config).join(' '),
         },
         "boot"=>{
           "#attributes"=>{

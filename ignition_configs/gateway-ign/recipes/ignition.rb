@@ -73,41 +73,42 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     }
   end
 
+  if node['environment_v2']['host'][host]['ip'].is_a?(Hash)
+    interfaces.each do |i, interface|
 
-  interfaces.each do |i, interface|
+      addr = node['environment_v2']['host'][host]['ip'][i]
+      vip_route = node['environment_v2']['set']['gateway']['vip'][i]
 
-    addr = node['environment_v2']['host'][host]['ip'][i]
-    vip_route = node['environment_v2']['set']['gateway']['vip'][i]
+      if !interface.nil? &&
+        !addr.nil? &&
+        !vip_route.nil?
 
-    if !interface.nil? &&
-      !addr.nil? &&
-      !vip_route.nil?
+        subnet_mask = node['environment_v2']['subnet'][i].split('/').last
 
-      subnet_mask = node['environment_v2']['subnet'][i].split('/').last
-
-      networkd << {
-        "name" => "#{interface}.network",
-        "contents" => {
-          "Match" => {
-            "Name" => interface
-          },
-          "Network" => {
-            "LinkLocalAddressing" => "no",
-            "DHCP" => "no",
-            "DNS" => [
-              node['environment_v2']['set']['dns']['vip'][i],
-              '8.8.8.8'
-            ]
-          },
-          "Address" => {
-            "Address" => "#{addr}/#{subnet_mask}"
-          },
-          "Route" => {
-            "Gateway" => vip_route,
-            "Metric" => 2048
+        networkd << {
+          "name" => "#{interface}.network",
+          "contents" => {
+            "Match" => {
+              "Name" => interface
+            },
+            "Network" => {
+              "LinkLocalAddressing" => "no",
+              "DHCP" => "no",
+              "DNS" => [
+                node['environment_v2']['set']['dns']['vip'][i],
+                '8.8.8.8'
+              ]
+            },
+            "Address" => {
+              "Address" => "#{addr}/#{subnet_mask}"
+            },
+            "Route" => {
+              "Gateway" => vip_route,
+              "Metric" => 2048
+            }
           }
         }
-      }
+      end
     end
   end
 

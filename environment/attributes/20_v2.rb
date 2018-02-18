@@ -2,6 +2,10 @@ node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 node.default['environment_v2']['subnet']['zfssync'] = "10.255.255.0/29"
 
+node.default['environment_v2']['netmask']['lan'] = '255.255.254.0'
+node.default['environment_v2']['netmask']['store'] = '255.255.254.0'
+node.default['environment_v2']['netmask']['zfssync'] = '255.255.255.240'
+
 node.default['environment_v2']['dhcp_pool']['lan'] = "192.168.62.64/26"
 node.default['environment_v2']['dhcp_pool']['store'] = "192.168.126.64/26"
 
@@ -226,9 +230,9 @@ node.default['environment_v2']['host']['ns3'] = {
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
-  'ip' => {
-    'store' => "192.168.126.222",
-  },
+  # 'ip' => {
+  #   'store' => "192.168.126.222",
+  # },
   'if' => {
     'store' => "eth0",
   },
@@ -240,9 +244,9 @@ node.default['environment_v2']['host']['etcd1'] = {
 }
 
 node.default['environment_v2']['host']['etcd2'] = {
-  'ip' => {
-    'store' => "192.168.126.223",
-  },
+  # 'ip' => {
+  #   'store' => "192.168.126.223",
+  # },
   'if' => {
     'store' => "eth0",
   },
@@ -254,9 +258,9 @@ node.default['environment_v2']['host']['etcd2'] = {
 }
 
 node.default['environment_v2']['host']['etcd3'] = {
-  'ip' => {
-    'store' => "192.168.126.224",
-  },
+  # 'ip' => {
+  #   'store' => "192.168.126.224",
+  # },
   'if' => {
     'store' => "eth0",
   },
