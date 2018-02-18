@@ -56,11 +56,7 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
         },
         "Network" => {
           "LinkLocalAddressing" => "no",
-          "DHCP" => "yes",
-          "DNS" => [
-            '127.0.0.1',
-            '8.8.8.8'
-          ]
+          "DHCP" => "yes"
         },
         "DHCP" => {
           "UseDNS" => "false",
@@ -98,6 +94,10 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
           "Network" => {
             "LinkLocalAddressing" => "no",
             "DHCP" => "no",
+            "DNS" => [
+              node['environment_v2']['set']['dns']['vip'][i],
+              '8.8.8.8'
+            ]
           },
           "Address" => {
             "Address" => "#{addr}/#{subnet_mask}"

@@ -37,14 +37,14 @@ unbound_manifest = {
           "-v",
           "-l",
           "0.0.0.0:53",
-        ] + node['environment_v2']['set']['gateway']['hosts'].map { |e|
-          "#{node['environment_v2']['host'][e]['ip']['store']}:53531"
+        ] + node['environment_v2']['set']['dns']['hosts'].map { |e|
+          "#{node['environment_v2']['host'][e]['ip']['store']}:53532"
         }
       }
     ]
   }
 }
 
-node['environment_v2']['set']['ns']['hosts'].each do |host|
+node['environment_v2']['set']['dns']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['unbound'] = unbound_manifest
 end

@@ -62,7 +62,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      'DNS.1' => ['*', domain].join('.')
+      'DNS.1' => ['*', domain].join('.'),
+      'DNS.2' => domain
     }
   )
 
@@ -116,29 +117,44 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
 
   networkd = []
 
-  # node['environment_v2']['host'][host]['if'].each do |i, interface|
-  #
-  #   if !interface.nil?
-  #     networkd << {
-  #       "name" => "#{interface}.network",
-  #       "contents" => {
-  #         "Match" => {
-  #           "Name" => interface
-  #         },
-  #         "Network" => {
-  #           "LinkLocalAddressing" => "no",
-  #           "DHCP" => "yes",
-  #         },
-  #         "DHCP" => {
-  #           "UseDNS" => "true",
-  #           "RouteMetric" => 500,
-  #           # "UseHostname" => "%m"
-  #         }
-  #       }
-  #     }
-  #   end
-  # end
+  interfaces = node['environment_v2']['host'][host]['if'].to_hash.dup
 
+  interfaces.each do |i, interface|
+
+    addr = node['environment_v2']['host'][host]['ip'][i]
+    vip_route = node['environment_v2']['set']['gateway']['vip'][i]
+
+    if !interface.nil? &&
+      !addr.nil? &&
+      !vip_route.nil?
+
+      subnet_mask = node['environment_v2']['subnet'][i].split('/').last
+
+      networkd << {
+        "name" => "#{interface}.network",
+        "contents" => {
+          "Match" => {
+            "Name" => interface
+          },
+          "Network" => {
+            "LinkLocalAddressing" => "no",
+            "DHCP" => "no",
+            "DNS" => [
+              node['environment_v2']['set']['dns']['vip'][i],
+              '8.8.8.8'
+            ]
+          },
+          "Address" => {
+            "Address" => "#{addr}/#{subnet_mask}"
+          },
+          "Route" => {
+            "Gateway" => vip_route,
+            "Metric" => 2048
+          }
+        }
+      }
+    end
+  end
 
   # etcd_environment = {
   #   "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",

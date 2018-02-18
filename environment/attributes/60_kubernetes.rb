@@ -2,7 +2,7 @@
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.8.5'
+node.default['kubernetes']['version'] = '1.9.3'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -82,15 +82,15 @@ node.default['environment_v2']['url']['manifests'] = 'https://raw.githubusercont
 ## images
 ##
 node.default['kube']['images']['hyperkube'] = "gcr.io/google_containers/hyperkube:v#{node['kubernetes']['version']}"
-node.default['kube']['images']['mysql_cluster'] = "randomcoww/mysql_cluster:7.5.9-1"
-node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:1_3_0"
-node.default['kube']['images']['haproxy'] = "haproxy:1.8.3-alpine"
+node.default['kube']['images']['mysql_cluster'] = "randomcoww/mysql_cluster:7.6.4"
+node.default['kube']['images']['kea_dhcp4'] = "randomcoww/kea:1.3.0"
+node.default['kube']['images']['haproxy'] = "haproxy:1.8.4-alpine"
 node.default['kube']['images']['keepalived'] = "randomcoww/keepalived:20171201.08"
 node.default['kube']['images']['unbound'] = "randomcoww/unbound:20171226.02"
 node.default['kube']['images']['nftables'] = "randomcoww/nftables:20171215.01"
 node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolver:20180111.01"
 node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20180111.01"
-node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.9.1-amd64"
+node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.10.0-amd64"
 node.default['kube']['images']['dnsdist'] = "randomcoww/dnsdist:1.2.0"
 # node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 # node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"

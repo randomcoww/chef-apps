@@ -470,7 +470,7 @@ kube_haproxy_manifest = {
 #           "timeoutSeconds" => 5
 #         },
 #         "args" => [
-#           "--nameservers=#{node['environment_v2']['set']['ns']['vip_lan']}",
+#           "--nameservers=#{node['environment_v2']['set']['dns']['vip_lan']}",
 #           "--domain=#{node['kubernetes']['cluster_domain']}.",
 #           "--dns-port=10053",
 #           "--config-dir=/kube-dns-config",

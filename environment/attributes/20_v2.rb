@@ -26,10 +26,11 @@ node.default['environment_v2']['set']['gateway'] = {
   }
 }
 
-node.default['environment_v2']['set']['ns'] = {
+node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'ns1',
+    'ns2',
+    'ns3',
   ],
   'vip' => {
     'lan' => "192.168.62.241",
@@ -39,11 +40,44 @@ node.default['environment_v2']['set']['ns'] = {
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'ns1',
+    'ns2'
+  ],
+  'vip' => {
+    'store' => "192.168.126.243",
+  }
+}
+
+node.default['environment_v2']['set']['kea-mysql-data'] = {
+  'hosts' => [
+    'ns1',
+    'ns2'
   ]
 }
 
+node.default['environment_v2']['set']['kea-mysql-mgm'] = {
+  'hosts' => [
+    'ns3',
+  ]
+}
+
+node.default['environment_v2']['set']['etcd'] = {
+  'hosts' => [
+    'etcd1',
+    'etcd2',
+    'etcd3',
+  ],
+  "services" => {
+    'etcd-server-ssl' => {
+      "port" => 2380,
+      "proto" => "tcp",
+    },
+    'etcd-client-ssl' => {
+      "port" => 2379,
+      "proto" => "tcp"
+    }
+  }
+}
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
@@ -66,28 +100,10 @@ node.default['environment_v2']['set']['kube-master'] = {
   }
 }
 
-
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
     'kube-worker'
   ]
-}
-
-node.default['environment_v2']['set']['etcd'] = {
-  'hosts' => [
-    'etcd1',
-    'etcd2',
-  ],
-  "services" => {
-    'etcd-server-ssl' => {
-      "port" => 2380,
-      "proto" => "tcp",
-    },
-    'etcd-client-ssl' => {
-      "port" => 2379,
-      "proto" => "tcp"
-    }
-  }
 }
 
 node.default['environment_v2']['set']['vmhost'] = {
@@ -129,8 +145,8 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => 'macvlan',
     'wan' => 'macvlan',
   },
-  'memory' => 6144,
-  'vcpu' => 4
+  'memory' => 3072,
+  'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['gateway2'] = {
@@ -154,11 +170,65 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => 'macvlan',
     'wan' => 'macvlan',
   },
+  'memory' => 3072,
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['ns1'] = {
+  'ip' => {
+    'lan' => "192.168.62.219",
+    'store' => "192.168.126.219",
+  },
+  'if' => {
+    'lan' => "eth0",
+    'store' => "eth1",
+  },
+  'if_type' => {
+    'lan' => 'macvlan',
+    'store' => 'macvlan',
+  },
   'memory' => 6144,
-  'vcpu' => 4
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['ns2'] = {
+  'ip' => {
+    'lan' => "192.168.62.220",
+    'store' => "192.168.126.220",
+  },
+  'if' => {
+    'lan' => "eth0",
+    'store' => "eth1",
+  },
+  'if_type' => {
+    'lan' => 'macvlan',
+    'store' => 'macvlan',
+  },
+  'memory' => 6144,
+  'vcpu' => 2
+}
+
+node.default['environment_v2']['host']['ns3'] = {
+  'ip' => {
+    'lan' => "192.168.62.221",
+    'store' => "192.168.126.221",
+  },
+  'if' => {
+    'lan' => "eth0",
+    'store' => "eth1",
+  },
+  'if_type' => {
+    'lan' => 'macvlan',
+    'store' => 'macvlan',
+  },
+  'memory' => 4096,
+  'vcpu' => 2
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
+  'ip' => {
+    'store' => "192.168.126.222",
+  },
   'if' => {
     'store' => "eth0",
   },
@@ -170,6 +240,9 @@ node.default['environment_v2']['host']['etcd1'] = {
 }
 
 node.default['environment_v2']['host']['etcd2'] = {
+  'ip' => {
+    'store' => "192.168.126.223",
+  },
   'if' => {
     'store' => "eth0",
   },
@@ -180,6 +253,19 @@ node.default['environment_v2']['host']['etcd2'] = {
   'vcpu' => 2
 }
 
+node.default['environment_v2']['host']['etcd3'] = {
+  'ip' => {
+    'store' => "192.168.126.224",
+  },
+  'if' => {
+    'store' => "eth0",
+  },
+  'if_type' => {
+    'store' => 'macvlan',
+  },
+  'memory' => 2048,
+  'vcpu' => 2
+}
 
 node.default['environment_v2']['host']['kube-master'] = {
   'if' => {
@@ -227,9 +313,13 @@ node.default['environment_v2']['host']['vm1'] = {
   # }
   'guests' => [
     'gateway1',
-    # 'gateway2',
+    'gateway2',
+    'ns1',
+    'ns2',
+    'ns3',
     'etcd1',
     'etcd2',
+    'etcd3',
     'kube-master',
     'kube-worker'
   ]
@@ -255,7 +345,7 @@ node.default['environment_v2']['host']['vm2'] = {
   # }
   'guests' => [
     # 'gateway1',
-    'gateway2',
+    # 'gateway2',
   ]
 }
 

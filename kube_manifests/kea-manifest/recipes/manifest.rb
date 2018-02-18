@@ -13,7 +13,7 @@ ndbd_manifest = {
         "image" => node['kube']['images']['mysql_cluster'],
         "args" => [
           "/ndbd-entrypoint",
-          %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['host_ips'].join(',')}}
+          %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['mysql_mgm_ips'].join(',')}}
         ],
         "volumeMounts" => [
           {
@@ -50,7 +50,7 @@ mysqld_manifest = {
           "--ndbcluster",
           "--default_storage_engine=ndbcluster",
           "--bind-address=0.0.0.0",
-          %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['host_ips'].join(',')}}
+          %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['mysql_mgm_ips'].join(',')}}
         ],
         "env" => [
           {
@@ -123,14 +123,35 @@ kea_manifest = {
           "-listen",
           "53530"
         ]
+      },
+      {
+        "name" => "dnsdist",
+        "image" => node['kube']['images']['dnsdist'],
+        "args" => [
+          "-v",
+          "-l",
+          "0.0.0.0:53531",
+        ] + node['environment_v2']['set']['kea']['hosts'].map { |e|
+          "#{node['environment_v2']['host'][e]['ip']['store']}:53530"
+        }
       }
     ]
   }
 }
 
+# kea nodes
+node['environment_v2']['set']['kea']['hosts'].each do |host|
+  node.default['kubernetes']['static_pods'][host]['kea-mysql'] = kea_manifest
+end
 
-node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index|
+# kea mysql-data
+node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
+  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd'] = ndbd_manifest
+  node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld'] = mysqld_manifest
+end
 
+# kea mysql-mgm
+node['environment_v2']['set']['kea-mysql-mgm']['hosts'].each.with_index(1) do |host, index|
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndb-mgmd'] = {
     "apiVersion" => "v1",
     "kind" => "Pod",
@@ -158,8 +179,4 @@ node['environment_v2']['set']['kea']['hosts'].each.with_index(1) do |host, index
       ]
     }
   }
-
-  node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd'] = ndbd_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld'] = mysqld_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-mysql'] = kea_manifest
 end
