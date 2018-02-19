@@ -63,8 +63,8 @@ guests.each do |guest, host|
 
     # add static config to ignition if static ip configured
     # skip if there are any dhcp configured interfaces
-    use_ignition_ip_config = guest_config['ip'].is_a?(Hash) &&
-        guest_config['ip'].length == guest_config['if'].length
+    use_ignition_ip_config = guest_config['ignition_static_ip'] &&
+      guest_config['ip'].is_a?(Hash)
 
 
     guest_config['if'].each do |i, interface|

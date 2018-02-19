@@ -150,7 +150,7 @@ node.default['environment_v2']['host']['gateway1'] = {
     'wan' => 'macvlan',
   },
   'memory' => 3072,
-  'vcpu' => 2
+  'vcpu' => 2,
 }
 
 node.default['environment_v2']['host']['gateway2'] = {
@@ -192,7 +192,8 @@ node.default['environment_v2']['host']['ns1'] = {
     'store' => 'macvlan',
   },
   'memory' => 6144,
-  'vcpu' => 2
+  'vcpu' => 2,
+  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['ns2'] = {
@@ -209,7 +210,8 @@ node.default['environment_v2']['host']['ns2'] = {
     'store' => 'macvlan',
   },
   'memory' => 6144,
-  'vcpu' => 2
+  'vcpu' => 2,
+  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['ns3'] = {
@@ -226,13 +228,14 @@ node.default['environment_v2']['host']['ns3'] = {
     'store' => 'macvlan',
   },
   'memory' => 4096,
-  'vcpu' => 2
+  'vcpu' => 2,
+  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
-  # 'ip' => {
-  #   'store' => "192.168.126.222",
-  # },
+  'ip' => {
+    'store' => "192.168.126.222",
+  },
   'if' => {
     'store' => "eth0",
   },
@@ -244,9 +247,9 @@ node.default['environment_v2']['host']['etcd1'] = {
 }
 
 node.default['environment_v2']['host']['etcd2'] = {
-  # 'ip' => {
-  #   'store' => "192.168.126.223",
-  # },
+  'ip' => {
+    'store' => "192.168.126.223",
+  },
   'if' => {
     'store' => "eth0",
   },
@@ -258,9 +261,9 @@ node.default['environment_v2']['host']['etcd2'] = {
 }
 
 node.default['environment_v2']['host']['etcd3'] = {
-  # 'ip' => {
-  #   'store' => "192.168.126.224",
-  # },
+  'ip' => {
+    'store' => "192.168.126.224",
+  },
   'if' => {
     'store' => "eth0",
   },

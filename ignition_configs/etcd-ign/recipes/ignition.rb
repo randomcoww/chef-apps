@@ -27,8 +27,14 @@ etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
 )
 etcd_peer_ca = etcd_peer_cert_generator.root_ca
 
+## --initial-cluster option for IP based config
+initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+    "#{e}=https://#{node['environment_v2']['host'][e]['ip']['store']}:2380"
+  }.join(",")
+
 
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
+  ip = node['environment_v2']['host'][host]['ip']['store']
 
   ##
   ## etcd ssl
@@ -45,6 +51,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     },
     {
       'DNS.1' => [host, domain].join('.'),
+      'IP.1' => ip
     }
   )
 
@@ -62,8 +69,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
     },
     {
-      'DNS.1' => ['*', domain].join('.'),
-      'DNS.2' => domain
+      'DNS.1' => [host, domain].join('.'),
+      'IP.1' => ip
     }
   )
 
@@ -156,106 +163,126 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     end
   end
 
-  # etcd_environment = {
-  #   "ETCD_DATA_DIR" => "/var/lib/etcd/#{host}",
-  #   "ETCD_DISCOVERY_SRV" => domain,
-  #   "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{hostname}:2380",
-  #   "ETCD_LISTEN_PEER_URLS" => "https://#{hostname}:2380",
-  #   "ETCD_LISTEN_CLIENT_URLS" => "https://#{hostname}:2379,https://127.0.0.1:2379",
-  #   "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{hostname}:2379",
-  #   "ETCD_INITIAL_CLUSTER_STATE" => "existing",
-  #   "ETCD_INITIAL_CLUSTER_TOKEN" => "etcd-1",
-  #
-  #   "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
-  #   "ETCD_CERT_FILE" => node['etcd']['cert_path'],
-  #   "ETCD_KEY_FILE" => node['etcd']['key_path'],
-  #
-  #   "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
-  #   "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
-  #   "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
-  #   "ETCD_PEER_CLIENT_CERT_AUTH" => true
-  # }
+
+  etcd_environment = {
+    "ETCD_NAME" => host,
+    "ETCD_DATA_DIR" => "/var/lib/etcd",
+
+    "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{ip}:2380",
+    "ETCD_LISTEN_PEER_URLS" => "https://#{ip}:2380",
+    "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{ip}:2379",
+    "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379",
+    "ETCD_INITIAL_CLUSTER" => initial_cluster,
+    "ETCD_INITIAL_CLUSTER_STATE" => "new",
+    "ETCD_INITIAL_CLUSTER_TOKEN" => node['etcd']['cluster_name'],
+
+    "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
+    "ETCD_CERT_FILE" => node['etcd']['cert_path'],
+    "ETCD_KEY_FILE" => node['etcd']['key_path'],
+
+    "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
+    "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
+    "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
+
+    "ETCD_PEER_CLIENT_CERT_AUTH" => true
+  }
 
   systemd = [
-    {
-      "name" => "setup-network-environment.service",
-      "contents" => {
-        "Unit" => {
-          "Requires" => "network-online.target",
-          "After" => "network-online.target"
-        },
-        "Service" => {
-          "Type" => "oneshot",
-          "ExecStart" => "/opt/bin/setup-network-environment",
-          "RemainAfterExit" => "yes"
-        }
-      }
-    },
     {
       "name" => "etcd-member.service",
       "dropins" => [
         {
           "name" => "etcd-env.conf",
           "contents" => {
-            "Unit" => {
-              "Requires" => [
-                # "var-lib-etcd.mount",
-                "setup-network-environment.service",
-              ],
-              "After" => [
-                # "var-lib-etcd.mount",
-                "setup-network-environment.service"
-              ]
-            },
             "Service" => {
-              # "Environment" => etcd_environment.map { |e|
-              #   e.join('=')
-              # }
-              "EnvironmentFile" => "/etc/network-environment",
-              "ExecStart" => [
-                '',
-                [
-                  "/usr/lib/coreos/etcd-wrapper",
-                  "--data-dir",
-                  "/var/lib/etcd",
-                  "--discovery-srv",
-                  domain,
-                  "--initial-advertise-peer-urls",
-                  "https://${DEFAULT_IPV4}:2380",
-                  "--listen-peer-urls",
-                  "https://${DEFAULT_IPV4}:2380",
-                  "--listen-client-urls",
-                  "https://${DEFAULT_IPV4}:2379,http://127.0.0.1:2379",
-                  "--advertise-client-urls",
-                  "https://${DEFAULT_IPV4}:2379",
-                  "--initial-cluster-state",
-                  "new",
-                  "--initial-cluster-token",
-                  node['etcd']['cluster_name'],
-
-                  "--trusted-ca-file",
-                  node['etcd']['ca_path'],
-                  "--cert-file",
-                  node['etcd']['cert_path'],
-                  "--key-file",
-                  node['etcd']['key_path'],
-
-                  "--peer-trusted-ca-file",
-                  node['etcd']['ca_peer_path'],
-                  "--peer-cert-file",
-                  node['etcd']['cert_peer_path'],
-                  "--peer-key-file",
-                  node['etcd']['key_peer_path'],
-
-                  "--peer-client-cert-auth"
-                ].join(' ')
-              ]
+              "Environment" => etcd_environment.map { |e|
+                e.join('=')
+              },
             }
           }
         }
       ]
     }
   ]
+
+  # DNS basec config
+  # systemd = [
+  #   {
+  #     "name" => "setup-network-environment.service",
+  #     "contents" => {
+  #       "Unit" => {
+  #         "Requires" => "network-online.target",
+  #         "After" => "network-online.target"
+  #       },
+  #       "Service" => {
+  #         "Type" => "oneshot",
+  #         "ExecStart" => "/opt/bin/setup-network-environment",
+  #         "RemainAfterExit" => "yes"
+  #       }
+  #     }
+  #   },
+  #   {
+  #     "name" => "etcd-member.service",
+  #     "dropins" => [
+  #       {
+  #         "name" => "etcd-env.conf",
+  #         "contents" => {
+  #           "Unit" => {
+  #             "Requires" => [
+  #               # "var-lib-etcd.mount",
+  #               "setup-network-environment.service",
+  #             ],
+  #             "After" => [
+  #               # "var-lib-etcd.mount",
+  #               "setup-network-environment.service"
+  #             ]
+  #           },
+  #           "Service" => {
+  #             "EnvironmentFile" => "/etc/network-environment",
+  #             "ExecStart" => [
+  #               '',
+  #               [
+  #                 "/usr/lib/coreos/etcd-wrapper",
+  #                 "--data-dir",
+  #                 "/var/lib/etcd",
+  #                 "--discovery-srv",
+  #                 domain,
+  #                 "--initial-advertise-peer-urls",
+  #                 "https://${DEFAULT_IPV4}:2380",
+  #                 "--listen-peer-urls",
+  #                 "https://${DEFAULT_IPV4}:2380",
+  #                 "--listen-client-urls",
+  #                 "https://${DEFAULT_IPV4}:2379",
+  #                 "--advertise-client-urls",
+  #                 "https://${DEFAULT_IPV4}:2379",
+  #                 "--initial-cluster-state",
+  #                 "new",
+  #                 "--initial-cluster-token",
+  #                 node['etcd']['cluster_name'],
+  #
+  #                 "--trusted-ca-file",
+  #                 node['etcd']['ca_path'],
+  #                 "--cert-file",
+  #                 node['etcd']['cert_path'],
+  #                 "--key-file",
+  #                 node['etcd']['key_path'],
+  #
+  #                 "--peer-trusted-ca-file",
+  #                 node['etcd']['ca_peer_path'],
+  #                 "--peer-cert-file",
+  #                 node['etcd']['cert_peer_path'],
+  #                 "--peer-key-file",
+  #                 node['etcd']['key_peer_path'],
+  #
+  #                 "--peer-client-cert-auth"
+  #               ].join(' ')
+  #             ]
+  #           }
+  #         }
+  #       }
+  #     ]
+  #   }
+  # ]
 
   node.default['ignition']['configs'][host] = {
     'base' => base,

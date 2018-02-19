@@ -269,6 +269,11 @@ kube_proxy_manifest = {
   }
 }
 
+## --etcd-servers option
+etcd_servers = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+    "https://#{node['environment_v2']['host'][e]['ip']['store']}:2379"
+  }.join(",")
+
 kube_apiserver_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -291,7 +296,8 @@ kube_apiserver_manifest = {
           "--secure-port=#{node['kubernetes']['secure_port']}",
           "--insecure-port=#{node['kubernetes']['insecure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
+          # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
+          "--etcd-servers=#{etcd_servers}",
           "--etcd-cafile=#{node['etcd']['ca_path']}",
           "--etcd-certfile=#{node['etcd']['cert_path']}",
           "--etcd-keyfile=#{node['etcd']['key_path']}",
