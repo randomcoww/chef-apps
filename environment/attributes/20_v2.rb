@@ -65,6 +65,16 @@ node.default['environment_v2']['set']['kea-mysql-mgm'] = {
   ]
 }
 
+node.default['environment_v2']['set']['pxe'] = {
+  'hosts' => [
+    'ns1',
+    'ns2',
+  ],
+  'vip' => {
+    'store' => "192.168.126.246",
+  }
+}
+
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'etcd1',
@@ -149,7 +159,7 @@ node.default['environment_v2']['host']['gateway1'] = {
     'store' => 'macvlan',
     'wan' => 'macvlan',
   },
-  'memory' => 3072,
+  'memory' => 6144,
   'vcpu' => 2,
 }
 
@@ -174,7 +184,7 @@ node.default['environment_v2']['host']['gateway2'] = {
     'store' => 'macvlan',
     'wan' => 'macvlan',
   },
-  'memory' => 3072,
+  'memory' => 6144,
   'vcpu' => 2
 }
 
@@ -183,6 +193,10 @@ node.default['environment_v2']['host']['ns1'] = {
     'store' => "192.168.126.219",
     'lan' => "192.168.62.219",
   },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+    'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
+  },
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
@@ -193,7 +207,6 @@ node.default['environment_v2']['host']['ns1'] = {
   },
   'memory' => 6144,
   'vcpu' => 2,
-  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['ns2'] = {
@@ -201,6 +214,10 @@ node.default['environment_v2']['host']['ns2'] = {
     'store' => "192.168.126.220",
     'lan' => "192.168.62.220",
   },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+    'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
+  },
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
@@ -211,13 +228,16 @@ node.default['environment_v2']['host']['ns2'] = {
   },
   'memory' => 6144,
   'vcpu' => 2,
-  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['ns3'] = {
   'ip' => {
     'store' => "192.168.126.221",
     'lan' => "192.168.62.221",
+  },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+    'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
   },
   'if' => {
     'lan' => "eth0",
@@ -227,14 +247,16 @@ node.default['environment_v2']['host']['ns3'] = {
     'lan' => 'macvlan',
     'store' => 'macvlan',
   },
-  'memory' => 4096,
+  'memory' => 6144,
   'vcpu' => 2,
-  'ignition_static_ip' => true
 }
 
 node.default['environment_v2']['host']['etcd1'] = {
   'ip' => {
     'store' => "192.168.126.222",
+  },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
   },
   'if' => {
     'store' => "eth0",
@@ -250,6 +272,9 @@ node.default['environment_v2']['host']['etcd2'] = {
   'ip' => {
     'store' => "192.168.126.223",
   },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+  },
   'if' => {
     'store' => "eth0",
   },
@@ -263,6 +288,9 @@ node.default['environment_v2']['host']['etcd2'] = {
 node.default['environment_v2']['host']['etcd3'] = {
   'ip' => {
     'store' => "192.168.126.224",
+  },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
   },
   'if' => {
     'store' => "eth0",

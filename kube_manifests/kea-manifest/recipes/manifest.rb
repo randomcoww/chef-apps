@@ -139,6 +139,29 @@ kea_manifest = {
   }
 }
 
+tftp_manifest = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    "name" => "kea-tftp"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "containers" => [
+      {
+        "name" => "tftpd-ipxe",
+        "image" => node['kube']['images']['tftpd_ipxe'],
+        "args" => [
+          "--address",
+          "0.0.0.0:69",
+          "--verbose"
+        ]
+      }
+    ]
+  }
+}
+
 # kea nodes
 node['environment_v2']['set']['kea']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kea-mysql'] = kea_manifest
@@ -148,6 +171,11 @@ end
 node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kea-mysql-ndbd'] = ndbd_manifest
   node.default['kubernetes']['static_pods'][host]['kea-mysql-mysqld'] = mysqld_manifest
+end
+
+# tftp
+node['environment_v2']['set']['pxe']['hosts'].each do |host|
+  node.default['kubernetes']['static_pods'][host]['tftp'] = tftp_manifest
 end
 
 # kea mysql-mgm

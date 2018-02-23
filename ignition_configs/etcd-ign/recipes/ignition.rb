@@ -115,11 +115,11 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "contents" => "data:;base64,#{Base64.encode64(etcd_peer_ca.to_pem)}"
     },
     ## setup-network-environment
-    {
-      "path" => "/opt/bin/setup-network-environment",
-      "mode" => 493,
-      "contents" => node['environment_v2']['url']['setup_network_environment']
-    }
+    # {
+    #   "path" => "/opt/bin/setup-network-environment",
+    #   "mode" => 493,
+    #   "contents" => node['environment_v2']['url']['setup_network_environment']
+    # }
   ]
 
   networkd = []
@@ -128,11 +128,11 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     node['environment_v2']['host'][host]['if'].each do |i, interface|
 
       addr = node['environment_v2']['host'][host]['ip'][i]
-      vip_route = node['environment_v2']['set']['gateway']['vip'][i]
+      gw = node['environment_v2']['host'][host]['gw'][i]
 
       if !interface.nil? &&
         !addr.nil? &&
-        !vip_route.nil?
+        !gw.nil?
 
         subnet_mask = node['environment_v2']['subnet'][i].split('/').last
 
@@ -154,7 +154,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
               "Address" => "#{addr}/#{subnet_mask}"
             },
             "Route" => {
-              "Gateway" => vip_route,
+              "Gateway" => gw,
               "Metric" => 2048
             }
           }

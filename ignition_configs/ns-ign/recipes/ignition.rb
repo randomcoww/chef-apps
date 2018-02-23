@@ -31,11 +31,11 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
   interfaces.each do |i, interface|
 
     addr = node['environment_v2']['host'][host]['ip'][i]
-    vip_route = node['environment_v2']['set']['gateway']['vip'][i]
+    gw = node['environment_v2']['host'][host]['gw'][i]
 
     if !interface.nil? &&
       !addr.nil? &&
-      !vip_route.nil?
+      !gw.nil?
 
       subnet_mask = node['environment_v2']['subnet'][i].split('/').last
 
@@ -57,7 +57,7 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
             "Address" => "#{addr}/#{subnet_mask}"
           },
           "Route" => {
-            "Gateway" => vip_route,
+            "Gateway" => gw,
             "Metric" => 2048
           }
         }

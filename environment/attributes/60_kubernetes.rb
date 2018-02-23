@@ -92,6 +92,8 @@ node.default['kube']['images']['kea_resolver'] = "randomcoww/go-kea-lease-resolv
 node.default['kube']['images']['kube_haproxy'] = "randomcoww/go-kube-haproxy:20180111.01"
 node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.10.0-amd64"
 node.default['kube']['images']['dnsdist'] = "randomcoww/dnsdist:1.2.0"
+node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
+node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
 # node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 # node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
 

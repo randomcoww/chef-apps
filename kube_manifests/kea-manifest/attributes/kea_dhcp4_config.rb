@@ -18,6 +18,25 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       "password" => node['mysql_credentials']['kea']['password'],
       "persist" => true
     },
+    "client-classes" => [
+      {
+        "name": "ipxe_detected",
+        "test": "substring(option[77].hex,0,4) == 'iPXE'",
+        "boot-file-name": "http://#{node['environment_v2']['set']['pxe']['vip']['store']}:8080/boot.ipxe"
+      },
+      {
+        "name": "ipxe",
+        "test": "option[93].hex == 0x0000",
+        "next-server": node['environment_v2']['set']['pxe']['vip']['store'],
+        "boot-file-name": "/undionly.kpxe"
+      },
+      {
+        "name": "ipxe_efi",
+        "test": "option[93].hex == 0x0007",
+        "next-server": node['environment_v2']['set']['pxe']['vip']['store'],
+        "boot-file-name": "/ipxe.efi"
+      }
+    ],
     "subnet4" => node['environment_v2']['dhcp_pool'].map { |i, pool|
 
       options = []

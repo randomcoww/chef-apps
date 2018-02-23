@@ -61,12 +61,6 @@ guests.each do |guest, host|
     ## make sure nics are always 2, 3, 4.. in order they are configured
     hardware_slot_index = 2
 
-    # add static config to ignition if static ip configured
-    # skip if there are any dhcp configured interfaces
-    use_ignition_ip_config = guest_config['ignition_static_ip'] &&
-      guest_config['ip'].is_a?(Hash)
-
-
     guest_config['if'].each do |i, interface|
 
       next if host_config['if'][i].nil?
@@ -74,13 +68,20 @@ guests.each do |guest, host|
       ##
       ## if static ip
       ##
-      if use_ignition_ip_config &&
+      if guest_config['ip'].is_a?(Hash) &&
         !guest_config['ip'][i].nil?
+
+        gw = nil
+        if guest_config['gw'].is_a?(Hash) &&
+          !guest_config['gw'][i].nil?
+
+          gw = guest_config['gw'][i]
+        end
 
         ignition_ip_config << "ip=" + [
           guest_config['ip'][i],
           '',
-          node['environment_v2']['set']['gateway']['vip'][i],
+          gw,
           node['environment_v2']['netmask'][i],
           '',
           guest_config['if'][i],
