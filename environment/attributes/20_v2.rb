@@ -77,20 +77,23 @@ node.default['environment_v2']['set']['pxe'] = {
 
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
-    'etcd1',
-    'etcd2',
-    'etcd3',
+    'vm1',
   ],
-  "services" => {
-    'etcd-server-ssl' => {
-      "port" => 2380,
-      "proto" => "tcp",
-    },
-    'etcd-client-ssl' => {
-      "port" => 2379,
-      "proto" => "tcp"
-    }
-  }
+  # 'hosts' => [
+  #   'etcd1',
+  #   'etcd2',
+  #   'etcd3',
+  # ],
+  # "services" => {
+  #   'etcd-server-ssl' => {
+  #     "port" => 2380,
+  #     "proto" => "tcp",
+  #   },
+  #   'etcd-client-ssl' => {
+  #     "port" => 2379,
+  #     "proto" => "tcp"
+  #   }
+  # }
 }
 
 node.default['environment_v2']['set']['haproxy'] = {
