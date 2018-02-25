@@ -95,7 +95,9 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            "--docker-disable-shared-pid=false"
+            "--docker-disable-shared-pid=false",
+            "--image-gc-high-threshold=0",
+            "--image-gc-low-threshold=0",
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

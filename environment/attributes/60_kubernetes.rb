@@ -2,7 +2,7 @@
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.9.3'
+node.default['kubernetes']['version'] = '1.8.7'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'

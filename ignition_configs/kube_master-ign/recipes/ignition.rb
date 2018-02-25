@@ -204,6 +204,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--docker-disable-shared-pid=false",
+            "--image-gc-high-threshold=0",
+            "--image-gc-low-threshold=0",
             # "--feature-gates=CustomPodDNS=true"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
