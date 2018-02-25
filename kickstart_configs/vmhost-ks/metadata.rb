@@ -20,3 +20,5 @@ chef_version '>= 12.1' if respond_to?(:chef_version)
 # source_url 'https://github.com/<insert_org_here>/vmhost-ks'
 depends          'environment'
 depends          'systemd_resource'
+depends          'openssl_cert'
+depends          'dbag'
