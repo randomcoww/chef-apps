@@ -8,6 +8,7 @@ keyboard us
 timezone --utc Etc/UTC
 rootpw --lock password
 firewall --disabled
+selinux --disabled
 network --hostname=<%= @hostname %>
 
 ## user
@@ -46,11 +47,17 @@ dnf -y swap zfs-fuse zfs
 
 ## enable systemd-resolve
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-restorecon -v /run/systemd/resolve/resolv.conf
+
+## create directories
+mkdir -p <%= @directories.join(' ') %>
 
 ## write all configs
 <% @files.each do |f| %>
+<% if f['append'] %>
+cat <<EOF >> <%= f['path'] %>
+<% else %>
 cat <<EOF > <%= f['path'] %>
+<% end %>
 <%= f['data'].chomp %>
 EOF
 

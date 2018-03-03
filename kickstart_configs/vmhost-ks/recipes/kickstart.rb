@@ -13,80 +13,61 @@ domain = [
   node['environment_v2']['domain']['top']
 ].join('.')
 
-
-## client
-etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
-)
-etcd_ca = etcd_cert_generator.root_ca
-
-## peer
-etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_peer_ssl', [['CN', 'etcd-peer-ca']]
-)
-etcd_peer_ca = etcd_peer_cert_generator.root_ca
-
-# no cluster because i only have two physical nodes...
-## --initial-cluster option for IP based config
-# initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
-#     "#{e}=https://#{node['environment_v2']['host'][e]['ip']['store']}:2380"
-#   }.join(",")
-
-
 subnet = node['environment_v2']['subnet']
 
+#
+# kubelet config
+#
+kube_config = {
+  "apiVersion" => "v1",
+  "kind" => "Config",
+  "clusters" => [
+    {
+      "name" => node['kubernetes']['cluster_name'],
+      "cluster" => {
+        "server" => "http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
+      }
+    }
+  ],
+  "users" => [
+    {
+      "name" => "kube",
+    }
+  ],
+  "contexts" => [
+    {
+      "name" => "kube-context",
+      "context" => {
+        "cluster" => node['kubernetes']['cluster_name'],
+        "user" => "kube"
+      }
+    }
+  ],
+  "current-context" => "kube-context"
+}
+
+flannel_cni = node['kubernetes']['flanneld_cni']
+flannel_cfg = node['kubernetes']['flanneld_cfg']
+
+#
+# host config
+#
 node['environment_v2']['set']['vmhost']['hosts'].each do |host|
 
   interfaces = node['environment_v2']['host'][host]['if']
   ips = node['environment_v2']['host'][host]['ip']
-
   ip = ips['store']
 
-  ##
-  ## etcd ssl
-  ##
-  etcd_key = etcd_cert_generator.generate_key
-  etcd_cert = etcd_cert_generator.node_cert(
-    [
-      ['CN', "etcd-#{host}"]
-    ],
-    etcd_key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {
-      'DNS.1' => [host, domain].join('.'),
-      'IP.1' => ip
-    }
-  )
-
-  ##
-  ## etcd peer ssl
-  ##
-  etcd_peer_key = etcd_peer_cert_generator.generate_key
-  etcd_peer_cert = etcd_peer_cert_generator.node_cert(
-    [
-      ['CN', "etcd-peer-#{host}"]
-    ],
-    etcd_peer_key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {
-      'DNS.1' => [host, domain].join('.'),
-      'IP.1' => ip
-    }
-  )
-
-
-  etcd_initial_cluster = "https://#{ip}:2379"
+  directories = [
+    '/var/lib/kubelet',
+    '/etc/kubernetes',
+    node['kubernetes']['cni_conf_dir'],
+  ]
 
   # write all files
   files = [
+    # disable annoying systemd-resolv dns features
     {
-      # disable annoying systemd-resolv dns features
       "path" => '/etc/systemd/resolved.conf',
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "Resolve" => {
@@ -95,18 +76,85 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    # kubelet using rkt and coreos wrapper method
     {
-      # other systemd
-      # ipmi fan control:
-      #
-      # ommited full speed:
-      # ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
-      #
-      # setting a specific duty cycle:
-      # fan control 0x30 0x70 0x66
-      # get 0x00, set 0x01
-      # zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
-      # duty cycle 0x00-0x64
+      "path" => '/etc/systemd/system/kubelet.service',
+      "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
+        "Service" => {
+          "ExecStartPre" => [
+            "/usr/bin/mkdir -p /var/log/containers",
+            "-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid"
+          ],
+          "ExecStart" => [
+            "/usr/bin/rkt",
+            "run",
+            "--insecure-options=image",
+            "--uuid-file-save=/var/run/kubelet-pod.uuid",
+            "--volume dns,kind=host,source=/etc/resolv.conf",
+            "--mount volume=dns,target=/etc/resolv.conf",
+
+            "--volume coreos-etc-kubernetes,kind=host,source=/etc/kubernetes,readOnly=false",
+            "--volume coreos-etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true",
+            "--volume coreos-usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true",
+            "--volume coreos-var-lib-docker,kind=host,source=/var/lib/docker,readOnly=false",
+            "--volume coreos-var-lib-kubelet,kind=host,source=/var/lib/kubelet,readOnly=false,recursive=true",
+            "--volume coreos-var-log,kind=host,source=/var/log,readOnly=false",
+            "--volume coreos-os-release,kind=host,source=/usr/lib/os-release,readOnly=true",
+            "--volume coreos-run,kind=host,source=/run,readOnly=false",
+            "--volume coreos-lib-modules,kind=host,source=/lib/modules,readOnly=true",
+            "--mount volume=coreos-etc-kubernetes,target=/etc/kubernetes",
+            "--mount volume=coreos-etc-ssl-certs,target=/etc/ssl/certs",
+            "--mount volume=coreos-usr-share-certs,target=/etc/pki/ca-trust",
+            "--mount volume=coreos-var-lib-docker,target=/var/lib/docker",
+            "--mount volume=coreos-var-lib-kubelet,target=/var/lib/kubelet",
+            "--mount volume=coreos-var-log,target=/var/log",
+            "--mount volume=coreos-os-release,target=/etc/os-release",
+            "--mount volume=coreos-run,target=/run",
+            "--mount volume=coreos-lib-modules,target=/lib/modules",
+            "--hosts-entry host",
+
+            "--stage1-from-dir=stage1-fly.aci",
+            "docker://#{node['kube']['images']['hyperkube']}",
+            "--exec=/kubelet",
+            "--",
+
+            "--register-node=true",
+            "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
+            "--network-plugin=cni",
+            "--container-runtime=docker",
+            "--allow-privileged=true",
+            "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
+            "--hostname-override=#{ip}",
+            "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
+            "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
+            "--docker-disable-shared-pid=false",
+            "--image-gc-high-threshold=0",
+            "--image-gc-low-threshold=0",
+            "--fail-swap-on=false",
+            "--cgroup-driver=systemd",
+          ].join(' '),
+          "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
+          "Restart" => "always",
+          "RestartSec" => 10
+        },
+        "Install" => {
+          "WantedBy" => "multi-user.target"
+        }
+      })
+    },
+    # other systemd
+    # ipmi fan control:
+    #
+    # ommited full speed:
+    # ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
+    #
+    # setting a specific duty cycle:
+    # fan control 0x30 0x70 0x66
+    # get 0x00, set 0x01
+    # zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
+    # duty cycle 0x00-0x64
+    {
       "path" => '/etc/systemd/system/fancontrol.service',
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "Unit" => {
@@ -116,8 +164,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         "Service" => {
           "Type" => "oneshot",
           "ExecStart" => [
-            "/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x18",
-            "/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x18"
+            "/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x10",
+            "/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x10"
           ]
         },
         "Install" => {
@@ -125,9 +173,9 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    # systemd networks
+    ## lan network
     {
-      # systemd networks
-      ## lan network
       "path" => "/etc/systemd/network/#{interfaces['lan']}.network",
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "Match" => {
@@ -140,8 +188,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    ## store
     {
-      ## store
       "path" => "/etc/systemd/network/#{interfaces['store']}.network",
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "Match" => {
@@ -154,8 +202,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    ## allow guests to access the host over macvlan
     {
-      ## allow guests to access the host over macvlan
       "path" => "/etc/systemd/network/#{interfaces['store']}_host.netdev",
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "NetDev" => {
@@ -182,8 +230,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    ## wan
     {
-      ## wan
       "path" => "/etc/systemd/network/#{interfaces['wan']}.netdev",
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "NetDev" => {
@@ -207,8 +255,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    ## zfssync
     {
-      ## zfssync
       "path" => "/etc/systemd/network/#{interfaces['zfssync']}.network",
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "Match" => {
@@ -223,16 +271,17 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
         }
       })
     },
+    # enable serial console
     {
-      # enable serial console
+      "append" => true,
       "path" => '/etc/default/grub',
       "data" => <<-EOF
 GRUB_TERMINAL="console serial"
 GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
 EOF
     },
+    # load NIC VFs
     {
-      # load NIC VFs
       "path" => '/etc/modprobe.d/local.conf',
       "data" => [
         # vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
@@ -248,19 +297,21 @@ EOF
     #     "exclude=kernel*"
     #   ].join($/)
     # },
+    # DNF automatic
     {
-      # DNF automatic
       "path" => '/etc/dnf/automatic.conf',
-      "data" => <<-EOF
-[commands]
-apply_updates = true
-upgrade_type = security
-[emitters]
-emit_via = motd
-EOF
+      "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
+        "commands" => {
+          "apply_updates" => true,
+          "upgrade_type" => "default"
+        },
+        "emitters" => {
+          "emit_via" => "motd"
+        }
+      }),
     },
+    # SSH
     {
-      # SSH
       "path" => '/etc/ssh/sshd_config',
       "data" => <<-EOF
 Subsystem sftp internal-sftp
@@ -269,56 +320,15 @@ PasswordAuthentication no
 ChallengeResponseAuthentication no
 EOF
     },
+    # kubelet
     {
-      # etcd configs
-      "path" => '/etc/etcd/etcd.conf',
-      "data" => {
-        "ETCD_NAME" => host,
-        "ETCD_DATA_DIR" => "/data/etcd/#{node['etcd']['cluster_name']}",
-
-        "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{ip}:2380",
-        "ETCD_LISTEN_PEER_URLS" => "https://#{ip}:2380",
-        "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{ip}:2379",
-        "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379,http://127.0.0.1:2379",
-        "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster,
-        "ETCD_INITIAL_CLUSTER_STATE" => "new",
-        "ETCD_INITIAL_CLUSTER_TOKEN" => node['etcd']['cluster_name'],
-
-        "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
-        "ETCD_CERT_FILE" => node['etcd']['cert_path'],
-        "ETCD_KEY_FILE" => node['etcd']['key_path'],
-
-        "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
-        "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
-        "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
-
-        "ETCD_PEER_CLIENT_CERT_AUTH" => true
-      }.map { |k, v| "#{k}=#{v}" }.join($/)
+      "path" => node['kubernetes']['client']['kubeconfig_path'],
+      "data" => kube_config.to_hash.to_yaml
     },
     {
-      "path" => node['etcd']['key_path'],
-      "data" => etcd_key.to_pem
+      "path" => ::File.join(node['kubernetes']['cni_conf_dir'], '10-flannel.conf'),
+      "data" => JSON.pretty_generate(flannel_cni.to_hash)
     },
-    {
-      "path" => node['etcd']['cert_path'],
-      "data" => etcd_cert.to_pem
-    },
-    {
-      "path" => node['etcd']['ca_path'],
-      "data" => etcd_ca.to_pem
-    },
-    {
-      "path" => node['etcd']['key_peer_path'],
-      "data" => etcd_peer_key.to_pem
-    },
-    {
-      "path" => node['etcd']['cert_peer_path'],
-      "data" => etcd_peer_cert.to_pem
-    },
-    {
-      "path" => node['etcd']['ca_peer_path'],
-      "data" => etcd_peer_ca.to_pem
-    }
   ]
 
 
@@ -333,6 +343,7 @@ EOF
       boot_params: node['kickstart']['vmhost']['boot_params'],
       packages_install: node['kickstart']['vmhost']['packages_install'],
       packages_remove: node['kickstart']['vmhost']['packages_remove'],
+      directories: directories,
       files: files,
       services_enable: node['kickstart']['vmhost']['services_enable'],
     })

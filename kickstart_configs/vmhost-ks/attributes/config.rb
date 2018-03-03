@@ -27,8 +27,10 @@ node.default['kickstart']['vmhost']['packages_install'] = %w{
   pciutils
   screen
   dnf-automatic
-  etcd
   lm_sensors
+  rkt
+  docker
+  ca-certificates
 }
 
 node.default['kickstart']['vmhost']['packages_remove'] = %w{
@@ -54,5 +56,5 @@ node.default['kickstart']['vmhost']['services_enable'] = %w{
   nfs-server
   dnf-automatic-download.timer
   chronyd
-  etcd
+  docker
 }
