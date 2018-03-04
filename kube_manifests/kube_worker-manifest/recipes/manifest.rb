@@ -55,7 +55,7 @@ flannel_manifest = {
             "readOnly" => true
           },
           {
-            "mountPath": "/etc/ssl",
+            "mountPath": "/etc/ssl/certs",
             "name": "ssl-certs-host",
             "readOnly": true
           }
@@ -84,7 +84,7 @@ flannel_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]
@@ -120,7 +120,7 @@ kube_proxy_manifest = {
             "readOnly" => true
           },
           {
-            "mountPath": "/etc/ssl",
+            "mountPath": "/etc/ssl/certs",
             "name": "ssl-certs-host",
             "readOnly": true
           }
@@ -137,7 +137,7 @@ kube_proxy_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]

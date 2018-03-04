@@ -53,7 +53,7 @@ flannel_manifest = {
             "readOnly" => true
           },
           {
-            "mountPath": "/etc/ssl",
+            "mountPath": "/etc/ssl/certs",
             "name": "ssl-certs-host",
             "readOnly": true
           }
@@ -82,7 +82,7 @@ flannel_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]
@@ -123,7 +123,7 @@ kube_controller_manager_manifest = {
           },
           {
             "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl",
+            "mountPath" => "/etc/ssl/certs",
             "readOnly" => true
           }
         ],
@@ -149,7 +149,7 @@ kube_controller_manager_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]
@@ -193,7 +193,7 @@ kube_scheduler_manifest = {
             "readOnly" => true
           },
           {
-            "mountPath": "/etc/ssl",
+            "mountPath": "/etc/ssl/certs",
             "name": "ssl-certs-host",
             "readOnly": true
           }
@@ -210,7 +210,7 @@ kube_scheduler_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]
@@ -262,7 +262,7 @@ kube_proxy_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]
@@ -313,7 +313,7 @@ kube_apiserver_manifest = {
         "volumeMounts" => [
           {
             "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl",
+            "mountPath" => "/etc/ssl/certs",
             "readOnly" => true
           }
         ],
@@ -333,7 +333,7 @@ kube_apiserver_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl"
+          "path" => "/etc/ssl/certs"
         }
       }
     ]

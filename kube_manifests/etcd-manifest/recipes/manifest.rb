@@ -27,7 +27,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
     "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
 
-    "ETCD_PEER_CLIENT_CERT_AUTH" => true
+    "ETCD_PEER_CLIENT_CERT_AUTH" => "true"
   }
 
   etcd_manifest = {
@@ -51,12 +51,12 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           },
           "volumeMounts" => [
             {
-              "mountPath" => "/etc/ssl",
+              "mountPath" => "/etc/ssl/certs",
               "name" => "ssl-certs-host",
               "readOnly" => true
             },
             {
-              "mountPath" => "/data/etcd",
+              "mountPath" => "/var/lib/etcd",
               "name" => "data-etcd-host",
               "readOnly" => false
             }
@@ -67,13 +67,13 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
         {
           "name" => "ssl-certs-host",
           "hostPath" => {
-            "path" => "/etc/ssl"
+            "path" => "/etc/ssl/certs"
           }
         },
         {
           "name" => "data-etcd-host",
           "hostPath" => {
-            "path" => "/var/lib/etcd"
+            "path" => "/data/etcd"
           }
         }
       ]
