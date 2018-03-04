@@ -107,6 +107,7 @@ node.default['environment_v2']['set']['haproxy'] = {
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
+    'vm1',
     'kube-master',
   ],
   'services' => {

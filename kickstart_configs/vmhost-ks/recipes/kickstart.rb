@@ -16,6 +16,28 @@ domain = [
 subnet = node['environment_v2']['subnet']
 
 #
+# SSL
+#
+
+## kube master
+cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
+)
+ca = cert_generator.root_ca
+
+## etcd client
+etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
+)
+etcd_ca = etcd_cert_generator.root_ca
+
+## etcd peer
+etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_peer_ssl', [['CN', 'etcd-peer-ca']]
+)
+etcd_peer_ca = etcd_peer_cert_generator.root_ca
+
+#
 # kubelet config
 #
 kube_config = {
@@ -64,6 +86,69 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
     ::File.dirname(node['kubernetes']['cni_conf_path']),
     ::File.dirname(node['kubernetes']['flanneld_conf_path'])
   ]
+
+
+  ##
+  ## kube ssl
+  ##
+  key = cert_generator.generate_key
+  cert = cert_generator.node_cert(
+    [
+      ['CN', "kube-#{host}"]
+    ],
+    key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => 'kubernetes',
+      'DNS.2' => 'kubernetes.default',
+      'DNS.3' => 'kubernetes.default.svc',
+      'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
+      'IP.1' => node['kubernetes']['cluster_service_ip'],
+      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store']
+    }
+  )
+
+  ##
+  ## etcd ssl
+  ##
+  etcd_key = etcd_cert_generator.generate_key
+  etcd_cert = etcd_cert_generator.node_cert(
+    [
+      ['CN', "etcd-#{host}"]
+    ],
+    etcd_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => [host, domain].join('.'),
+      'IP.1' => ip
+    }
+  )
+
+  ##
+  ## etcd peer ssl
+  ##
+  etcd_peer_key = etcd_peer_cert_generator.generate_key
+  etcd_peer_cert = etcd_peer_cert_generator.node_cert(
+    [
+      ['CN', "etcd-peer-#{host}"]
+    ],
+    etcd_peer_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => [host, domain].join('.'),
+      'IP.1' => ip
+    }
+  )
+
 
   # write all files
   files = [
@@ -333,6 +418,45 @@ EOF
     {
       "path" => node['kubernetes']['cni_conf_path'],
       "data" => JSON.pretty_generate(cni_conf.to_hash)
+    },
+    ## ssl
+    {
+      "path" => node['kubernetes']['key_path'],
+      "data" => key.to_pem
+    },
+    {
+      "path" => node['kubernetes']['cert_path'],
+      "data" => cert.to_pem
+    },
+    {
+      "path" => node['kubernetes']['ca_path'],
+      "data" => ca.to_pem
+    },
+    ## etcd ssl
+    {
+      "path" => node['etcd']['key_path'],
+      "data" => etcd_key.to_pem
+    },
+    {
+      "path" => node['etcd']['cert_path'],
+      "data" => etcd_cert.to_pem
+    },
+    {
+      "path" => node['etcd']['ca_path'],
+      "data" => etcd_ca.to_pem
+    },
+    ## etcd peer ssl
+    {
+      "path" => node['etcd']['key_peer_path'],
+      "data" => etcd_peer_key.to_pem
+    },
+    {
+      "path" => node['etcd']['cert_peer_path'],
+      "data" => etcd_peer_cert.to_pem
+    },
+    {
+      "path" => node['etcd']['ca_peer_path'],
+      "data" => etcd_peer_ca.to_pem
     },
   ]
 
