@@ -19,18 +19,17 @@ node.default['kubernetes']['service_ip_range'] = '10.3.0.0/24'
 node.default['kubernetes']['cluster_service_ip'] = '10.3.0.1'
 node.default['kubernetes']['cluster_dns_ip'] = '10.3.0.10'
 
-node.default['kubernetes']['cni_conf_dir'] = "/etc/kubernetes/cni/net.d"
 
-node.default['kubernetes']['flanneld_cfg_path'] = "/etc/kube-flannel/net-conf.json"
-node.default['kubernetes']['flanneld_cfg'] = {
+node.default['kubernetes']['flanneld_conf_path'] = "/etc/kube-flannel/net-conf.json"
+node.default['kubernetes']['flanneld_conf'] = {
   "Network" => node['kubernetes']['cluster_cidr'],
   "Backend" => {
     "Type" => "vxlan"
   }
 }
 
-node.default['kubernetes']['flanneld_cni_path'] = "/etc/kube-flannel/cni-conf.json"
-node.default['kubernetes']['flanneld_cni'] = {
+node.default['kubernetes']['cni_conf_path'] = "/etc/kubernetes/cni/net.d/10-flannel.conf"
+node.default['kubernetes']['cni_conf'] = {
   "name": "cbr0",
   "type": "flannel",
   "delegate": {
@@ -94,8 +93,8 @@ node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.10.0-amd6
 node.default['kube']['images']['dnsdist'] = "randomcoww/dnsdist:1.2.0"
 node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
 node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
-# node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
-# node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.2.10"
+node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
+node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
 
 # node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
 # node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"

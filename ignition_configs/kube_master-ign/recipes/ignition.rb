@@ -52,8 +52,8 @@ kube_config = {
 }
 
 
-flannel_cni = JSON.pretty_generate(node['kubernetes']['flanneld_cni'].to_hash)
-flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_cfg'].to_hash)
+cni_conf = JSON.pretty_generate(node['kubernetes']['cni_conf'].to_hash)
+flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
 
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
@@ -107,14 +107,14 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     },
     ## flannel
     {
-      "path" => node['kubernetes']['flanneld_cfg_path'],
+      "path" => node['kubernetes']['flanneld_conf_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
     },
     {
-      "path" => ::File.join(node['kubernetes']['cni_conf_dir'], '10-flannel.conf'),
+      "path" => node['kubernetes']['cni_conf_path'],
       "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(flannel_cni)}"
+      "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
     },
     ## kube ssl
     {
@@ -194,7 +194,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
             "--register-node=true",
-            "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
+            "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
             "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",

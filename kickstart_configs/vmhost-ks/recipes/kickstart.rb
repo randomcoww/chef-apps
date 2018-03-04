@@ -46,8 +46,8 @@ kube_config = {
   "current-context" => "kube-context"
 }
 
-flannel_cni = node['kubernetes']['flanneld_cni']
-flannel_cfg = node['kubernetes']['flanneld_cfg']
+cni_conf = node['kubernetes']['cni_conf']
+flannel_cfg = node['kubernetes']['flanneld_conf']
 
 #
 # host config
@@ -61,7 +61,8 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
   directories = [
     '/var/lib/kubelet',
     '/etc/kubernetes',
-    node['kubernetes']['cni_conf_dir'],
+    ::File.dirname(node['kubernetes']['cni_conf_path']),
+    ::File.dirname(node['kubernetes']['flanneld_conf_path'])
   ]
 
   # write all files
@@ -119,7 +120,7 @@ node['environment_v2']['set']['vmhost']['hosts'].each do |host|
             "--",
 
             "--register-node=true",
-            "--cni-conf-dir=#{node['kubernetes']['cni_conf_dir']}",
+            "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
             "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
@@ -326,8 +327,12 @@ EOF
       "data" => kube_config.to_hash.to_yaml
     },
     {
-      "path" => ::File.join(node['kubernetes']['cni_conf_dir'], '10-flannel.conf'),
-      "data" => JSON.pretty_generate(flannel_cni.to_hash)
+      "path" => node['kubernetes']['flanneld_conf_path'],
+      "data" => JSON.pretty_generate(flannel_cfg.to_hash)
+    },
+    {
+      "path" => node['kubernetes']['cni_conf_path'],
+      "data" => JSON.pretty_generate(cni_conf.to_hash)
     },
   ]
 

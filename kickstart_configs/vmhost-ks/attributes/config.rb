@@ -57,4 +57,5 @@ node.default['kickstart']['vmhost']['services_enable'] = %w{
   dnf-automatic-download.timer
   chronyd
   docker
+  kubelet
 }

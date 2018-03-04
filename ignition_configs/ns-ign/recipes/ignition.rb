@@ -89,7 +89,7 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
             "--register-node=true",
-            "--cni-conf-dir=/etc/kubernetes/cni/net.d",
+            "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
