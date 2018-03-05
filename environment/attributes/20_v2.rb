@@ -98,7 +98,6 @@ node.default['environment_v2']['set']['etcd'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'vm1',
     'kube-master',
   ],
   'vip' => {
