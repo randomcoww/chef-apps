@@ -16,7 +16,7 @@ node['environment_v2']['set'].each_value do |set|
         }
 
         services["backend #{service}"] = {
-          "{{range $nodename, $n := $.Nodes}}server" => "{{$nodename}} {{$n.Address}}:#{c['port']} check
+          "{{range $nodename, $n := $.Nodes}}{{if $n.Address}}server" => "{{$nodename}} {{$n.Address}}:#{c['port']} check{{end}}
   {{end}}"
         }
       end
@@ -64,7 +64,7 @@ haproxy_template = <<-EOF
   bind *:{{$p.TargetPort}}
   maxconn 2000
 backend {{$name}}_{{$portname}}
-  {{range $nodename, $n := $.Nodes}}server {{$nodename}} {{$n.Address}}:{{$p.NodePort}} check
+  {{range $nodename, $n := $.Nodes}}{{if $n.Address}}server {{$nodename}} {{$n.Address}}:{{$p.NodePort}} check{{end}}
   {{end}}
 {{end}}{{end}}
 EOF

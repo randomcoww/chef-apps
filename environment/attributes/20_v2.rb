@@ -98,6 +98,10 @@ node.default['environment_v2']['set']['etcd'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
+    # 'vm1',
+    'ns1',
+    'ns2',
+    'ns3',
     'kube-master',
   ],
   'vip' => {
@@ -108,6 +112,9 @@ node.default['environment_v2']['set']['haproxy'] = {
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'vm1',
+    'ns1',
+    'ns2',
+    'ns3',
     'kube-master',
   ],
   'services' => {
@@ -120,7 +127,7 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'kube-worker'
+    'kube-worker',
   ]
 }
 
@@ -209,8 +216,8 @@ node.default['environment_v2']['host']['ns1'] = {
     'lan' => 'macvlan',
     'store' => 'macvlan',
   },
-  'memory' => 6144,
-  'vcpu' => 2,
+  'memory' => 8192,
+  'vcpu' => 3,
 }
 
 node.default['environment_v2']['host']['ns2'] = {
@@ -230,8 +237,8 @@ node.default['environment_v2']['host']['ns2'] = {
     'lan' => 'macvlan',
     'store' => 'macvlan',
   },
-  'memory' => 6144,
-  'vcpu' => 2,
+  'memory' => 8192,
+  'vcpu' => 3,
 }
 
 node.default['environment_v2']['host']['ns3'] = {
@@ -251,8 +258,8 @@ node.default['environment_v2']['host']['ns3'] = {
     'lan' => 'macvlan',
     'store' => 'macvlan',
   },
-  'memory' => 6144,
-  'vcpu' => 2,
+  'memory' => 8192,
+  'vcpu' => 3,
 }
 
 node.default['environment_v2']['host']['etcd1'] = {

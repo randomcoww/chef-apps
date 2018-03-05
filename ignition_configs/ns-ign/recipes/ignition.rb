@@ -11,7 +11,94 @@ base = {
 }
 
 
+cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
+)
+ca = cert_generator.root_ca
+
+
+etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
+)
+etcd_ca = etcd_cert_generator.root_ca
+
+
+kube_config = {
+  "apiVersion" => "v1",
+  "kind" => "Config",
+  "clusters" => [
+    {
+      "name" => node['kubernetes']['cluster_name'],
+      "cluster" => {
+        "server" => "http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
+      }
+    }
+  ],
+  "users" => [
+    {
+      "name" => "kube",
+    }
+  ],
+  "contexts" => [
+    {
+      "name" => "kube-context",
+      "context" => {
+        "cluster" => node['kubernetes']['cluster_name'],
+        "user" => "kube"
+      }
+    }
+  ],
+  "current-context" => "kube-context"
+}
+
+
+cni_conf = JSON.pretty_generate(node['kubernetes']['cni_conf'].to_hash)
+flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
+
+
 node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
+
+  ip = node['environment_v2']['host'][host]['ip']['store']
+
+  ##
+  ## etcd ssl
+  ##
+  etcd_key = etcd_cert_generator.generate_key
+  etcd_cert = etcd_cert_generator.node_cert(
+    [
+      ['CN', "etcd-#{host}"]
+    ],
+    etcd_key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {}
+  )
+
+  ##
+  ## kube ssl
+  ##
+  key = cert_generator.generate_key
+  cert = cert_generator.node_cert(
+    [
+      ['CN', "kube-#{host}"]
+    ],
+    key,
+    {
+      "basicConstraints" => "CA:FALSE",
+      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+    },
+    {
+      'DNS.1' => 'kubernetes',
+      'DNS.2' => 'kubernetes.default',
+      'DNS.3' => 'kubernetes.default.svc',
+      'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
+      'IP.1' => node['kubernetes']['cluster_service_ip'],
+      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store'],
+      'IP.3' => ip
+    }
+  )
 
   directories = []
 
@@ -20,7 +107,56 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
       "path" => "/etc/hostname",
       "mode" => 420,
       "contents" => "data:,#{host}"
-    }
+    },
+    ## flannel
+    {
+      "path" => node['kubernetes']['flanneld_conf_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    },
+    {
+      "path" => node['kubernetes']['cni_conf_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
+    },
+    ## kube ssl
+    {
+      "path" => node['kubernetes']['key_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(key.to_pem)}"
+    },
+    {
+      "path" => node['kubernetes']['cert_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(cert.to_pem)}"
+    },
+    {
+      "path" => node['kubernetes']['ca_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
+    },
+    ## kubeconfig
+    {
+      "path" => node['kubernetes']['client']['kubeconfig_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
+    },
+    ## etcd ssl
+    {
+      "path" => node['etcd']['key_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_key.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['cert_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_cert.to_pem)}"
+    },
+    {
+      "path" => node['etcd']['ca_path'],
+      "mode" => 420,
+      "contents" => "data:;base64,#{Base64.encode64(etcd_ca.to_pem)}"
+    },
   ]
 
 
@@ -65,7 +201,6 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
     end
   end
 
-
   systemd = [
     {
       "name" => "kubelet.service",
@@ -78,7 +213,7 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
               "--volume var-log,kind=host,source=/var/log",
               "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
-              "--mount volume=dns,target=/etc/resolv.conf",
+              "--mount volume=dns,target=/etc/resolv.conf"
             ].join(' ')}"}
           ],
           "ExecStartPre" => [
@@ -90,14 +225,18 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
             "/usr/lib/coreos/kubelet-wrapper",
             "--register-node=true",
             "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
+            "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
+            "--hostname-override=#{ip}",
             "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
             "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--docker-disable-shared-pid=false",
             "--image-gc-high-threshold=0",
             "--image-gc-low-threshold=0",
+            # "--feature-gates=CustomPodDNS=true"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",
