@@ -5,13 +5,13 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
   if_wan = node['environment_v2']['host'][host]['if']['wan']
   vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
 
-  ##https://stosb.com/blog/explaining-my-configs-nftables/
-
-  load_balancer_ips = [
-    node['environment_v2']['set']['haproxy']['vip']['store'],
+  ip_haproxy = [
+    vip_haproxy,
   ] + node['environment_v2']['set']['haproxy']['hosts'].map { |host|
     node['environment_v2']['host'][host]['ip']['store']
   }
+
+  ##https://stosb.com/blog/explaining-my-configs-nftables/
 
   nftables_rules =
 <<-EOF
@@ -19,7 +19,7 @@ define if_lan = #{if_lan}
 define if_store = #{if_store}
 define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
-define ip_lb = (#{load_balancer_ips.join(', ')})
+define vip_lb = #{vip_haproxy}
 
 
 table ip filter {
@@ -27,6 +27,13 @@ table ip filter {
   chain base_checks {
     ct state {established, related} accept;
     ct state invalid drop;
+  }
+
+  set ip_lb {
+    type ipv4_addr
+    elements = {
+      #{ip_haproxy.join(', ')}
+    }
   }
 
   set tcp_fwd {
@@ -75,8 +82,8 @@ table ip filter {
     iifname $if_internal tcp dport @tcp_fwd accept;
     iifname $if_internal udp dport @udp_fwd accept;
 
-    iifname $if_internal ip daddr $ip_lb accept;
-    ip daddr $ip_lb ct status dnat accept;
+    iifname $if_internal ip daddr $vip_lb accept;
+    ip daddr $vip_lb ct status dnat accept;
   }
 
   chain output {
@@ -97,7 +104,7 @@ table ip nat {
   chain prerouting {
     type nat hook prerouting priority 0; policy accept;
 
-    tcp dport @tcp_dnat dnat $ip_lb;
+    tcp dport @tcp_dnat dnat $vip_lb;
   }
 
   chain input {

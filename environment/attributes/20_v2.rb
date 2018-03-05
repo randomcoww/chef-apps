@@ -105,6 +105,7 @@ node.default['environment_v2']['set']['haproxy'] = {
     # 'kube-master',
   ],
   'vip' => {
+    'lan' => "192.168.62.242",
     'store' => "192.168.126.242",
   }
 }
@@ -434,12 +435,12 @@ node.default['environment_v2']['set']['nfs'] = {
 
 node.default['environment_v2']['set']['transmission'] = {
   'vip' => {
-    'store' => node['environment_v2']['set']['haproxy']['vip']['store']
+    'store' => node['environment_v2']['set']['haproxy']['vip']['lan']
   }
 }
 
 node.default['environment_v2']['host']['unifi'] = {
   'ip' => {
-    'lan' => node['environment_v2']['set']['haproxy']['vip']['store']
+    'lan' => node['environment_v2']['set']['haproxy']['vip']['lan']
   }
 }
