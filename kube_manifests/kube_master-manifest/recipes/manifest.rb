@@ -655,7 +655,10 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard'] = kube_dashboard
   # node.default['kubernetes']['static_pods'][host]['kube_dns'] = kube_dns_manifest
+end
+
+node['environment_v2']['set']['haproxy']['hosts'].each do |host|
+  node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
 end

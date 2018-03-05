@@ -102,7 +102,7 @@ node.default['environment_v2']['set']['haproxy'] = {
     'ns1',
     'ns2',
     'ns3',
-    'kube-master',
+    # 'kube-master',
   ],
   'vip' => {
     'store' => "192.168.126.242",
@@ -115,7 +115,7 @@ node.default['environment_v2']['set']['kube-master'] = {
     'ns1',
     'ns2',
     'ns3',
-    'kube-master',
+    # 'kube-master',
   ],
   'services' => {
     'kube-master' => {

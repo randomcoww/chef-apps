@@ -7,13 +7,19 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   ##https://stosb.com/blog/explaining-my-configs-nftables/
 
+  load_balancer_ips = [
+    node['environment_v2']['set']['haproxy']['vip']['store'],
+  ] + node['environment_v2']['set']['haproxy']['hosts'].map { |host|
+    node['environment_v2']['host'][host]['ip']['store']
+  }
+
   nftables_rules =
 <<-EOF
 define if_lan = #{if_lan}
 define if_store = #{if_store}
 define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
-define ip_lb = #{vip_haproxy}
+define ip_lb = (#{load_balancer_ips.join(', ')})
 
 
 table ip filter {
