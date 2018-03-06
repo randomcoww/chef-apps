@@ -5,11 +5,6 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
   if_wan = node['environment_v2']['host'][host]['if']['wan']
   vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
 
-  ip_haproxy = [
-    vip_haproxy,
-  ] + node['environment_v2']['set']['haproxy']['hosts'].map { |host|
-    node['environment_v2']['host'][host]['ip']['store']
-  }
 
   ##https://stosb.com/blog/explaining-my-configs-nftables/
 
@@ -27,13 +22,6 @@ table ip filter {
   chain base_checks {
     ct state {established, related} accept;
     ct state invalid drop;
-  }
-
-  set ip_lb {
-    type ipv4_addr
-    elements = {
-      #{ip_haproxy.join(', ')}
-    }
   }
 
   set tcp_fwd {

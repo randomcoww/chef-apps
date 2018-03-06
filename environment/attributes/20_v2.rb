@@ -34,7 +34,6 @@ node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
     'ns1',
     'ns2',
-    'ns3',
   ],
   'vip' => {
     'store' => "192.168.126.244",
@@ -61,7 +60,7 @@ node.default['environment_v2']['set']['kea-mysql-data'] = {
 
 node.default['environment_v2']['set']['kea-mysql-mgm'] = {
   'hosts' => [
-    'ns3',
+    'vm1',
   ]
 }
 
@@ -98,10 +97,8 @@ node.default['environment_v2']['set']['etcd'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    # 'vm1',
     'ns1',
     'ns2',
-    'ns3',
     # 'kube-master',
   ],
   'vip' => {
@@ -115,7 +112,6 @@ node.default['environment_v2']['set']['kube-master'] = {
     'vm1',
     'ns1',
     'ns2',
-    'ns3',
     # 'kube-master',
   ],
   'services' => {
@@ -242,88 +238,88 @@ node.default['environment_v2']['host']['ns2'] = {
   'vcpu' => 3,
 }
 
-node.default['environment_v2']['host']['ns3'] = {
-  'ip' => {
-    'store' => "192.168.126.221",
-    'lan' => "192.168.62.221",
-  },
-  'gw' => {
-    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
-    'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
-  },
-  'if' => {
-    'lan' => "eth0",
-    'store' => "eth1",
-  },
-  'if_type' => {
-    'lan' => 'macvlan',
-    'store' => 'macvlan',
-  },
-  'memory' => 8192,
-  'vcpu' => 3,
-}
+# node.default['environment_v2']['host']['ns3'] = {
+#   'ip' => {
+#     'store' => "192.168.126.221",
+#     'lan' => "192.168.62.221",
+#   },
+#   'gw' => {
+#     'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+#     'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
+#   },
+#   'if' => {
+#     'lan' => "eth0",
+#     'store' => "eth1",
+#   },
+#   'if_type' => {
+#     'lan' => 'macvlan',
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 8192,
+#   'vcpu' => 3,
+# }
 
-node.default['environment_v2']['host']['etcd1'] = {
-  'ip' => {
-    'store' => "192.168.126.222",
-  },
-  'gw' => {
-    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
-  },
-  'if' => {
-    'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['etcd2'] = {
-  'ip' => {
-    'store' => "192.168.126.223",
-  },
-  'gw' => {
-    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
-  },
-  'if' => {
-    'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['etcd3'] = {
-  'ip' => {
-    'store' => "192.168.126.224",
-  },
-  'gw' => {
-    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
-  },
-  'if' => {
-    'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 2048,
-  'vcpu' => 2
-}
-
-node.default['environment_v2']['host']['kube-master'] = {
-  'if' => {
-    'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 6144,
-  'vcpu' => 4
-}
+# node.default['environment_v2']['host']['etcd1'] = {
+#   'ip' => {
+#     'store' => "192.168.126.222",
+#   },
+#   'gw' => {
+#     'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+#   },
+#   'if' => {
+#     'store' => "eth0",
+#   },
+#   'if_type' => {
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 2048,
+#   'vcpu' => 2
+# }
+#
+# node.default['environment_v2']['host']['etcd2'] = {
+#   'ip' => {
+#     'store' => "192.168.126.223",
+#   },
+#   'gw' => {
+#     'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+#   },
+#   'if' => {
+#     'store' => "eth0",
+#   },
+#   'if_type' => {
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 2048,
+#   'vcpu' => 2
+# }
+#
+# node.default['environment_v2']['host']['etcd3'] = {
+#   'ip' => {
+#     'store' => "192.168.126.224",
+#   },
+#   'gw' => {
+#     'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+#   },
+#   'if' => {
+#     'store' => "eth0",
+#   },
+#   'if_type' => {
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 2048,
+#   'vcpu' => 2
+# }
+#
+# node.default['environment_v2']['host']['kube-master'] = {
+#   'if' => {
+#     'store' => "eth0",
+#   },
+#   'if_type' => {
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 6144,
+#   'vcpu' => 4
+# }
 
 node.default['environment_v2']['host']['kube-worker'] = {
   'if' => {
@@ -363,11 +359,11 @@ node.default['environment_v2']['host']['vm1'] = {
     'gateway2',
     'ns1',
     'ns2',
-    'ns3',
-    'etcd1',
-    'etcd2',
-    'etcd3',
-    'kube-master',
+    # 'ns3',
+    # 'etcd1',
+    # 'etcd2',
+    # 'etcd3',
+    # 'kube-master',
     'kube-worker'
   ]
 }
