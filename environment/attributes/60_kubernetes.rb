@@ -38,7 +38,7 @@ node.default['kubernetes']['cni_conf'] = {
   }
 }
 
-node.default['kubernetes']['ssl_path'] = '/etc/ssl/certs'
+node.default['kubernetes']['ssl_path'] = '/etc/ssl/localcerts'
 ## cert and auth
 node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_ca.crt')
 node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_cert.crt')

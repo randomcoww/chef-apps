@@ -1,3 +1,125 @@
+#
+# kube ssl
+#
+cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
+)
+ca = cert_generator.root_ca
+
+key = cert_generator.generate_key
+cert = cert_generator.node_cert(
+  [
+    ['CN', "kube"]
+  ],
+  key,
+  {
+    "basicConstraints" => "CA:FALSE",
+    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+  },
+  {
+    'DNS.1' => 'kubernetes',
+    'DNS.2' => 'kubernetes.default',
+    'DNS.3' => 'kubernetes.default.svc',
+    'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
+    'IP.1' => node['kubernetes']['cluster_service_ip'],
+    'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store'],
+    'IP.3' => node['environment_v2']['set']['haproxy']['vip']['lan'],
+  }
+)
+
+#
+# etcd ssl
+#
+etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
+  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
+)
+etcd_ca = etcd_cert_generator.root_ca
+
+
+domain = [
+  node['environment_v2']['domain']['host'],
+  node['environment_v2']['domain']['top']
+].join('.')
+
+san_ips = {}
+san_dns = {}
+
+node['environment_v2']['set']['etcd']['hosts'].each.with_index(1) do |host, i|
+
+  san_ips["IP.#{i}"] = node['environment_v2']['host'][host]['ip']['store']
+  san_dns["DNS.#{i}"] = [host, domain].join('.')
+end
+
+etcd_key = etcd_cert_generator.generate_key
+etcd_cert = etcd_cert_generator.node_cert(
+  [
+    ['CN', "etcd"]
+  ],
+  etcd_key,
+  {
+    "basicConstraints" => "CA:FALSE",
+    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+  },
+  san_dns.merge(san_ips)
+)
+
+#
+# ssl init containers
+#
+
+kube_init_container_manifest = {
+  node['kubernetes']['ca_path'] => ca.to_pem,
+  node['kubernetes']['key_path'] => key.to_pem,
+  node['kubernetes']['cert_path'] => cert.to_pem
+}.map { |path, c|
+  {
+    "name" => "kube-ssl#{path.gsub(/[\/._]/, '-')}",
+    "image" => node['kube']['images']['envwriter'],
+    "env" => [
+      {
+        "name" => "DATA",
+        "value" => c
+      },
+    ],
+    "args" => [
+      path
+    ],
+    "volumeMounts" => [
+      {
+        "name" => "local-certs",
+        "mountPath" => node['kubernetes']['ssl_path'],
+      }
+    ]
+  }
+}
+
+etcd_init_container_manifest = {
+  node['etcd']['ca_path'] => etcd_ca.to_pem,
+  node['etcd']['key_path'] => etcd_key.to_pem,
+  node['etcd']['cert_path'] => etcd_cert.to_pem
+}.map { |path, c|
+  {
+    "name" => "etcd-ssl#{path.gsub(/[\/._]/, '-')}",
+    "image" => node['kube']['images']['envwriter'],
+    "env" => [
+      {
+        "name" => "DATA",
+        "value" => c
+      },
+    ],
+    "args" => [
+      path
+    ],
+    "volumeMounts" => [
+      {
+        "name" => "local-certs",
+        "mountPath" => node['etcd']['ssl_path'],
+      }
+    ]
+  }
+}
+
+
 flannel_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
@@ -99,6 +221,7 @@ kube_controller_manager_manifest = {
   "spec" => {
     "restartPolicy" => 'Always',
     "hostNetwork" => true,
+    "initContainers" => kube_init_container_manifest,
     "containers" => [
       {
         "name" => "kube-controller-manager",
@@ -125,6 +248,11 @@ kube_controller_manager_manifest = {
             "name" => "ssl-certs-host",
             "mountPath" => "/etc/ssl/certs",
             "readOnly" => true
+          },
+          {
+            "name" => "local-certs",
+            "mountPath" => node['kubernetes']['ssl_path'],
+            "readOnly" => false
           }
         ],
         "livenessProbe" => {
@@ -151,6 +279,10 @@ kube_controller_manager_manifest = {
         "hostPath" => {
           "path" => "/etc/ssl/certs"
         }
+      },
+      {
+        "name" => "local-certs",
+        "emptyDir" => {}
       }
     ]
   }
@@ -284,6 +416,7 @@ kube_apiserver_manifest = {
   "spec" => {
     "hostNetwork" => true,
     "restartPolicy" => 'Always',
+    "initContainers" => (kube_init_container_manifest + etcd_init_container_manifest),
     "containers" => [
       {
         "name" => "kube-apiserver",
@@ -315,6 +448,11 @@ kube_apiserver_manifest = {
             "name" => "ssl-certs-host",
             "mountPath" => "/etc/ssl/certs",
             "readOnly" => true
+          },
+          {
+            "name" => "local-certs",
+            "mountPath" => node['kubernetes']['ssl_path'],
+            "readOnly" => false
           }
         ],
         "livenessProbe" => {
@@ -335,6 +473,10 @@ kube_apiserver_manifest = {
         "hostPath" => {
           "path" => "/etc/ssl/certs"
         }
+      },
+      {
+        "name" => "local-certs",
+        "emptyDir" => {}
       }
     ]
   }

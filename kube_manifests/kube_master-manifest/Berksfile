@@ -5,3 +5,5 @@ metadata
 
 cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
 cookbook "haproxy_resource", github: "randomcoww/chef-haproxy_resource"
+cookbook "openssl_cert", github: "randomcoww/chef-openssl_cert"
+cookbook "dbag", github: "randomcoww/chef-dbag"

@@ -1,4 +1,4 @@
-node.default['etcd']['ssl_path'] = '/etc/ssl/certs'
+node.default['etcd']['ssl_path'] = '/etc/ssl/localcerts'
 node.default['etcd']['cluster_name'] = 'etcd-default'
 ## cert and auth
 node.default['etcd']['ca_path'] = ::File.join(node['etcd']['ssl_path'], 'etcd_ca.crt')
