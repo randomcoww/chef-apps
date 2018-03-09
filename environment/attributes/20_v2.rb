@@ -124,7 +124,7 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    'kube-worker',
+    # 'kube-worker',
   ]
 }
 
@@ -132,12 +132,6 @@ node.default['environment_v2']['set']['vmhost'] = {
   'hosts' => [
     'vm1',
     'vm2',
-  ]
-}
-
-node.default['environment_v2']['set']['mgm'] = {
-  'hosts' => [
-    'chromebook',
   ]
 }
 
@@ -320,17 +314,17 @@ node.default['environment_v2']['host']['ns2'] = {
 #   'memory' => 6144,
 #   'vcpu' => 4
 # }
-
-node.default['environment_v2']['host']['kube-worker'] = {
-  'if' => {
-    'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 6144,
-  'vcpu' => 4
-}
+#
+# node.default['environment_v2']['host']['kube-worker'] = {
+#   'if' => {
+#     'store' => "eth0",
+#   },
+#   'if_type' => {
+#     'store' => 'macvlan',
+#   },
+#   'memory' => 6144,
+#   'vcpu' => 4
+# }
 
 ##
 ## hardware

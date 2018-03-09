@@ -123,8 +123,9 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
       "contents" => {
         "Service" => {
           "Environment" => [
-            "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
+            "KUBELET_IMAGE=docker://#{node['kube']['images']['hyperkube']}",
             %Q{RKT_RUN_ARGS="#{[
+              "--insecure-options=image",
               "--uuid-file-save=/var/run/kubelet-pod.uuid",
               "--volume var-log,kind=host,source=/var/log",
               "--mount volume=var-log,target=/var/log",
