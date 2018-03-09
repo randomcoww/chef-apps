@@ -74,6 +74,9 @@ configs.each do |host, config|
               ]
             }
           },
+          "args" => [
+            "-P"
+          ],
           "env" => [
             {
               "name" => "CONFIG",
