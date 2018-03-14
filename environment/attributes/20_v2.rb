@@ -95,6 +95,12 @@ node.default['environment_v2']['set']['etcd'] = {
   # }
 }
 
+node.default['environment_v2']['set']['ca'] = {
+  'hosts' => [
+    'vm1',
+  ]
+}
+
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
     'ns1',

@@ -1,123 +1,29 @@
-#
-# kube ssl
-#
-cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
-)
-ca = cert_generator.root_ca
-
-key = cert_generator.generate_key
-cert = cert_generator.node_cert(
-  [
-    ['CN', "kube"]
-  ],
-  key,
-  {
-    "basicConstraints" => "CA:FALSE",
-    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
+ssl_config = {
+  "auth_keys" => {
+    "key1" => {
+      "type" => "standard",
+      "key" => "245f62575040243f3d544926562f4a5d"
+    }
   },
-  {
-    'DNS.1' => 'kubernetes',
-    'DNS.2' => 'kubernetes.default',
-    'DNS.3' => 'kubernetes.default.svc',
-    'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
-    'IP.1' => node['kubernetes']['cluster_service_ip'],
-    'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store'],
-    'IP.3' => node['environment_v2']['set']['haproxy']['vip']['lan'],
+  "signing" => {
+    "default" => {
+      "auth_remote" => {
+        "remote" => "cfssl_server",
+        "auth_key" => "key1"
+      }
+    }
+  },
+  "remotes" => {
+    "cfssl_server" => node['environment_v2']['set']['ca']['hosts'].map { |e|
+      "http://#{node['environment_v2']['host'][e]['ip']['store']}:8888"
+    }.join(',')
   }
-)
-
-#
-# etcd ssl
-#
-etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
-)
-etcd_ca = etcd_cert_generator.root_ca
-
+}.to_json
 
 domain = [
   node['environment_v2']['domain']['host'],
   node['environment_v2']['domain']['top']
 ].join('.')
-
-san_ips = {}
-san_dns = {}
-
-node['environment_v2']['set']['etcd']['hosts'].each.with_index(1) do |host, i|
-
-  san_ips["IP.#{i}"] = node['environment_v2']['host'][host]['ip']['store']
-  san_dns["DNS.#{i}"] = [host, domain].join('.')
-end
-
-etcd_key = etcd_cert_generator.generate_key
-etcd_cert = etcd_cert_generator.node_cert(
-  [
-    ['CN', "etcd"]
-  ],
-  etcd_key,
-  {
-    "basicConstraints" => "CA:FALSE",
-    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-  },
-  san_dns.merge(san_ips)
-)
-
-#
-# ssl init containers
-#
-
-kube_init_container_manifest = {
-  node['kubernetes']['ca_path'] => ca.to_pem,
-  node['kubernetes']['key_path'] => key.to_pem,
-  node['kubernetes']['cert_path'] => cert.to_pem
-}.map { |path, c|
-  {
-    "name" => "kube-ssl#{path.gsub(/[\/._]/, '-')}",
-    "image" => node['kube']['images']['envwriter'],
-    "env" => [
-      {
-        "name" => "DATA",
-        "value" => c
-      },
-    ],
-    "args" => [
-      path
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "local-certs",
-        "mountPath" => node['kubernetes']['ssl_path'],
-      }
-    ]
-  }
-}
-
-etcd_init_container_manifest = {
-  node['etcd']['ca_path'] => etcd_ca.to_pem,
-  node['etcd']['key_path'] => etcd_key.to_pem,
-  node['etcd']['cert_path'] => etcd_cert.to_pem
-}.map { |path, c|
-  {
-    "name" => "etcd-ssl#{path.gsub(/[\/._]/, '-')}",
-    "image" => node['kube']['images']['envwriter'],
-    "env" => [
-      {
-        "name" => "DATA",
-        "value" => c
-      },
-    ],
-    "args" => [
-      path
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "local-certs",
-        "mountPath" => node['etcd']['ssl_path'],
-      }
-    ]
-  }
-}
 
 
 flannel_manifest = {
@@ -211,82 +117,6 @@ flannel_manifest = {
   }
 }
 
-kube_controller_manager_manifest = {
-  "kind" => "Pod",
-  "apiVersion" => "v1",
-  "metadata" => {
-    "namespace" => "kube-system",
-    "name" => "kube-controller-manager"
-  },
-  "spec" => {
-    "restartPolicy" => 'Always',
-    "hostNetwork" => true,
-    "initContainers" => kube_init_container_manifest,
-    "containers" => [
-      {
-        "name" => "kube-controller-manager",
-        "image" => node['kube']['images']['hyperkube'],
-        "command" => [
-          "/hyperkube",
-          "controller-manager",
-          "--allocate-node-cidrs=true",
-          "--cluster-name=#{node['kubernetes']['cluster_name']}",
-          "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
-          "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--service-account-private-key-file=#{node['kubernetes']['key_path']}",
-          "--root-ca-file=#{node['kubernetes']['ca_path']}",
-          "--leader-elect=true",
-          "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
-            "readOnly" => true
-          },
-          {
-            "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl/certs",
-            "readOnly" => true
-          },
-          {
-            "name" => "local-certs",
-            "mountPath" => node['kubernetes']['ssl_path'],
-            "readOnly" => false
-          }
-        ],
-        "livenessProbe" => {
-          "httpGet" => {
-            "scheme" => "HTTP",
-            "host" => "127.0.0.1",
-            "port" => 10252,
-            "path" => "/healthz"
-          },
-          "initialDelaySeconds" => 15,
-          "timeoutSeconds" => 15
-        }
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "kubeconfig",
-        "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
-        }
-      },
-      {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => "/etc/ssl/certs"
-        }
-      },
-      {
-        "name" => "local-certs",
-        "emptyDir" => {}
-      }
-    ]
-  }
-}
 
 kube_scheduler_manifest = {
   "kind" => "Pod",
@@ -405,82 +235,6 @@ kube_proxy_manifest = {
 etcd_servers = node['environment_v2']['set']['etcd']['hosts'].map { |e|
     "https://#{node['environment_v2']['host'][e]['ip']['store']}:2379"
   }.join(",")
-
-kube_apiserver_manifest = {
-  "kind" => "Pod",
-  "apiVersion" => "v1",
-  "metadata" => {
-    "namespace" => "kube-system",
-    "name" => "kube-apiserver"
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "restartPolicy" => 'Always',
-    "initContainers" => (kube_init_container_manifest + etcd_init_container_manifest),
-    "containers" => [
-      {
-        "name" => "kube-apiserver",
-        "image" => node['kube']['images']['hyperkube'],
-        "command" => [
-          "/hyperkube",
-          "apiserver",
-          "--bind-address=0.0.0.0",
-          "--insecure-bind-address=127.0.0.1",
-          "--secure-port=#{node['kubernetes']['secure_port']}",
-          "--insecure-port=#{node['kubernetes']['insecure_port']}",
-          "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
-          "--etcd-servers=#{etcd_servers}",
-          "--etcd-cafile=#{node['etcd']['ca_path']}",
-          "--etcd-certfile=#{node['etcd']['cert_path']}",
-          "--etcd-keyfile=#{node['etcd']['key_path']}",
-          "--tls-cert-file=#{node['kubernetes']['cert_path']}",
-          "--tls-private-key-file=#{node['kubernetes']['key_path']}",
-          "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-          "--client-ca-file=#{node['kubernetes']['ca_path']}",
-          "--service-account-key-file=#{node['kubernetes']['key_path']}",
-          # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
-          # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
-          "--allow-privileged=true"
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl/certs",
-            "readOnly" => true
-          },
-          {
-            "name" => "local-certs",
-            "mountPath" => node['kubernetes']['ssl_path'],
-            "readOnly" => false
-          }
-        ],
-        "livenessProbe" => {
-          "httpGet" => {
-            "scheme" => "HTTP",
-            "host" => "127.0.0.1",
-            "port" => node['kubernetes']['insecure_port'],
-            "path" => "/healthz"
-          },
-          "initialDelaySeconds" => 15,
-          "timeoutSeconds" => 15
-        }
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => "/etc/ssl/certs"
-        }
-      },
-      {
-        "name" => "local-certs",
-        "emptyDir" => {}
-      }
-    ]
-  }
-}
 
 
 kube_haproxy_manifest = {
@@ -792,6 +546,267 @@ kube_haproxy_manifest = {
 
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
+  ip = node['environment_v2']['host'][host]['ip']['store']
+
+  #
+  # kube ssl
+  #
+  kube_ssl_csr = {
+    "hosts" => [
+      'kubernetes',
+      'kubernetes.default',
+      'kubernetes.default.svc',
+      "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
+      node['kubernetes']['cluster_service_ip'],
+      node['environment_v2']['set']['haproxy']['vip']['store'],
+      node['environment_v2']['set']['haproxy']['vip']['lan'],
+      [host, domain].join('.'),
+      ip
+    ],
+    "key" => {
+      "algo" => "rsa",
+      "size" => 2048
+    }
+  }.to_json
+
+  #
+  # etcd ssl
+  #
+  etcd_ssl_csr = {
+    "hosts" => [
+      ip
+    ],
+    "key" => {
+      "algo" => "rsa",
+      "size" => 2048
+    }
+  }.to_json
+
+  #
+  # init container
+  #
+  kube_ssl_init = {
+    "name" => "cfssl-kube",
+    "image" => node['kube']['images']['cfssl'],
+    "command" => [
+      "/gencert_wrapper.sh"
+    ],
+    "args" => [
+      "-p",
+      "client",
+      "-o",
+      File.join(node['etcd']['ssl_path'], "kube")
+    ],
+    "env" => [
+      {
+        "name" => "CSR",
+        "value" => kube_ssl_csr
+      },
+      {
+        "name" => "CONFIG",
+        "value" => ssl_config
+      }
+    ],
+    "volumeMounts" => [
+      {
+        "name" => "local-certs",
+        "mountPath" => node['etcd']['ssl_path'],
+        "readOnly" => false
+      }
+    ]
+  }
+
+  etcd_ssl_init = {
+    "name" => "cfssl-etcd",
+    "image" => node['kube']['images']['cfssl'],
+    "command" => [
+      "/gencert_wrapper.sh"
+    ],
+    "args" => [
+      "-p",
+      "client",
+      "-o",
+      File.join(node['etcd']['ssl_path'], "etcd")
+    ],
+    "env" => [
+      {
+        "name" => "CSR",
+        "value" => etcd_ssl_csr
+      },
+      {
+        "name" => "CONFIG",
+        "value" => ssl_config
+      }
+    ],
+    "volumeMounts" => [
+      {
+        "name" => "local-certs",
+        "mountPath" => node['etcd']['ssl_path'],
+        "readOnly" => false
+      }
+    ]
+  }
+
+
+  kube_apiserver_manifest = {
+    "kind" => "Pod",
+    "apiVersion" => "v1",
+    "metadata" => {
+      "namespace" => "kube-system",
+      "name" => "kube-apiserver"
+    },
+    "spec" => {
+      "hostNetwork" => true,
+      "restartPolicy" => 'Always',
+      "initContainers" => [
+        kube_ssl_init,
+        etcd_ssl_init
+      ],
+      "containers" => [
+        {
+          "name" => "kube-apiserver",
+          "image" => node['kube']['images']['hyperkube'],
+          "command" => [
+            "/hyperkube",
+            "apiserver",
+            "--bind-address=0.0.0.0",
+            "--insecure-bind-address=127.0.0.1",
+            "--secure-port=#{node['kubernetes']['secure_port']}",
+            "--insecure-port=#{node['kubernetes']['insecure_port']}",
+            "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
+            # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
+            "--etcd-servers=#{etcd_servers}",
+            "--etcd-cafile=#{node['etcd']['ca_path']}",
+            "--etcd-certfile=#{node['etcd']['cert_path']}",
+            "--etcd-keyfile=#{node['etcd']['key_path']}",
+            "--tls-cert-file=#{node['kubernetes']['cert_path']}",
+            "--tls-private-key-file=#{node['kubernetes']['key_path']}",
+            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
+            "--client-ca-file=#{node['kubernetes']['ca_path']}",
+            "--service-account-key-file=#{node['kubernetes']['key_path']}",
+            # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
+            # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
+            "--allow-privileged=true"
+          ],
+          "volumeMounts" => [
+            {
+              "name" => "ssl-certs-host",
+              "mountPath" => "/etc/ssl/certs",
+              "readOnly" => true
+            },
+            {
+              "name" => "local-certs",
+              "mountPath" => node['kubernetes']['ssl_path'],
+              "readOnly" => false
+            }
+          ],
+          "livenessProbe" => {
+            "httpGet" => {
+              "scheme" => "HTTP",
+              "host" => "127.0.0.1",
+              "port" => node['kubernetes']['insecure_port'],
+              "path" => "/healthz"
+            },
+            "initialDelaySeconds" => 15,
+            "timeoutSeconds" => 15
+          }
+        }
+      ],
+      "volumes" => [
+        {
+          "name" => "ssl-certs-host",
+          "hostPath" => {
+            "path" => "/etc/ssl/certs"
+          }
+        },
+        {
+          "name" => "local-certs",
+          "emptyDir" => {}
+        }
+      ]
+    }
+  }
+
+  kube_controller_manager_manifest = {
+    "kind" => "Pod",
+    "apiVersion" => "v1",
+    "metadata" => {
+      "namespace" => "kube-system",
+      "name" => "kube-controller-manager"
+    },
+    "spec" => {
+      "restartPolicy" => 'Always',
+      "hostNetwork" => true,
+      "initContainers" => [
+        kube_ssl_init,
+      ],
+      "containers" => [
+        {
+          "name" => "kube-controller-manager",
+          "image" => node['kube']['images']['hyperkube'],
+          "command" => [
+            "/hyperkube",
+            "controller-manager",
+            "--allocate-node-cidrs=true",
+            "--cluster-name=#{node['kubernetes']['cluster_name']}",
+            "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
+            "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
+            "--service-account-private-key-file=#{node['kubernetes']['key_path']}",
+            "--root-ca-file=#{node['kubernetes']['ca_path']}",
+            "--leader-elect=true",
+            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
+          ],
+          "volumeMounts" => [
+            {
+              "name" => "kubeconfig",
+              "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+              "readOnly" => true
+            },
+            {
+              "name" => "ssl-certs-host",
+              "mountPath" => "/etc/ssl/certs",
+              "readOnly" => true
+            },
+            {
+              "name" => "local-certs",
+              "mountPath" => node['kubernetes']['ssl_path'],
+              "readOnly" => false
+            }
+          ],
+          "livenessProbe" => {
+            "httpGet" => {
+              "scheme" => "HTTP",
+              "host" => "127.0.0.1",
+              "port" => 10252,
+              "path" => "/healthz"
+            },
+            "initialDelaySeconds" => 15,
+            "timeoutSeconds" => 15
+          }
+        }
+      ],
+      "volumes" => [
+        {
+          "name" => "kubeconfig",
+          "hostPath" => {
+            "path" => node['kubernetes']['client']['kubeconfig_path']
+          }
+        },
+        {
+          "name" => "ssl-certs-host",
+          "hostPath" => {
+            "path" => "/etc/ssl/certs"
+          }
+        },
+        {
+          "name" => "local-certs",
+          "emptyDir" => {}
+        }
+      ]
+    }
+  }
+
+
   node.default['kubernetes']['static_pods'][host]['flannel'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest'] = kube_controller_manager_manifest

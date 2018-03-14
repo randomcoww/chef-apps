@@ -40,9 +40,9 @@ node.default['kubernetes']['cni_conf'] = {
 
 node.default['kubernetes']['ssl_path'] = '/etc/ssl/localcerts'
 ## cert and auth
-node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_ca.crt')
-node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_cert.crt')
-node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube_key.key')
+node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube-ca.pem')
+node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube.pem')
+node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube-key.pem')
 
 
 ## pods
@@ -95,8 +95,9 @@ node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
 node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
 node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
-node.default['kube']['images']['libvirt_monitor'] = "randomcoww/go-libvirt-mon:20180306.01"
+node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
 
+# node.default['kube']['images']['libvirt_monitor'] = "randomcoww/go-libvirt-mon:20180306.01"
 # node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
 # node.default['kube']['images']['ddclient'] = "randomcoww/ddclient:20171201.02"
 # node.default['kube']['images']['sshd'] = "randomcoww/sshd:20171201.01"

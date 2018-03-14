@@ -1,126 +1,46 @@
-#
-# etcd ssl
-#
-etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
-)
-etcd_ca = etcd_cert_generator.root_ca
-
-## peer
-etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_peer_ssl', [['CN', 'etcd-peer-ca']]
-)
-etcd_peer_ca = etcd_peer_cert_generator.root_ca
-
-
-domain = [
-  node['environment_v2']['domain']['host'],
-  node['environment_v2']['domain']['top']
-].join('.')
-
-san_ips = {}
-san_dns = {}
-
-node['environment_v2']['set']['etcd']['hosts'].each.with_index(1) do |host, i|
-
-  san_ips["IP.#{i}"] = node['environment_v2']['host'][host]['ip']['store']
-  san_dns["DNS.#{i}"] = [host, domain].join('.')
-end
-
-etcd_key = etcd_cert_generator.generate_key
-etcd_cert = etcd_cert_generator.node_cert(
-  [
-    ['CN', "etcd"]
-  ],
-  etcd_key,
-  {
-    "basicConstraints" => "CA:FALSE",
-    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-  },
-  san_dns.merge(san_ips)
-)
-
-##
-## etcd peer ssl
-##
-etcd_peer_key = etcd_peer_cert_generator.generate_key
-etcd_peer_cert = etcd_peer_cert_generator.node_cert(
-  [
-    ['CN', "etcd-peer"]
-  ],
-  etcd_peer_key,
-  {
-    "basicConstraints" => "CA:FALSE",
-    "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-  },
-  san_dns.merge(san_ips)
-)
-
-
-#
-# ssl init containers
-#
-
-etcd_init_container_manifest = {
-  node['etcd']['ca_path'] => etcd_ca.to_pem,
-  node['etcd']['key_path'] => etcd_key.to_pem,
-  node['etcd']['cert_path'] => etcd_cert.to_pem
-}.map { |path, c|
-  {
-    "name" => "etcd-ssl#{path.gsub(/[\/._]/, '-')}",
-    "image" => node['kube']['images']['envwriter'],
-    "env" => [
-      {
-        "name" => "DATA",
-        "value" => c
-      },
-    ],
-    "args" => [
-      path
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "local-certs",
-        "mountPath" => node['etcd']['ssl_path'],
-      }
-    ]
-  }
-}
-
-etcd_peer_init_container_manifest = {
-  node['etcd']['ca_peer_path'] => etcd_peer_ca.to_pem,
-  node['etcd']['key_peer_path'] => etcd_peer_key.to_pem,
-  node['etcd']['cert_peer_path'] => etcd_peer_cert.to_pem
-}.map { |path, c|
-  {
-    "name" => "etcd-peer-ssl#{path.gsub(/[\/._]/, '-')}",
-    "image" => node['kube']['images']['envwriter'],
-    "env" => [
-      {
-        "name" => "DATA",
-        "value" => c
-      },
-    ],
-    "args" => [
-      path
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "local-certs",
-        "mountPath" => node['etcd']['ssl_path'],
-      }
-    ]
-  }
-}
-
-
 ## --initial-cluster option for IP based config
 etcd_initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
     "#{e}=https://#{node['environment_v2']['host'][e]['ip']['store']}:2380"
   }.join(",")
 
+ssl_config = {
+  "auth_keys" => {
+    "key1" => {
+      "type" => "standard",
+      "key" => "245f62575040243f3d544926562f4a5d"
+    }
+  },
+  "signing" => {
+    "default" => {
+      "auth_remote" => {
+        "remote" => "cfssl_server",
+        "auth_key" => "key1"
+      }
+    }
+  },
+  "remotes" => {
+    "cfssl_server" => node['environment_v2']['set']['ca']['hosts'].map { |e|
+      "http://#{node['environment_v2']['host'][e]['ip']['store']}:8888"
+    }.join(',')
+  }
+}.to_json
+
+
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
+
+  #
+  # etcd ssl
+  #
+  ssl_csr = {
+    "hosts" => [
+      ip
+    ],
+    "key" => {
+      "algo" => "rsa",
+      "size" => 2048
+    }
+  }.to_json
 
   etcd_environment = {
     "ETCD_NAME" => host,
@@ -154,7 +74,68 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     },
     "spec" => {
       "hostNetwork" => true,
-      "initContainers" => (etcd_init_container_manifest + etcd_peer_init_container_manifest),
+      "initContainers" => [
+        {
+          "name" => "cfssl-etcd",
+          "image" => node['kube']['images']['cfssl'],
+          "command" => [
+            "/gencert_wrapper.sh"
+          ],
+          "args" => [
+            "-p",
+            "client",
+            "-o",
+            File.join(node['etcd']['ssl_path'], "etcd")
+          ],
+          "env" => [
+            {
+              "name" => "CSR",
+              "value" => ssl_csr
+            },
+            {
+              "name" => "CONFIG",
+              "value" => ssl_config
+            }
+          ],
+          "volumeMounts" => [
+            {
+              "name" => "local-certs",
+              "mountPath" => node['etcd']['ssl_path'],
+              "readOnly" => false
+            }
+          ]
+        },
+        {
+          "name" => "cfssl-etcd-peer",
+          "image" => node['kube']['images']['cfssl'],
+          "command" => [
+            "/gencert_wrapper.sh"
+          ],
+          "args" => [
+            "-p",
+            "client",
+            "-o",
+            File.join(node['etcd']['ssl_path'], "etcd-peer")
+          ],
+          "env" => [
+            {
+              "name" => "CSR",
+              "value" => ssl_csr
+            },
+            {
+              "name" => "CONFIG",
+              "value" => ssl_config
+            }
+          ],
+          "volumeMounts" => [
+            {
+              "name" => "local-certs",
+              "mountPath" => node['etcd']['ssl_path'],
+              "readOnly" => false
+            }
+          ]
+        }
+      ],
       "containers" => [
         {
           "name" => "kube-etcd",
