@@ -552,6 +552,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   # kube ssl
   #
   kube_ssl_csr = {
+    "CN" => host,
     "hosts" => [
       'kubernetes',
       'kubernetes.default',
@@ -573,6 +574,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   # etcd ssl
   #
   etcd_ssl_csr = {
+    "CN" => host,
     "hosts" => [
       ip
     ],
@@ -593,7 +595,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     ],
     "args" => [
       "-p",
-      "client",
+      "kubernetes",
       "-o",
       File.join(node['etcd']['ssl_path'], "kube")
     ],

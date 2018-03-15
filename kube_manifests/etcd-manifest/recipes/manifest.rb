@@ -33,6 +33,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
   # etcd ssl
   #
   ssl_csr = {
+    "CN" => host,
     "hosts" => [
       ip
     ],
@@ -83,7 +84,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           ],
           "args" => [
             "-p",
-            "client",
+            "server",
             "-o",
             File.join(node['etcd']['ssl_path'], "etcd")
           ],
@@ -113,7 +114,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           ],
           "args" => [
             "-p",
-            "client",
+            "peer",
             "-o",
             File.join(node['etcd']['ssl_path'], "etcd-peer")
           ],

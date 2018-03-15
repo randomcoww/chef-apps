@@ -6,7 +6,7 @@ cfssl_manifest = {
   },
   "spec" => {
     "restartPolicy" => "Always",
-    # "hostNetwork" => true,
+    "hostNetwork" => true,
     "containers" => [
       {
         "name" => "cfssl",
@@ -28,13 +28,13 @@ cfssl_manifest = {
             "mountPath" => "/certs"
           }
         ],
-        "ports" => [
-          {
-            "containerPort" => 8888,
-            "hostPort" => 8888,
-            "protocol" => "TCP"
-          }
-        ]
+        # "ports" => [
+        #   {
+        #     "containerPort" => 8888,
+        #     "hostPort" => 8888,
+        #     "protocol" => "TCP"
+        #   }
+        # ]
       }
     ],
     "volumes" => [
