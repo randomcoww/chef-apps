@@ -10,6 +10,7 @@ ssl_config = {
     },
     "profiles" => {
       "intermediate" => {
+        "auth_key" => "key1",
         "expiry" => "43800h",
         "usages" => [
           "signing",
@@ -23,13 +24,14 @@ ssl_config = {
         }
       },
       "kubernetes" => {
+        "auth_key" => "key1",
+        "expiry" => "43800h",
         "usages" => [
           "signing",
           "key encipherment",
           "server auth",
           "client auth"
-        ],
-        "expiry" => "8760h"
+        ]
       },
       "server" => {
         "auth_key" => "key1",
@@ -74,7 +76,8 @@ cfssl_manifest = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {
-    "name" => "cfssl"
+    "name" => "cfssl",
+    "namespace" => "kube-system",
   },
   "spec" => {
     "restartPolicy" => "Always",
