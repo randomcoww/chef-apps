@@ -565,8 +565,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       ip
     ],
     "key" => {
-      "algo" => "rsa",
-      "size" => 2048
+      "algo" => "ecdsa",
+      "size" => 256
     }
   }.to_json
 
@@ -579,8 +579,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       ip
     ],
     "key" => {
-      "algo" => "rsa",
-      "size" => 2048
+      "algo" => "ecdsa",
+      "size" => 256
     }
   }.to_json
 

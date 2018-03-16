@@ -14,6 +14,12 @@ node['environment_v2']['set'].each do |set, c|
     configs[host] ||= {}
     sync_groups = []
 
+    configs[host]['global_defs'] = [
+      {
+        'vrrp_version' => 3
+      }
+    ]
+
     configs[host]["vrrp_sync_group VG_#{set}"] = [
       {
         'group' => sync_groups
@@ -36,12 +42,6 @@ node['environment_v2']['set'].each do |set, c|
           'virtual_router_id' => id,
           'interface' => interface,
           'priority' => 100,
-          'authentication' => [
-            {
-              'auth_type' => 'AH',
-              'auth_pass' => password
-            }
-          ],
           'virtual_ipaddress' => [
             "#{addr}/#{subnet_mask}"
           ]

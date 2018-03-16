@@ -38,8 +38,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       ip
     ],
     "key" => {
-      "algo" => "rsa",
-      "size" => 2048
+      "algo" => "ecdsa",
+      "size" => 256
     }
   }.to_json
 

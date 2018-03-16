@@ -98,7 +98,13 @@ node.default['environment_v2']['set']['etcd'] = {
 node.default['environment_v2']['set']['ca'] = {
   'hosts' => [
     'vm1',
-  ]
+  ],
+  'services' => {
+    'cfssl' => {
+      "port" => 8888,
+      "proto" => "tcp"
+    }
+  }
 }
 
 node.default['environment_v2']['set']['haproxy'] = {
