@@ -38,12 +38,23 @@ node.default['kubernetes']['cni_conf'] = {
   }
 }
 
-node.default['kubernetes']['ssl_path'] = '/etc/ssl/localcerts'
-## cert and auth
-node.default['kubernetes']['ca_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube-ca.pem')
-node.default['kubernetes']['cert_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube.pem')
-node.default['kubernetes']['key_path'] = ::File.join(node['kubernetes']['ssl_path'], 'kube-key.pem')
 
+## ssl paths
+node.default['kubernetes']['apiserver_ssl_path'] = '/internalcerts/apiserver'
+node.default['kubernetes']['etcd_ssl_path'] = '/internalcerts/etcd'
+node.default['kubernetes']['serviceaccount_ssl_path'] = '/internalcerts/serviceaccount'
+
+node.default['kubernetes']['apiserver_ssl_base_path'] = ::File.join(node['kubernetes']['apiserver_ssl_path'], 'apiserver')
+node.default['kubernetes']['apiserver_ssl_host_path'] = '/data/certs/apiserver'
+
+node.default['kubernetes']['etcd_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcd')
+node.default['kubernetes']['etcdpeer_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcdpeer')
+## need something permanent for this
+node.default['kubernetes']['serviceaccount_ssl_base_path'] = ::File.join(node['kubernetes']['serviceaccount_ssl_path'], 'serviceaccount')
+node.default['kubernetes']['serviceaccount_ssl_host_path'] = '/data/certs/serviceaccount'
+
+## etcd
+node.default['kubernetes']['etcd_cluster_name'] = 'etcd-default'
 
 ## pods
 # node.default['kubernetes']['manifests_path'] = '/etc/kubernetes/manifests'
@@ -93,7 +104,6 @@ node.default['kube']['images']['flannel'] = "quay.io/coreos/flannel:v0.10.0-amd6
 node.default['kube']['images']['dnsdist'] = "randomcoww/dnsdist:1.2.1"
 node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
 node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
-node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
 node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
 

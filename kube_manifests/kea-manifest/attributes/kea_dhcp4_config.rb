@@ -22,7 +22,7 @@ node.default['kube_manifests']['kea']['dhcp4_config'] = {
       {
         "name": "ipxe_detected",
         "test": "substring(option[77].hex,0,4) == 'iPXE'",
-        "boot-file-name": "http://#{node['environment_v2']['set']['pxe']['vip']['store']}:8080/boot.ipxe"
+        "boot-file-name": "http://#{node['environment_v2']['set']['haproxy']['vip']['store']}:48080/boot.ipxe"
       },
       {
         "name": "ipxe",

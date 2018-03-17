@@ -31,6 +31,7 @@ node.default['kickstart']['vmhost']['packages_install'] = %w{
   rkt
   docker
   ca-certificates
+  wget
 }
 
 node.default['kickstart']['vmhost']['packages_remove'] = %w{

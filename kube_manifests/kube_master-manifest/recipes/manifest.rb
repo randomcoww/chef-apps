@@ -556,8 +556,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     "hosts" => [
       'kubernetes',
       'kubernetes.default',
-      'kubernetes.default.svc',
-      "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
       node['kubernetes']['cluster_service_ip'],
       node['environment_v2']['set']['haproxy']['vip']['store'],
       node['environment_v2']['set']['haproxy']['vip']['lan'],
@@ -587,7 +585,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   #
   # init container
   #
-  kube_ssl_init = {
+  apiserver_ssl_init = {
     "name" => "cfssl-kube",
     "image" => node['kube']['images']['cfssl'],
     "command" => [
@@ -597,7 +595,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "-p",
       "kubernetes",
       "-o",
-      File.join(node['etcd']['ssl_path'], "kube")
+      node['kubernetes']['apiserver_ssl_base_path']
     ],
     "env" => [
       {
@@ -612,7 +610,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     "volumeMounts" => [
       {
         "name" => "local-certs",
-        "mountPath" => node['etcd']['ssl_path'],
+        "mountPath" => node['kubernetes']['apiserver_ssl_path'],
         "readOnly" => false
       }
     ]
@@ -628,7 +626,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "-p",
       "client",
       "-o",
-      File.join(node['etcd']['ssl_path'], "etcd")
+      node['kubernetes']['etcd_ssl_base_path']
     ],
     "env" => [
       {
@@ -642,13 +640,12 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     ],
     "volumeMounts" => [
       {
-        "name" => "local-certs",
-        "mountPath" => node['etcd']['ssl_path'],
+        "name" => "etcd-certs",
+        "mountPath" => node['kubernetes']['etcd_ssl_path'],
         "readOnly" => false
       }
     ]
   }
-
 
   kube_apiserver_manifest = {
     "kind" => "Pod",
@@ -661,7 +658,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "hostNetwork" => true,
       "restartPolicy" => 'Always',
       "initContainers" => [
-        kube_ssl_init,
+        apiserver_ssl_init,
         etcd_ssl_init
       ],
       "containers" => [
@@ -672,20 +669,20 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "/hyperkube",
             "apiserver",
             "--bind-address=0.0.0.0",
+            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
             "--insecure-bind-address=127.0.0.1",
             "--secure-port=#{node['kubernetes']['secure_port']}",
             "--insecure-port=#{node['kubernetes']['insecure_port']}",
             "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
             # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
             "--etcd-servers=#{etcd_servers}",
-            "--etcd-cafile=#{node['etcd']['ca_path']}",
-            "--etcd-certfile=#{node['etcd']['cert_path']}",
-            "--etcd-keyfile=#{node['etcd']['key_path']}",
-            "--tls-cert-file=#{node['kubernetes']['cert_path']}",
-            "--tls-private-key-file=#{node['kubernetes']['key_path']}",
-            "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-            "--client-ca-file=#{node['kubernetes']['ca_path']}",
-            "--service-account-key-file=#{node['kubernetes']['key_path']}",
+            "--etcd-cafile=#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem",
+            "--etcd-certfile=#{node['kubernetes']['etcd_ssl_base_path']}.pem",
+            "--etcd-keyfile=#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
+            "--tls-cert-file=#{node['kubernetes']['apiserver_ssl_base_path']}.pem",
+            "--tls-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
+            "--client-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
+            "--service-account-key-file=#{node['kubernetes']['serviceaccount_ssl_base_path']}-key.pem",
             # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
             # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
             "--allow-privileged=true"
@@ -697,9 +694,19 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
               "readOnly" => true
             },
             {
-              "name" => "local-certs",
-              "mountPath" => node['kubernetes']['ssl_path'],
-              "readOnly" => false
+              "name" => "etcd-certs",
+              "mountPath" => node['kubernetes']['etcd_ssl_path'],
+              "readOnly" => true
+            },
+            {
+              "name" => "apiserver-certs-host",
+              "mountPath" => node['kubernetes']['apiserver_ssl_path'],
+              "readOnly" => true
+            },
+            {
+              "name" => "serviceaccount-certs-host",
+              "mountPath" => node['kubernetes']['serviceaccount_ssl_path'],
+              "readOnly" => true
             }
           ],
           "livenessProbe" => {
@@ -722,8 +729,18 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
           }
         },
         {
-          "name" => "local-certs",
+          "name" => "etcd-certs",
           "emptyDir" => {}
+        },
+        {
+          "name" => "apiserver-certs",
+          "emptyDir" => {}
+        },
+        {
+          "name" => "serviceaccount-certs-host",
+          "hostPath" => {
+            "path" => node['kubernetes']['serviceaccount_ssl_host_path']
+          }
         }
       ]
     }
@@ -740,7 +757,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "restartPolicy" => 'Always',
       "hostNetwork" => true,
       "initContainers" => [
-        kube_ssl_init,
+        apiserver_ssl_init,
       ],
       "containers" => [
         {
@@ -753,8 +770,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--cluster-name=#{node['kubernetes']['cluster_name']}",
             "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
             "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-            "--service-account-private-key-file=#{node['kubernetes']['key_path']}",
-            "--root-ca-file=#{node['kubernetes']['ca_path']}",
+            "--service-account-private-key-file=#{node['kubernetes']['serviceaccount_ssl_base_path']}-key.pem",
+            "--root-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
             "--leader-elect=true",
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
           ],
@@ -770,9 +787,14 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
               "readOnly" => true
             },
             {
-              "name" => "local-certs",
-              "mountPath" => node['kubernetes']['ssl_path'],
-              "readOnly" => false
+              "name" => "apiserver-certs-host",
+              "mountPath" => node['kubernetes']['apiserver_ssl_path'],
+              "readOnly" => true
+            },
+            {
+              "name" => "serviceaccount-certs-host",
+              "mountPath" => node['kubernetes']['serviceaccount_ssl_path'],
+              "readOnly" => true
             }
           ],
           "livenessProbe" => {
@@ -801,8 +823,14 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
           }
         },
         {
-          "name" => "local-certs",
+          "name" => "apiserver-certs-host",
           "emptyDir" => {}
+        },
+        {
+          "name" => "serviceaccount-certs-host",
+          "hostPath" => {
+            "path" => node['kubernetes']['serviceaccount_ssl_host_path']
+          }
         }
       ]
     }

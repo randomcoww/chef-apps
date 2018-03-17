@@ -6,6 +6,10 @@ node.default['environment_v2']['haproxy']['cfssl'] = {
   "port" => 8888
 }
 
+node.default['environment_v2']['haproxy']['matchbox'] = {
+  "port" => 48080
+}
+
 # node.default['environment_v2']['haproxy']['etcd-client-ssl'] = {
 #   "port" => 2379
 # }

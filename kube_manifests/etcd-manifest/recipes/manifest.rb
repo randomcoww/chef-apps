@@ -53,15 +53,15 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379",
     "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster,
     "ETCD_INITIAL_CLUSTER_STATE" => "new",
-    "ETCD_INITIAL_CLUSTER_TOKEN" => node['etcd']['cluster_name'],
+    "ETCD_INITIAL_CLUSTER_TOKEN" => node['kubernetes']['etcd_cluster_name'],
 
-    "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
-    "ETCD_CERT_FILE" => node['etcd']['cert_path'],
-    "ETCD_KEY_FILE" => node['etcd']['key_path'],
+    "ETCD_TRUSTED_CA_FILE" => "#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem",
+    "ETCD_CERT_FILE" => "#{node['kubernetes']['etcd_ssl_base_path']}.pem",
+    "ETCD_KEY_FILE" => "#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
 
-    "ETCD_PEER_TRUSTED_CA_FILE" => node['etcd']['ca_peer_path'],
-    "ETCD_PEER_CERT_FILE" => node['etcd']['cert_peer_path'],
-    "ETCD_PEER_KEY_FILE" => node['etcd']['key_peer_path'],
+    "ETCD_PEER_TRUSTED_CA_FILE" => "#{node['kubernetes']['etcdpeer_ssl_base_path']}-ca.pem",
+    "ETCD_PEER_CERT_FILE" => "#{node['kubernetes']['etcdpeer_ssl_base_path']}.pem",
+    "ETCD_PEER_KEY_FILE" => "#{node['kubernetes']['etcdpeer_ssl_base_path']}-key.pem",
 
     "ETCD_PEER_CLIENT_CERT_AUTH" => "true"
   }
@@ -86,7 +86,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
             "-p",
             "server",
             "-o",
-            File.join(node['etcd']['ssl_path'], "etcd")
+            node['kubernetes']['etcd_ssl_base_path']
           ],
           "env" => [
             {
@@ -100,8 +100,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           ],
           "volumeMounts" => [
             {
-              "name" => "local-certs",
-              "mountPath" => node['etcd']['ssl_path'],
+              "name" => "etcd-certs",
+              "mountPath" => node['kubernetes']['etcd_ssl_path'],
               "readOnly" => false
             }
           ]
@@ -116,7 +116,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
             "-p",
             "peer",
             "-o",
-            File.join(node['etcd']['ssl_path'], "etcd-peer")
+            node['kubernetes']['etcdpeer_ssl_base_path']
           ],
           "env" => [
             {
@@ -130,8 +130,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           ],
           "volumeMounts" => [
             {
-              "name" => "local-certs",
-              "mountPath" => node['etcd']['ssl_path'],
+              "name" => "etcd-certs",
+              "mountPath" => node['kubernetes']['etcd_ssl_path'],
               "readOnly" => false
             }
           ]
@@ -159,8 +159,8 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
               "readOnly" => false
             },
             {
-              "name" => "local-certs",
-              "mountPath" => node['etcd']['ssl_path'],
+              "name" => "etcd-certs",
+              "mountPath" => node['kubernetes']['etcd_ssl_path'],
               "readOnly" => false
             }
           ]
@@ -180,7 +180,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           }
         },
         {
-          "name" => "local-certs",
+          "name" => "etcd-certs",
           "emptyDir" => {}
         }
       ]

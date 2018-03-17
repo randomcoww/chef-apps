@@ -74,6 +74,18 @@ node.default['environment_v2']['set']['pxe'] = {
   }
 }
 
+node.default['environment_v2']['set']['matchbox'] = {
+  'hosts' => [
+    'vm1',
+  ],
+  'services' => {
+    'matchbox' => {
+      "port" => 48080,
+      "proto" => "tcp"
+    }
+  }
+}
+
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'vm1',
@@ -109,9 +121,7 @@ node.default['environment_v2']['set']['ca'] = {
 
 node.default['environment_v2']['set']['haproxy'] = {
   'hosts' => [
-    'ns1',
-    'ns2',
-    # 'kube-master',
+    'vm1',
   ],
   'vip' => {
     'lan' => "192.168.62.242",
@@ -122,9 +132,6 @@ node.default['environment_v2']['set']['haproxy'] = {
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     'vm1',
-    'ns1',
-    'ns2',
-    # 'kube-master',
   ],
   'services' => {
     'kube-master' => {
@@ -136,14 +143,14 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    # 'kube-worker',
+    'ns1',
+    'ns2',
   ]
 }
 
 node.default['environment_v2']['set']['vmhost'] = {
   'hosts' => [
     'vm1',
-    'vm2',
   ]
 }
 
@@ -350,7 +357,7 @@ node.default['environment_v2']['host']['vm1'] = {
   'if' => {
     'lan' => "eno2",
     'wan' => "wan",
-    'store' => "eno1",
+    'store' => "eno1_host",
     'zfssync' => "ens1f0"
   },
   # 'passthrough_hba' => {
