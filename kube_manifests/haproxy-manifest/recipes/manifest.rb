@@ -81,34 +81,22 @@ node['environment_v2']['set'].each_value do |config|
     "spec" => {
       "restartPolicy" => "Always",
       "hostNetwork" => true,
-      "initContainers" => [
-        "name" => "haproxy-config",
-        "image" => node['kube']['images']['envwriter'],
-        "env" => [
-          {
-            "name" => "CONFIG",
-            "value" => HaproxyHelper::ConfigGenerator.generate_from_hash(config_base.merge(services))
-          }
-        ],
-        "args" => [
-          haproxy_config_path
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(haproxy_config_path)
-          }
-        ]
-      ],
       "containers" => [
         {
           "name" => "haproxy",
           "image" => node['kube']['images']['haproxy'],
+          "env" => [
+            {
+              "name" => "CONFIG",
+              "value" => HaproxyHelper::ConfigGenerator.generate_from_hash(config_base.merge(services))
+            }
+          ],
+          "command" => [
+            "/entrypoint_wrapper.sh"
+          ],
           "args" => [
             "haproxy",
             "-V",
-            "-f",
-            haproxy_config_path,
             "-p",
             haproxy_pid_path,
           ],
