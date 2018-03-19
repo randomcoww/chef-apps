@@ -20,6 +20,8 @@ ssl_config = {
   }
 }.to_json
 
+env_vars = node['environment_v2']['set']['matchbox']['vars']
+
 
 node['environment_v2']['set']['matchbox']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
@@ -88,20 +90,13 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
           "name" => "matchbox",
           "image" => node['kube']['images']['matchbox'],
           "args" => [
-            "-address",
-            "0.0.0.0:48080",
-            "-rpc-address",
-            "0.0.0.0:48081",
-            "-ca-file",
-            "#{cert_path}-ca.pem",
-            "cert-file",
-            "#{cert_path}.pem",
-            "key-file",
-            "#{cert_path}-key.pem",
-            "-data-path",
-            data_path,
-            "-assets-path",
-            ::File.join(data_path, "assets")
+            "-address=0.0.0.0:48080",
+            "-rpc-address=0.0.0.0:48081",
+            "-ca-file=#{cert_path}-ca.pem",
+            "-cert-file=#{cert_path}.pem",
+            "-key-file=#{cert_path}-key.pem",
+            "-data-path=#{data_path}",
+            "-assets-path=#{::File.join(data_path, "assets")}",
           ],
           "volumeMounts" => [
             {
@@ -125,7 +120,7 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
         {
           "name" => "data-path",
           "hostPath" => {
-            "path" => data_path
+            "path" => env_vars["data_path"]
           }
         }
       ]

@@ -71,6 +71,8 @@ ssl_config = {
   }
 }.to_json
 
+env_vars = node['environment_v2']['set']['ca']['vars']
+
 
 cfssl_manifest = {
   "apiVersion" => "v1",
@@ -91,16 +93,11 @@ cfssl_manifest = {
         ],
         "args" => [
           # "serve",
-          "-address",
-          "0.0.0.0",
-          "-port",
-          node['environment_v2']['port']['ca'],
-          "-ca",
-          "/certs/root_ca/root_ca.pem",
-          "-ca-key",
-          "/certs/root_ca/root_ca-key.pem",
-          # "-config",
-          # "/certs/config.json",
+          "-address=0.0.0.0",
+          "-port=#{node['environment_v2']['port']['ca']}",
+          "-ca=/certs/root_ca/root_ca.pem",
+          "-ca-key=/certs/root_ca/root_ca-key.pem",
+          # "-config=/certs/config.json",
         ],
         "env" => [
           {
@@ -127,7 +124,7 @@ cfssl_manifest = {
       {
         "name" => "certs",
         "hostPath" => {
-          "path" => "/data/certs"
+          "path" => env_vars["ssl_path"]
         }
       }
     ]

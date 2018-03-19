@@ -25,6 +25,8 @@ ssl_config = {
   }
 }.to_json
 
+env_vars = node['environment_v2']['set']['etcd']['vars']
+
 
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
@@ -170,13 +172,13 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
         {
           "name" => "ssl-certs-host",
           "hostPath" => {
-            "path" => "/etc/ssl/certs"
+            "path" => env_vars["ssl_path"]
           }
         },
         {
           "name" => "data-etcd-host",
           "hostPath" => {
-            "path" => "/data/etcd"
+            "path" => env_vars["data_path"]
           }
         },
         {
