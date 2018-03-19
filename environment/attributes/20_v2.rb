@@ -18,7 +18,7 @@ node.default['environment_v2']['domain']['host'] = 'host'
 
 node.default['environment_v2']['port']['kube-master'] = 50443
 node.default['environment_v2']['port']['kube-master-insecure'] = 62080
-node.default['environment_v2']['port']['ca'] = 58888
+node.default['environment_v2']['port']['ca'] = 48888
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
 node.default['environment_v2']['port']['kea-dns'] = 53531
@@ -89,12 +89,12 @@ node.default['environment_v2']['set']['haproxy'] = {
         "port" => node['environment_v2']['port']['matchbox-rpc'],
       }
     },
-    'ca' => {
-      "default" => {
-        "hostport" => 48888,
-        "port" => node['environment_v2']['port']['ca'],
-      }
-    },
+    # 'ca' => {
+    #   "default" => {
+    #     "hostport" => 48888,
+    #     "port" => node['environment_v2']['port']['ca'],
+    #   }
+    # },
     'kube-master' => {
       "default" => {
         "hostport" => 40443,
@@ -107,19 +107,29 @@ node.default['environment_v2']['set']['haproxy'] = {
 node.default['environment_v2']['set']['matchbox'] = {
   'hosts' => [
     'vm1',
-  ]
+  ],
+  'vars' => {
+    'data_path' => "/data/matchbox"
+  }
 }
 
 node.default['environment_v2']['set']['etcd'] = {
   'hosts' => [
     'vm1',
-  ]
+  ],
+  'vars' => {
+    'data_path' => "/data/etcd",
+    'ssl_path' => "/etc/ssl/certs"
+  }
 }
 
 node.default['environment_v2']['set']['ca'] = {
   'hosts' => [
     'vm1',
-  ]
+  ],
+  'vars' => {
+    'ssl_path' => "/data/certs"
+  }
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
