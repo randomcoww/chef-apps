@@ -1,28 +1,28 @@
 services = {}
-node['environment_v2']['set'].each_value do |set|
-  if set.is_a?(Hash) &&
-    set.has_key?('services')
-
-    set['services'].each do |service, c|
-      if node['environment_v2']['haproxy'].has_key?(service) &&
-        node['environment_v2']['haproxy'][service].has_key?('port')
-
-        bind = node['environment_v2']['haproxy'][service]['port']
-
-        services["frontend #{service}"] = {
-          'default_backend' => service,
-          'bind' => "*:#{bind}",
-          'maxconn' => 2000
-        }
-
-        services["backend #{service}"] = {
-          "{{range $nodename, $n := $.Nodes}}{{if $n.Address}}server" => "{{$nodename}} {{$n.Address}}:#{c['port']} check{{end}}
-  {{end}}"
-        }
-      end
-    end
-  end
-end
+# node['environment_v2']['set'].each_value do |set|
+#   if set.is_a?(Hash) &&
+#     set.has_key?('services')
+#
+#     set['services'].each do |service, c|
+#       if node['environment_v2']['haproxy'].has_key?(service) &&
+#         node['environment_v2']['haproxy'][service].has_key?('port')
+#
+#         bind = node['environment_v2']['haproxy'][service]['port']
+#
+#         services["frontend #{service}"] = {
+#           'default_backend' => service,
+#           'bind' => "*:#{bind}",
+#           'maxconn' => 2000
+#         }
+#
+#         services["backend #{service}"] = {
+#           "{{range $nodename, $n := $.Nodes}}{{if $n.Address}}server" => "{{$nodename}} {{$n.Address}}:#{c['port']} check{{end}}
+#   {{end}}"
+#         }
+#       end
+#     end
+#   end
+# end
 
 
 haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
