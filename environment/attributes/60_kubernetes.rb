@@ -2,14 +2,14 @@
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.8.7'
+node.default['kubernetes']['version'] = '1.9.4'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
 
 node.default['kubernetes']['insecure_port'] = 62080
-node.default['kubernetes']['secure_port'] = node['environment_v2']['set']['kube-master']['services']['kube-master']['port']
+node.default['kubernetes']['secure_port'] = node['environment_v2']['port']['kube-master']
 
 ## pod network
 node.default['kubernetes']['cluster_cidr'] = '10.244.0.0/16'
@@ -106,6 +106,7 @@ node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
 node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
 node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
+node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 
 # node.default['kube']['images']['libvirt_monitor'] = "randomcoww/go-libvirt-mon:20180306.01"
 # node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
