@@ -21,11 +21,11 @@ ssl_config = {
 }.to_json
 
 
-node['environment_v2']['set']['etcd']['hosts'].each do |host|
+node['environment_v2']['set']['matchbox']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
   #
-  # etcd ssl
+  # matchbox ssl
   #
   ssl_csr = {
     "CN" => host,
@@ -47,8 +47,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     "kind" => "Pod",
     "apiVersion" => "v1",
     "metadata" => {
-      "name" => "kube-etcd",
-      "namespace" => "kube-system",
+      "name" => "matchbox"
     },
     "spec" => {
       "hostNetwork" => true,

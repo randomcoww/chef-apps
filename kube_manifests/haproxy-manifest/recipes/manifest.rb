@@ -75,7 +75,6 @@ node['environment_v2']['set'].each_value do |config|
     "apiVersion" => "v1",
     "kind" => "Pod",
     "metadata" => {
-      "namespace" => "kube-system",
       "name" => "haproxy"
     },
     "spec" => {
