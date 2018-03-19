@@ -15,7 +15,7 @@ ssl_config = {
   },
   "remotes" => {
     "cfssl_server" => node['environment_v2']['set']['ca']['hosts'].map { |e|
-      "http://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['ca']}"
+      "http://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['ca-internal']}"
     }.join(',')
   }
 }.to_json

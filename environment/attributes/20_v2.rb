@@ -18,11 +18,11 @@ node.default['environment_v2']['domain']['host'] = 'host'
 
 node.default['environment_v2']['port']['kube-master'] = 50443
 node.default['environment_v2']['port']['kube-master-insecure'] = 62080
-node.default['environment_v2']['port']['ca'] = 48888
+node.default['environment_v2']['port']['ca-internal'] = 48888
+node.default['environment_v2']['port']['ca'] = 58888
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
 node.default['environment_v2']['port']['kea-dns'] = 53531
-node.default['environment_v2']['port']['unbound-dns'] = 53
 
 ##
 ## sets
@@ -89,12 +89,12 @@ node.default['environment_v2']['set']['haproxy'] = {
         "port" => node['environment_v2']['port']['matchbox-rpc'],
       }
     },
-    # 'ca' => {
-    #   "default" => {
-    #     "hostport" => 48888,
-    #     "port" => node['environment_v2']['port']['ca'],
-    #   }
-    # },
+    'ca' => {
+      "default" => {
+        "hostport" => node['environment_v2']['port']['ca-internal'],
+        "port" => node['environment_v2']['port']['ca'],
+      }
+    },
     'kube-master' => {
       "default" => {
         "hostport" => 40443,
