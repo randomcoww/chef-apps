@@ -93,6 +93,8 @@ cfssl_manifest = {
           # "serve",
           "-address",
           "0.0.0.0",
+          "-port",
+          node['environment_v2']['port']['ca'],
           "-ca",
           "/certs/root_ca/root_ca.pem",
           "-ca-key",
