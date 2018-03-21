@@ -242,7 +242,7 @@ kube_haproxy_manifest = {
   "kind" => "Pod",
   "metadata" => {
     "namespace" => "kube-system",
-    "name" => "haproxy"
+    "name" => "kube-haproxy"
   },
   "spec" => {
     "restartPolicy" => "Always",
@@ -609,7 +609,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
     ],
     "volumeMounts" => [
       {
-        "name" => "local-certs",
+        "name" => "apiserver-certs",
         "mountPath" => node['kubernetes']['apiserver_ssl_path'],
         "readOnly" => false
       }
@@ -682,7 +682,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--tls-cert-file=#{node['kubernetes']['apiserver_ssl_base_path']}.pem",
             "--tls-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
             "--client-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
-            "--service-account-key-file=#{node['kubernetes']['serviceaccount_ssl_base_path']}-key.pem",
+            "--service-account-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
             # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
             # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
             "--allow-privileged=true"
@@ -699,13 +699,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
               "readOnly" => true
             },
             {
-              "name" => "apiserver-certs-host",
+              "name" => "apiserver-certs",
               "mountPath" => node['kubernetes']['apiserver_ssl_path'],
-              "readOnly" => true
-            },
-            {
-              "name" => "serviceaccount-certs-host",
-              "mountPath" => node['kubernetes']['serviceaccount_ssl_path'],
               "readOnly" => true
             }
           ],
@@ -735,12 +730,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         {
           "name" => "apiserver-certs",
           "emptyDir" => {}
-        },
-        {
-          "name" => "serviceaccount-certs-host",
-          "hostPath" => {
-            "path" => node['kubernetes']['serviceaccount_ssl_host_path']
-          }
         }
       ]
     }
@@ -770,7 +759,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--cluster-name=#{node['kubernetes']['cluster_name']}",
             "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
             "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-            "--service-account-private-key-file=#{node['kubernetes']['serviceaccount_ssl_base_path']}-key.pem",
+            "--service-account-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
             "--root-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
             "--leader-elect=true",
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
@@ -787,13 +776,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
               "readOnly" => true
             },
             {
-              "name" => "apiserver-certs-host",
+              "name" => "apiserver-certs",
               "mountPath" => node['kubernetes']['apiserver_ssl_path'],
-              "readOnly" => true
-            },
-            {
-              "name" => "serviceaccount-certs-host",
-              "mountPath" => node['kubernetes']['serviceaccount_ssl_path'],
               "readOnly" => true
             }
           ],
@@ -823,14 +807,8 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
           }
         },
         {
-          "name" => "apiserver-certs-host",
+          "name" => "apiserver-certs",
           "emptyDir" => {}
-        },
-        {
-          "name" => "serviceaccount-certs-host",
-          "hostPath" => {
-            "path" => node['kubernetes']['serviceaccount_ssl_host_path']
-          }
         }
       ]
     }

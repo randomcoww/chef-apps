@@ -98,19 +98,7 @@ node['environment_v2']['set'].each_value do |config|
             "-V",
             "-p",
             haproxy_pid_path,
-          ],
-          "volumeMounts" => [
-            {
-              "name" => "haproxy-config",
-              "mountPath" => ::File.dirname(haproxy_config_path)
-            }
           ]
-        }
-      ],
-      "volumes" => [
-        {
-          "name" => "haproxy-config",
-          "emptyDir" => {}
         }
       ]
     }
