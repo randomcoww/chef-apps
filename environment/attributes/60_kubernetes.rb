@@ -42,7 +42,7 @@ node.default['kubernetes']['cni_conf'] = {
 ## ssl paths
 node.default['kubernetes']['apiserver_ssl_path'] = '/internalcerts/apiserver'
 node.default['kubernetes']['etcd_ssl_path'] = '/internalcerts/etcd'
-node.default['kubernetes']['serviceaccount_ssl_path'] = '/internalcerts/serviceaccount'
+# node.default['kubernetes']['serviceaccount_ssl_path'] = '/internalcerts/serviceaccount'
 
 node.default['kubernetes']['apiserver_ssl_base_path'] = ::File.join(node['kubernetes']['apiserver_ssl_path'], 'apiserver')
 node.default['kubernetes']['apiserver_ssl_host_path'] = '/data/certs/apiserver'
@@ -50,8 +50,8 @@ node.default['kubernetes']['apiserver_ssl_host_path'] = '/data/certs/apiserver'
 node.default['kubernetes']['etcd_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcd')
 node.default['kubernetes']['etcdpeer_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcdpeer')
 ## need something permanent for this
-node.default['kubernetes']['serviceaccount_ssl_base_path'] = ::File.join(node['kubernetes']['serviceaccount_ssl_path'], 'serviceaccount')
-node.default['kubernetes']['serviceaccount_ssl_host_path'] = '/data/certs/serviceaccount'
+# node.default['kubernetes']['serviceaccount_ssl_base_path'] = ::File.join(node['kubernetes']['serviceaccount_ssl_path'], 'serviceaccount')
+# node.default['kubernetes']['serviceaccount_ssl_host_path'] = '/data/certs/serviceaccount'
 
 ## etcd
 node.default['kubernetes']['etcd_cluster_name'] = 'etcd-default'
@@ -107,6 +107,7 @@ node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.0
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
 node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
 node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
+node.default['kube']['images']['vault'] = "vault:latest"
 
 # node.default['kube']['images']['libvirt_monitor'] = "randomcoww/go-libvirt-mon:20180306.01"
 # node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"

@@ -302,7 +302,7 @@ EOF
       "path" => '/etc/dnf/automatic.conf',
       "data" => SystemdHelper::ConfigGenerator.generate_from_hash({
         "commands" => {
-          "apply_updates" => true,
+          "apply_updates" => "yes",
           "upgrade_type" => "default"
         },
         "emitters" => {
