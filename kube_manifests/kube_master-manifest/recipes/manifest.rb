@@ -714,41 +714,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "initialDelaySeconds" => 15,
             "timeoutSeconds" => 15
           }
-        }
-      ],
-      "volumes" => [
-        {
-          "name" => "ssl-certs-host",
-          "hostPath" => {
-            "path" => "/etc/ssl/certs"
-          }
         },
-        {
-          "name" => "etcd-certs",
-          "emptyDir" => {}
-        },
-        {
-          "name" => "apiserver-certs",
-          "emptyDir" => {}
-        }
-      ]
-    }
-  }
-
-  kube_controller_manager_manifest = {
-    "kind" => "Pod",
-    "apiVersion" => "v1",
-    "metadata" => {
-      "namespace" => "kube-system",
-      "name" => "kube-controller-manager"
-    },
-    "spec" => {
-      "restartPolicy" => 'Always',
-      "hostNetwork" => true,
-      "initContainers" => [
-        apiserver_ssl_init,
-      ],
-      "containers" => [
         {
           "name" => "kube-controller-manager",
           "image" => node['kube']['images']['hyperkube'],
@@ -795,20 +761,24 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       ],
       "volumes" => [
         {
-          "name" => "kubeconfig",
-          "hostPath" => {
-            "path" => node['kubernetes']['client']['kubeconfig_path']
-          }
-        },
-        {
           "name" => "ssl-certs-host",
           "hostPath" => {
             "path" => "/etc/ssl/certs"
           }
         },
         {
+          "name" => "etcd-certs",
+          "emptyDir" => {}
+        },
+        {
           "name" => "apiserver-certs",
           "emptyDir" => {}
+        },
+        {
+          "name" => "kubeconfig",
+          "hostPath" => {
+            "path" => node['kubernetes']['client']['kubeconfig_path']
+          }
         }
       ]
     }
@@ -817,7 +787,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
   node.default['kubernetes']['static_pods'][host]['flannel'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest'] = kube_apiserver_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest'] = kube_scheduler_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard'] = kube_dashboard

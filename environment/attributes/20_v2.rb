@@ -17,6 +17,7 @@ node.default['environment_v2']['domain']['host'] = 'host'
 ##
 
 node.default['environment_v2']['port']['kube-master'] = 50443
+node.default['environment_v2']['port']['kube-master-internal'] = 40443
 node.default['environment_v2']['port']['kube-master-insecure'] = 62080
 node.default['environment_v2']['port']['ca-internal'] = 48888
 node.default['environment_v2']['port']['ca'] = 58888
@@ -97,7 +98,7 @@ node.default['environment_v2']['set']['haproxy'] = {
     },
     'kube-master' => {
       "default" => {
-        "hostport" => 40443,
+        "hostport" => node['environment_v2']['port']['kube-master-internal'],
         "port" => node['environment_v2']['port']['kube-master'],
       }
     }
