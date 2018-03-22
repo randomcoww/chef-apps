@@ -56,9 +56,9 @@ mysqld_manifest = {
           {
             "name" => "INIT",
             "value" => [
-              %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
-              %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'127.0.0.1';},
-              %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'127.0.0.1' WITH GRANT OPTION;}
+              %Q{CREATE DATABASE IF NOT EXISTS #{node['kube_manifests']['kea']['mysql_database']};},
+              %Q{CREATE USER IF NOT EXISTS '#{node['kube_manifests']['kea']['mysql_user']}'@'127.0.0.1';},
+              %Q{GRANT ALL PRIVILEGES ON #{node['kube_manifests']['kea']['mysql_database']}.* TO '#{node['kube_manifests']['kea']['mysql_user']}'@'127.0.0.1' WITH GRANT OPTION;}
             ].join($/)
           }
         ]
@@ -136,11 +136,11 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
       },
       "lease-database" => {
         "type" => "mysql",
-        "name" => node['mysql_credentials']['kea']['database'],
+        "name" => node['kube_manifests']['kea']['mysql_database'],
         "host" => "127.0.0.1",
         # "host" => "",
         # "port" => 3306,
-        "user" => node['mysql_credentials']['kea']['username'],
+        "user" => node['kube_manifests']['kea']['mysql_user'],
         # "password" => node['mysql_credentials']['kea']['password'],
         "password" => "",
         "persist" => true
@@ -243,7 +243,7 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
             "/seeder",
             "--host=127.0.0.1",
             # "--socket=/var/run/mysqld/mysql.sock",
-            "--user=#{node['mysql_credentials']['kea']['username']}",
+            "--user=#{node['kube_manifests']['kea']['mysql_user']}",
             # "--password=#{node['mysql_credentials']['kea']['password']}"
           ],
           "env" => [
@@ -275,9 +275,9 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
             "-h",
             "127.0.0.1",
             "-d",
-            node['mysql_credentials']['kea']['database'],
+            node['kube_manifests']['kea']['mysql_database'],
             "-u",
-            node['mysql_credentials']['kea']['username'],
+            node['kube_manifests']['kea']['mysql_user'],
             # "-w",
             # node['mysql_credentials']['kea']['password'],
             "-listen",

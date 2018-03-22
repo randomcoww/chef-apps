@@ -1,8 +1,8 @@
 node.default['kube_manifests']['kea']['mysql_seed_sql'] = <<-EOF
 --
 
-CREATE DATABASE IF NOT EXISTS `#{node['mysql_credentials']['kea']['database']}`;
-USE `#{node['mysql_credentials']['kea']['database']}`;
+CREATE DATABASE IF NOT EXISTS `#{node['kube_manifests']['kea']['mysql_database']}`;
+USE `#{node['kube_manifests']['kea']['mysql_database']}`;
 
 --
 -- Table structure for table `lease6_types`

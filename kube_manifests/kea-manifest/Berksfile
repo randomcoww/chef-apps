@@ -3,8 +3,6 @@ source "https://supermarket.chef.io"
 metadata
 
 cookbook "environment", github: "randomcoww/chef-deploys", rel: "environment"
-cookbook "mysql_credentials", github: "randomcoww/chef-deploys", rel: "mysql_credentials"
 cookbook "kea", github: "randomcoww/chef-kea", branch: "attr"
-cookbook "dbag", github: "randomcoww/chef-dbag"
 cookbook "mysql_cluster", github: "randomcoww/chef-mysql_cluster"
 cookbook "systemd_resource", github: "randomcoww/chef-systemd_resource"
