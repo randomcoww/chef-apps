@@ -49,7 +49,7 @@ mysqld_manifest = {
           "/mysqld-entrypoint",
           "--ndbcluster",
           "--default_storage_engine=ndbcluster",
-          "--bind-address=0.0.0.0",
+          "--bind-address=127.0.0.1",
           %Q{--ndb-connectstring=#{node['kube_manifests']['kea']['mysql_mgm_ips'].join(',')}}
         ],
         "env" => [
@@ -57,8 +57,8 @@ mysqld_manifest = {
             "name" => "INIT",
             "value" => [
               %Q{CREATE DATABASE IF NOT EXISTS #{node['mysql_credentials']['kea']['database']};},
-              %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'%' IDENTIFIED BY '#{node['mysql_credentials']['kea']['password']}';},
-              %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'%' WITH GRANT OPTION;}
+              %Q{CREATE USER IF NOT EXISTS '#{node['mysql_credentials']['kea']['username']}'@'127.0.0.1';},
+              %Q{GRANT ALL PRIVILEGES ON #{node['mysql_credentials']['kea']['database']}.* TO '#{node['mysql_credentials']['kea']['username']}'@'127.0.0.1' WITH GRANT OPTION;}
             ].join($/)
           }
         ]
@@ -138,9 +138,11 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
         "type" => "mysql",
         "name" => node['mysql_credentials']['kea']['database'],
         "host" => "127.0.0.1",
-        "port" => 3306,
+        # "host" => "",
+        # "port" => 3306,
         "user" => node['mysql_credentials']['kea']['username'],
-        "password" => node['mysql_credentials']['kea']['password'],
+        # "password" => node['mysql_credentials']['kea']['password'],
+        "password" => "",
         "persist" => true
       },
       "client-classes" => [
@@ -240,8 +242,9 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
           "args" => [
             "/seeder",
             "--host=127.0.0.1",
+            # "--socket=/var/run/mysqld/mysql.sock",
             "--user=#{node['mysql_credentials']['kea']['username']}",
-            "--password=#{node['mysql_credentials']['kea']['password']}"
+            # "--password=#{node['mysql_credentials']['kea']['password']}"
           ],
           "env" => [
             {
@@ -275,8 +278,8 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
             node['mysql_credentials']['kea']['database'],
             "-u",
             node['mysql_credentials']['kea']['username'],
-            "-w",
-            node['mysql_credentials']['kea']['password'],
+            # "-w",
+            # node['mysql_credentials']['kea']['password'],
             "-listen",
             "#{kea_dns_port_internal}"
           ]
