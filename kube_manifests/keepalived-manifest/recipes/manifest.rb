@@ -32,7 +32,6 @@ node['environment_v2']['set'].each do |set, c|
       subnet_mask = node['environment_v2']['subnet'][i].split('/').last
 
       id = keepalived_bag.get_or_create("VI_#{key}_id", rand(255))
-      password = keepalived_bag.get_or_create("VI_#{key}_password", SecureRandom.base64(6))
 
       sync_groups << "VI_#{key}"
 
