@@ -125,7 +125,8 @@ node.default['environment_v2']['set']['matchbox'] = {
     'vmhost1',
   ],
   'vars' => {
-    'ssl_path' => "/etc/ssl/certs"
+    'ssl_path' => "/etc/ssl/certs",
+    "assets_path" => "/data/matchbox/assets"
   }
 }
 

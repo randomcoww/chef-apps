@@ -4,8 +4,7 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
   data_path = "/var/lib/matchbox"
-  # cert_base_path = "/internalcerts"
-  # cert_path = ::File.join(cert_base_path, "server")
+  assets_path = "/assets"
 
   matchbox_manifest = {
     "kind" => "Pod",
@@ -26,7 +25,7 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
             "-cert-file=#{node['kubernetes']['etcd_ssl_base_path']}.pem",
             "-key-file=#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
             "-data-path=#{data_path}",
-            "-assets-path=",
+            "-assets-path=#{assets_path}",
           ],
           "volumeMounts" => [
             {
@@ -35,8 +34,13 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
               "readOnly" => true
             },
             {
+              "mountPath" => assets_path,
+              "name" => "data-assets-host",
+              "readOnly" => false
+            },
+            {
               "mountPath" => data_path,
-              "name" => "data-matchbox-host",
+              "name" => "data-matchbox",
               "readOnly" => false
             }
           ]
@@ -50,7 +54,13 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
           }
         },
         {
-          "name" => "data-matchbox-host",
+          "name" => "data-assets-host",
+          "hostPath" => {
+            "path" => env_vars["assets_path"]
+          }
+        },
+        {
+          "name" => "data-matchbox",
           "emptyDir" => {}
         }
       ]
