@@ -2,7 +2,7 @@
 ## kubernetes
 ##
 
-node.default['kubernetes']['version'] = '1.9.4'
+node.default['kubernetes']['version'] = '1.10.0'
 
 # node.default['kubernetes']['node_ip'] = NodeData::NodeIp.subnet_ipv4(node['environment_v2']['subnet']['lan']).first
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
@@ -47,8 +47,11 @@ node.default['kubernetes']['etcd_ssl_path'] = '/internalcerts/etcd'
 node.default['kubernetes']['apiserver_ssl_base_path'] = ::File.join(node['kubernetes']['apiserver_ssl_path'], 'apiserver')
 node.default['kubernetes']['apiserver_ssl_host_path'] = '/data/certs/apiserver'
 
-node.default['kubernetes']['etcd_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcd')
-node.default['kubernetes']['etcdpeer_ssl_base_path'] = ::File.join(node['kubernetes']['etcd_ssl_path'], 'etcdpeer')
+node.default['kubernetes']['internal_ssl_base_path'] = "/etc/ssl/certs/internal"
+node.default['kubernetes']['etcd_ssl_base_path'] = node['kubernetes']['internal_ssl_base_path']
+node.default['kubernetes']['etcdpeer_ssl_base_path'] = node['kubernetes']['internal_ssl_base_path']
+
+node.default['kubernetes']['service_account_key_path'] = "#{node['kubernetes']['apiserver_ssl_base_path']}-serviceaccount.pem"
 ## need something permanent for this
 # node.default['kubernetes']['serviceaccount_ssl_base_path'] = ::File.join(node['kubernetes']['serviceaccount_ssl_path'], 'serviceaccount')
 # node.default['kubernetes']['serviceaccount_ssl_host_path'] = '/data/certs/serviceaccount'
@@ -105,9 +108,10 @@ node.default['kube']['images']['dnsdist'] = "randomcoww/dnsdist:1.2.1"
 node.default['kube']['images']['matchbox'] = "quay.io/coreos/matchbox:latest"
 node.default['kube']['images']['tftpd_ipxe'] = "randomcoww/tftpd_ipxe:20180222.02"
 node.default['kube']['images']['etcd'] = "quay.io/coreos/etcd:v3.3"
-node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
-node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
+# node.default['kube']['images']['cfssl'] = "randomcoww/cfssl:1.3.1"
+# node.default['kube']['images']['envwriter'] = "randomcoww/envwriter:20171220.02"
 node.default['kube']['images']['vault'] = "vault:latest"
+node.default['kube']['images']['vault_reader'] = "randomcoww/vault_reader:20180326.04"
 
 # node.default['kube']['images']['libvirt_monitor'] = "randomcoww/go-libvirt-mon:20180306.01"
 # node.default['kube']['images']['openvpn'] = "randomcoww/openvpn:20171216.01"
