@@ -8,7 +8,7 @@ node.default['kubernetes']['version'] = '1.10.0'
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
 node.default['kubernetes']['cluster_domain'] = 'cluster.local'
 
-node.default['kubernetes']['insecure_port'] = 62080
+node.default['kubernetes']['insecure_port'] = node['environment_v2']['port']['kube-master-insecure']
 node.default['kubernetes']['secure_port'] = node['environment_v2']['port']['kube-master-internal']
 
 ## pod network
