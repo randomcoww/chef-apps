@@ -1,3 +1,4 @@
+env_vars = node['environment_v2']['set']['kube-master']['vars']
 master_hosts = node['environment_v2']['set']['kube-master']['hosts']
 
 flannel_manifest = {
@@ -84,7 +85,7 @@ flannel_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl/certs"
+          "path" => env_vars['ssl_path']
         }
       }
     ]

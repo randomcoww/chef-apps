@@ -3,56 +3,42 @@ etcd_initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
     "#{e}=https://#{node['environment_v2']['host'][e]['ip']['store']}:2380"
   }.join(",")
 
-ssl_config = {
-  "auth_keys" => {
-    "key1" => {
-      "type" => "standard",
-      "key" => "245f62575040243f3d544926562f4a5d"
-    }
-  },
-  "signing" => {
-    "default" => {
-      "auth_remote" => {
-        "remote" => "cfssl_server",
-        "auth_key" => "key1"
-      }
-    }
-  },
-  "remotes" => {
-    "cfssl_server" => node['environment_v2']['set']['ca']['hosts'].map { |e|
-      "http://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['ca-internal']}"
-    }.join(',')
-  }
-}.to_json
-
 env_vars = node['environment_v2']['set']['etcd']['vars']
 
 
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
-  #
-  # etcd ssl
-  #
-  ssl_csr = {
-    "CN" => host,
-    "hosts" => [
-      ip
-    ],
-    "key" => {
-      "algo" => "ecdsa",
-      "size" => 256
+  vault_config = {
+    "api_addr": "https://#{ip}:#{node['environment_v2']['port']['vault']}",
+    "storage": {
+      "etcd": {
+        "ha_enabled": "true",
+        "address": "https://#{ip}:2379",
+        "etcd_api": "v3",
+        "tls_cert_file": "#{node['kubernetes']['etcd_ssl_base_path']}.pem",
+        "tls_key_file": "#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
+        "tls_ca_file": "#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem"
+      }
+    },
+    "listener" => {
+      "tcp" => {
+        "address" => "0.0.0.0:#{node['environment_v2']['port']['vault']}",
+        "tls_cert_file" => "#{node['kubernetes']['etcd_ssl_base_path']}.pem",
+        "tls_key_file"  => "#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
+        "tls_client_ca_file" => "#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem"
+      }
     }
-  }.to_json
+  }
 
   etcd_environment = {
     "ETCD_NAME" => host,
-    "ETCD_DATA_DIR" => "/var/lib/etcd",
+    "ETCD_DATA_DIR" => "/var/lib/etcd/default",
 
     "ETCD_INITIAL_ADVERTISE_PEER_URLS" => "https://#{ip}:2380",
     "ETCD_LISTEN_PEER_URLS" => "https://#{ip}:2380",
     "ETCD_ADVERTISE_CLIENT_URLS" => "https://#{ip}:2379",
-    "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379",
+    "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379,https://127.0.0.1:2379",
     "ETCD_INITIAL_CLUSTER" => etcd_initial_cluster,
     "ETCD_INITIAL_CLUSTER_STATE" => "new",
     "ETCD_INITIAL_CLUSTER_TOKEN" => node['kubernetes']['etcd_cluster_name'],
@@ -77,68 +63,6 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     },
     "spec" => {
       "hostNetwork" => true,
-      "initContainers" => [
-        {
-          "name" => "cfssl-etcd",
-          "image" => node['kube']['images']['cfssl'],
-          "command" => [
-            "/gencert_wrapper.sh"
-          ],
-          "args" => [
-            "-p",
-            "server",
-            "-o",
-            node['kubernetes']['etcd_ssl_base_path']
-          ],
-          "env" => [
-            {
-              "name" => "CSR",
-              "value" => ssl_csr
-            },
-            {
-              "name" => "CONFIG",
-              "value" => ssl_config
-            }
-          ],
-          "volumeMounts" => [
-            {
-              "name" => "etcd-certs",
-              "mountPath" => node['kubernetes']['etcd_ssl_path'],
-              "readOnly" => false
-            }
-          ]
-        },
-        {
-          "name" => "cfssl-etcd-peer",
-          "image" => node['kube']['images']['cfssl'],
-          "command" => [
-            "/gencert_wrapper.sh"
-          ],
-          "args" => [
-            "-p",
-            "peer",
-            "-o",
-            node['kubernetes']['etcdpeer_ssl_base_path']
-          ],
-          "env" => [
-            {
-              "name" => "CSR",
-              "value" => ssl_csr
-            },
-            {
-              "name" => "CONFIG",
-              "value" => ssl_config
-            }
-          ],
-          "volumeMounts" => [
-            {
-              "name" => "etcd-certs",
-              "mountPath" => node['kubernetes']['etcd_ssl_path'],
-              "readOnly" => false
-            }
-          ]
-        }
-      ],
       "containers" => [
         {
           "name" => "kube-etcd",
@@ -159,11 +83,33 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
               "mountPath" => "/var/lib/etcd",
               "name" => "data-etcd-host",
               "readOnly" => false
-            },
+            }
+          ]
+        },
+        {
+          "name" => "vault",
+          "image" => node['kube']['images']['vault'],
+          "securityContext" => {
+            "capabilities" => {
+              "add" => [
+                "IPC_LOCK"
+              ]
+            }
+          },
+          "args" => [
+            "server",
+          ],
+          "env" => [
             {
-              "name" => "etcd-certs",
-              "mountPath" => node['kubernetes']['etcd_ssl_path'],
-              "readOnly" => false
+              "name" => "VAULT_LOCAL_CONFIG",
+              "value" => vault_config.to_json
+            }
+          ],
+          "volumeMounts" => [
+            {
+              "mountPath" => "/etc/ssl/certs",
+              "name" => "ssl-certs-host",
+              "readOnly" => true
             }
           ]
         }
@@ -180,10 +126,6 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
           "hostPath" => {
             "path" => env_vars["data_path"]
           }
-        },
-        {
-          "name" => "etcd-certs",
-          "emptyDir" => {}
         }
       ]
     }

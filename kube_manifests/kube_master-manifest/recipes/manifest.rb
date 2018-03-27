@@ -1,24 +1,4 @@
-ssl_config = {
-  "auth_keys" => {
-    "key1" => {
-      "type" => "standard",
-      "key" => "245f62575040243f3d544926562f4a5d"
-    }
-  },
-  "signing" => {
-    "default" => {
-      "auth_remote" => {
-        "remote" => "cfssl_server",
-        "auth_key" => "key1"
-      }
-    }
-  },
-  "remotes" => {
-    "cfssl_server" => node['environment_v2']['set']['ca']['hosts'].map { |e|
-      "http://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['ca-internal']}"
-    }.join(',')
-  }
-}.to_json
+env_vars = node['environment_v2']['set']['kube-master']['vars']
 
 domain = [
   node['environment_v2']['domain']['host'],
@@ -110,7 +90,7 @@ flannel_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl/certs"
+          "path" => env_vars['ssl_path']
         }
       }
     ]
@@ -172,7 +152,7 @@ kube_scheduler_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl/certs"
+          "path" => env_vars['ssl_path']
         }
       }
     ]
@@ -224,7 +204,7 @@ kube_proxy_manifest = {
       {
         "name" => "ssl-certs-host",
         "hostPath" => {
-          "path" => "/etc/ssl/certs"
+          "path" => env_vars['ssl_path']
         }
       }
     ]
@@ -548,105 +528,6 @@ kube_haproxy_manifest = {
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
-  #
-  # kube ssl
-  #
-  kube_ssl_csr = {
-    "CN" => host,
-    "hosts" => [
-      'kubernetes',
-      'kubernetes.default',
-      node['kubernetes']['cluster_service_ip'],
-      node['environment_v2']['set']['haproxy']['vip']['store'],
-      node['environment_v2']['set']['haproxy']['vip']['lan'],
-      [host, domain].join('.'),
-      ip
-    ],
-    "key" => {
-      "algo" => "ecdsa",
-      "size" => 256
-    }
-  }.to_json
-
-  #
-  # etcd ssl
-  #
-  etcd_ssl_csr = {
-    "CN" => host,
-    "hosts" => [
-      ip
-    ],
-    "key" => {
-      "algo" => "ecdsa",
-      "size" => 256
-    }
-  }.to_json
-
-  #
-  # init container
-  #
-  apiserver_ssl_init = {
-    "name" => "cfssl-kube",
-    "image" => node['kube']['images']['cfssl'],
-    "command" => [
-      "/gencert_wrapper.sh"
-    ],
-    "args" => [
-      "-p",
-      "kubernetes",
-      "-o",
-      node['kubernetes']['apiserver_ssl_base_path']
-    ],
-    "env" => [
-      {
-        "name" => "CSR",
-        "value" => kube_ssl_csr
-      },
-      {
-        "name" => "CONFIG",
-        "value" => ssl_config
-      }
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "apiserver-certs",
-        "mountPath" => node['kubernetes']['apiserver_ssl_path'],
-        "readOnly" => false
-      }
-    ]
-  }
-
-  etcd_ssl_init = {
-    "name" => "cfssl-etcd",
-    "image" => node['kube']['images']['cfssl'],
-    "command" => [
-      "/gencert_wrapper.sh"
-    ],
-    "args" => [
-      "-p",
-      "client",
-      "-o",
-      node['kubernetes']['etcd_ssl_base_path']
-    ],
-    "env" => [
-      {
-        "name" => "CSR",
-        "value" => etcd_ssl_csr
-      },
-      {
-        "name" => "CONFIG",
-        "value" => ssl_config
-      }
-    ],
-    "volumeMounts" => [
-      {
-        "name" => "etcd-certs",
-        "mountPath" => node['kubernetes']['etcd_ssl_path'],
-        "readOnly" => false
-      }
-    ]
-  }
-
   kube_apiserver_manifest = {
     "kind" => "Pod",
     "apiVersion" => "v1",
@@ -658,8 +539,50 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "hostNetwork" => true,
       "restartPolicy" => 'Always',
       "initContainers" => [
-        apiserver_ssl_init,
-        etcd_ssl_init
+        "name" => "kube-vault-writer",
+        "image" => node['kube']['images']['vault_reader'],
+        "args" => [
+          "-r",
+          "apiserver",
+          "-c",
+          "#{node['kubernetes']['internal_ssl_base_path']}.pem",
+          "-k",
+          "#{node['kubernetes']['internal_ssl_base_path']}-key.pem",
+          "-a",
+          "#{node['kubernetes']['internal_ssl_base_path']}-ca.pem",
+          "-s",
+          "https://haproxy.svc.internal:#{node['environment_v2']['port']['vault']}",
+          "-o",
+          node['kubernetes']['apiserver_ssl_base_path'],
+          "-i",
+          [
+            '127.0.0.1',
+            node['kubernetes']['cluster_service_ip'],
+            ip,
+            node['environment_v2']['set']['kube-master']['vip']['store'],
+            node['environment_v2']['set']['kube-master']['vip']['lan'],
+          ].join(','),
+          "-n",
+          [
+            'kubernetes.default',
+            [host, domain].join('.'),
+            'kube-master.svc.internal'
+          ].join(','),
+          "-t",
+          "3"
+        ],
+        "volumeMounts" => [
+          {
+            "name" => "ssl-certs-host",
+            "mountPath" => "/etc/ssl/certs",
+            "readOnly" => true
+          },
+          {
+            "name" => "apiserver-certs",
+            "mountPath" => node['kubernetes']['apiserver_ssl_path'],
+            "readOnly" => false
+          }
+        ],
       ],
       "containers" => [
         {
@@ -682,7 +605,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--tls-cert-file=#{node['kubernetes']['apiserver_ssl_base_path']}.pem",
             "--tls-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
             "--client-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
-            "--service-account-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
+            "--service-account-key-file=#{node['kubernetes']['service_account_key_path']}",
             # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
             # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
             "--allow-privileged=true"
@@ -691,11 +614,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             {
               "name" => "ssl-certs-host",
               "mountPath" => "/etc/ssl/certs",
-              "readOnly" => true
-            },
-            {
-              "name" => "etcd-certs",
-              "mountPath" => node['kubernetes']['etcd_ssl_path'],
               "readOnly" => true
             },
             {
@@ -725,7 +643,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
             "--cluster-name=#{node['kubernetes']['cluster_name']}",
             "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
             "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-            "--service-account-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
+            "--service-account-private-key-file=#{node['kubernetes']['service_account_key_path']}",
             "--root-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
             "--leader-elect=true",
             "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
@@ -763,7 +681,7 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         {
           "name" => "ssl-certs-host",
           "hostPath" => {
-            "path" => "/etc/ssl/certs"
+            "path" => env_vars['ssl_path']
           }
         },
         {
@@ -791,8 +709,5 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
   # node.default['kubernetes']['static_pods'][host]['kube-dashboard'] = kube_dashboard
   # node.default['kubernetes']['static_pods'][host]['kube_dns'] = kube_dns_manifest
-end
-
-node['environment_v2']['set']['haproxy']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
 end
