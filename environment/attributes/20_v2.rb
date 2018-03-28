@@ -19,20 +19,11 @@ node.default['environment_v2']['domain']['host'] = 'host'
 node.default['environment_v2']['port']['kube-master'] = 50443
 node.default['environment_v2']['port']['kube-master-internal'] = 40443
 node.default['environment_v2']['port']['kube-master-insecure'] = 62080
-# node.default['environment_v2']['port']['ca-internal'] = 48888
-# node.default['environment_v2']['port']['ca'] = 58888
 node.default['environment_v2']['port']['vault'] = 48889
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
 node.default['environment_v2']['port']['kea-dns'] = 53531
-
-##
-## internal ca path
-##
-
-# node.default['environment_v2']['internal_ca']['ca_path'] = '/etc/ssl/certs/internal-ca.pem'
-# node.default['environment_v2']['internal_ca']['cert_path'] = '/etc/ssl/certs/internal.pem'
-# node.default['environment_v2']['internal_ca']['key_path'] = '/etc/ssl/certs/internal-key.pem'
+node.default['environment_v2']['port']['etcd'] = 52379
 
 ##
 ## sets
@@ -85,7 +76,6 @@ node.default['environment_v2']['set']['haproxy'] = {
     'vmhost1',
   ],
   'vip' => {
-    'lan' => "192.168.62.242",
     'store' => "192.168.126.242",
   },
   'lb' => {
@@ -99,24 +89,12 @@ node.default['environment_v2']['set']['haproxy'] = {
         "port" => node['environment_v2']['port']['matchbox-rpc'],
       }
     },
-    # 'ca' => {
-    #   "default" => {
-    #     "hostport" => node['environment_v2']['port']['ca-internal'],
-    #     "port" => node['environment_v2']['port']['ca'],
-    #   }
-    # },
-    # 'vault' => {
-    #   "default" => {
-    #     "hostport" => node['environment_v2']['port']['vault-internal'],
-    #     "port" => node['environment_v2']['port']['vault'],
-    #   }
-    # },
-    # 'kube-master' => {
-    #   "default" => {
-    #     "hostport" => node['environment_v2']['port']['kube-master-internal'],
-    #     "port" => node['environment_v2']['port']['kube-master'],
-    #   }
-    # }
+    'etcd' => {
+      'default' => {
+        "hostport" => 2379,
+        "port" => node['environment_v2']['port']['etcd'],
+      }
+    }
   }
 }
 
@@ -139,45 +117,24 @@ node.default['environment_v2']['set']['etcd'] = {
     'ssl_path' => "/etc/ssl/certs"
   },
   'vip' => {
-    'lan' => "192.168.62.243",
     'store' => "192.168.126.243",
   }
 }
 
-# node.default['environment_v2']['set']['vault'] = {
-#   'hosts' => [
-#     'vmhost1',
-#   ],
-#   # 'vars' => {
-#   #   'data_path' => "/data/vault",
-#   #   'ssl_path' => "/etc/ssl/certs"
-#   # },
-#   # 'vip' => {
-#   #   'store' => "192.168.126.243",
-#   #   'lan' => "192.168.62.243",
-#   # }
-# }
-
-# node.default['environment_v2']['set']['ca'] = {
-#   'hosts' => [
-#     # 'vmhost1',
-#   ],
-#   'vars' => {
-#     'ssl_path' => "/data/certs"
-#   }
-# }
+node.default['environment_v2']['set']['vault'] = {
+  'vip' => {
+    'store' => node['environment_v2']['set']['etcd']['vip']['store'],
+  }
+}
 
 node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
-    "ns1",
-    "ns2",
-    # "vmhost1"
+    "controller"
   ],
   'vars' => {
     'ssl_path' => "/etc/ssl/certs"
   },
   'vip' => {
-    'lan' => "192.168.62.245",
     'store' => "192.168.126.245",
   }
 }
@@ -188,12 +145,6 @@ node.default['environment_v2']['set']['kube-worker'] = {
     # 'ns2',
   ]
 }
-
-# node.default['environment_v2']['set']['vmhost'] = {
-#   'hosts' => [
-#     'vmhost1',
-#   ],
-# }
 
 
 ##
@@ -286,6 +237,17 @@ node.default['environment_v2']['host']['ns2'] = {
   'vcpu' => 3,
 }
 
+node.default['environment_v2']['host']['controller'] = {
+  'if' => {
+    'store' => "eth0",
+  },
+  'if_type' => {
+    'store' => 'macvlan',
+  },
+  'memory' => 8192,
+  'vcpu' => 3,
+}
+
 
 ##
 ## hardware
@@ -293,32 +255,30 @@ node.default['environment_v2']['host']['ns2'] = {
 
 node.default['environment_v2']['host']['vmhost1'] = {
   'ip' => {
-    'lan' => '192.168.62.251',
     'store' => '192.168.126.251',
   },
   'if' => {
-    # 'lan' => "ens1f1",
+    'lan' => "ens1f1",
     # 'store' => "ens1f0",
-    'lan' => "lan_host",
+    # 'lan' => "lan_host",
     'store' => "store_host",
     'wan' => "eno2",
   },
   'guests' => [
-    'gateway1',
-    'gateway2',
-    'ns1',
-    'ns2',
+    # 'gateway1',
+    # 'gateway2',
+    # 'ns1',
+    # 'ns2',
   ]
 }
 
 node.default['environment_v2']['host']['vmhost2'] = {
   'ip' => {
-    'lan' => '192.168.62.252',
     'store' => '192.168.126.252',
   },
   'if' => {
     'lan' => "ens1f1",
-    'store' => "ens1f0",
+    'store' => "store_host",
     'wan' => "eno2",
   },
   # 'passthrough_hba' => {
@@ -365,12 +325,12 @@ node.default['environment_v2']['set']['nfs'] = {
 
 node.default['environment_v2']['set']['transmission'] = {
   'vip' => {
-    'store' => node['environment_v2']['set']['haproxy']['vip']['lan']
+    'store' => node['environment_v2']['set']['kube-master']['vip']['store']
   }
 }
 
 node.default['environment_v2']['host']['unifi'] = {
   'ip' => {
-    'lan' => node['environment_v2']['set']['haproxy']['vip']['lan']
+    'lan' => node['environment_v2']['set']['kube-master']['vip']['store']
   }
 }

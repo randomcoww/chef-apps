@@ -59,6 +59,13 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
 
 
 haproxy_template = <<-EOF
+frontend apiserver
+  default_backend apiserver
+  bind *:#{node['environment_v2']['port']['kube-master']}
+  maxconn 2000
+backend apiserver
+  {{range $nodename, $n := $.Nodes}}{{if $n.Address}}server {{$nodename}} {{$n.Address}}:#{node['environment_v2']['port']['kube-master-internal']} check{{end}}
+  {{end}}
 {{range $name, $s := $.Services}}{{range $portname, $p := $s.Ports}}frontend {{$name}}_{{$portname}}
   default_backend {{$name}}_{{$portname}}
   bind *:{{$p.TargetPort}}

@@ -14,7 +14,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     "storage": {
       "etcd": {
         "ha_enabled": "true",
-        "address": "https://#{ip}:2379",
+        "address": "https://127.0.0.1:2379",
         "etcd_api": "v3",
         "tls_cert_file": "#{node['kubernetes']['etcd_ssl_base_path']}.pem",
         "tls_key_file": "#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",

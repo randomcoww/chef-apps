@@ -212,9 +212,9 @@ kube_proxy_manifest = {
 }
 
 ## --etcd-servers option
-etcd_servers = node['environment_v2']['set']['etcd']['hosts'].map { |e|
-    "https://#{node['environment_v2']['host'][e]['ip']['store']}:2379"
-  }.join(",")
+# etcd_servers = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+#     "https://#{node['environment_v2']['host'][e]['ip']['store']}:2379"
+#   }.join(",")
 
 
 kube_haproxy_manifest = {
@@ -332,16 +332,14 @@ kube_apiserver_manifest = {
         "-a",
         "#{node['kubernetes']['internal_ssl_base_path']}-ca.pem",
         "-s",
-        "https://etcd.#{service_domain}:#{node['environment_v2']['port']['vault']}",
+        "https://vault.#{service_domain}:#{node['environment_v2']['port']['vault']}",
         "-o",
         node['kubernetes']['apiserver_ssl_base_path'],
         "-i",
-        [
+        (node['environment_v2']['set']['kube-master']['vip'].values + [
           '127.0.0.1',
           node['kubernetes']['cluster_service_ip'],
-          node['environment_v2']['set']['kube-master']['vip']['store'],
-          node['environment_v2']['set']['kube-master']['vip']['lan'],
-        ].join(','),
+        ]).compact.join(','),
         "-n",
         [
           'kubernetes.default',
@@ -377,7 +375,7 @@ kube_apiserver_manifest = {
           "--insecure-port=#{node['kubernetes']['insecure_port']}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
           # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
-          "--etcd-servers=#{etcd_servers}",
+          "--etcd-servers=https://haproxy.#{service_domain}:#{node['environment_v2']['port']['etcd']}",
           "--etcd-cafile=#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem",
           "--etcd-certfile=#{node['kubernetes']['etcd_ssl_base_path']}.pem",
           "--etcd-keyfile=#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
