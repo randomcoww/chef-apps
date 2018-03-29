@@ -31,8 +31,7 @@ node.default['environment_v2']['port']['etcd'] = 52379
 
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
-    'gateway1',
-    'gateway2'
+    'gateway',
   ],
   'vip' => {
     'store' => "192.168.126.240",
@@ -151,48 +150,12 @@ node.default['environment_v2']['set']['kube-worker'] = {
 ## hosts
 ##
 
-node.default['environment_v2']['host']['gateway1'] = {
-  'ip' => {
-    'store' => "192.168.126.217",
-    'lan' => "192.168.62.217",
-  },
+node.default['environment_v2']['host']['gateway'] = {
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
     'wan' => "eth2",
-  },
-  'mac' => {
-    "wan" => "52:54:00:63:6e:b0"
-  },
-  'if_type' => {
-    'lan' => 'macvlan',
-    'store' => 'macvlan',
-    'wan' => 'macvlan',
-  },
-  'memory' => 6144,
-  'vcpu' => 2,
-}
-
-node.default['environment_v2']['host']['gateway2'] = {
-  'ip' => {
-    'store' => "192.168.126.218",
-    'lan' => "192.168.62.218",
-  },
-  'if' => {
-    'lan' => "eth0",
-    'store' => "eth1",
-    'wan' => "eth2",
-  },
-  'mac' => {
-    "wan" => "52:54:00:63:6e:b1"
-  },
-  'if_type' => {
-    'lan' => 'macvlan',
-    'store' => 'macvlan',
-    'wan' => 'macvlan',
-  },
-  'memory' => 6144,
-  'vcpu' => 2
+  }
 }
 
 node.default['environment_v2']['host']['ns1'] = {
@@ -207,13 +170,7 @@ node.default['environment_v2']['host']['ns1'] = {
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
-  },
-  'if_type' => {
-    'lan' => 'macvlan',
-    'store' => 'macvlan',
-  },
-  'memory' => 8192,
-  'vcpu' => 3,
+  }
 }
 
 node.default['environment_v2']['host']['ns2'] = {
@@ -228,24 +185,13 @@ node.default['environment_v2']['host']['ns2'] = {
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
-  },
-  'if_type' => {
-    'lan' => 'macvlan',
-    'store' => 'macvlan',
-  },
-  'memory' => 8192,
-  'vcpu' => 3,
+  }
 }
 
 node.default['environment_v2']['host']['controller'] = {
   'if' => {
     'store' => "eth0",
-  },
-  'if_type' => {
-    'store' => 'macvlan',
-  },
-  'memory' => 8192,
-  'vcpu' => 3,
+  }
 }
 
 
@@ -259,17 +205,9 @@ node.default['environment_v2']['host']['vmhost1'] = {
   },
   'if' => {
     'lan' => "ens1f1",
-    # 'store' => "ens1f0",
-    # 'lan' => "lan_host",
     'store' => "store_host",
     'wan' => "eno2",
-  },
-  'guests' => [
-    # 'gateway1',
-    # 'gateway2',
-    # 'ns1',
-    # 'ns2',
-  ]
+  }
 }
 
 node.default['environment_v2']['host']['vmhost2'] = {
@@ -288,10 +226,6 @@ node.default['environment_v2']['host']['vmhost2'] = {
   #   'function' => "0x0",
   #   'file' => "/data/kvm/firmware/mptsas3.rom"
   # }
-  'guests' => [
-    # 'gateway1',
-    # 'gateway2',
-  ]
 }
 
 node.default['environment_v2']['host']['vmhost1-ipmi'] = {
