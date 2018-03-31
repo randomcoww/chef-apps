@@ -205,7 +205,7 @@ node.default['environment_v2']['host']['vmhost1'] = {
   },
   'if' => {
     'lan' => "ens1f1",
-    'store' => "store_host",
+    'store' => "host_bridge",
     'wan' => "eno2",
   }
 }
@@ -216,7 +216,7 @@ node.default['environment_v2']['host']['vmhost2'] = {
   },
   'if' => {
     'lan' => "ens1f1",
-    'store' => "store_host",
+    'store' => "host_bridge",
     'wan' => "eno2",
   },
   # 'passthrough_hba' => {
