@@ -147,21 +147,21 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
       },
       "client-classes" => [
         {
-          "name": "ipxe_detected",
-          "test": "substring(option[77].hex,0,4) == 'iPXE'",
-          "boot-file-name": "http://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['port']['matchbox-http']}/boot.ipxe"
+          "name" => "ipxe_detected",
+          "test" => "substring(option[77].hex,0,4) == 'iPXE'",
+          "boot-file-name" => "http://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['port']['matchbox-http']}/boot.ipxe"
         },
         {
-          "name": "ipxe",
-          "test": "option[93].hex == 0x0000",
-          "next-server": nextserver,
-          "boot-file-name": "/undionly.kpxe"
+          "name" => "ipxe",
+          "test" => "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)",
+          "next-server" => nextserver,
+          "boot-file-name" => "/undionly.kpxe"
         },
         {
-          "name": "ipxe_efi",
-          "test": "option[93].hex == 0x0007",
-          "next-server": nextserver,
-          "boot-file-name": "/ipxe.efi"
+          "name" => "ipxe_efi",
+          "test" => "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
+          "next-server" => nextserver,
+          "boot-file-name" => "/ipxe.efi"
         }
       ],
       "subnet4" => node['environment_v2']['dhcp_pool'].map { |i, pool|
