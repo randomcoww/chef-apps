@@ -43,6 +43,7 @@ node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
     'ns1',
     'ns2',
+    'ns3'
   ],
   'vip' => {
     'store' => "192.168.126.244",
@@ -66,7 +67,7 @@ node.default['environment_v2']['set']['kea-mysql-data'] = {
 
 node.default['environment_v2']['set']['kea-mysql-mgm'] = {
   'hosts' => [
-    'vmhost1',
+    'ns3',
   ]
 }
 
@@ -177,6 +178,21 @@ node.default['environment_v2']['host']['ns2'] = {
   'ip' => {
     'store' => "192.168.126.220",
     'lan' => "192.168.62.220",
+  },
+  'gw' => {
+    'store' => node['environment_v2']['set']['gateway']['vip']['store'],
+    'lan' => node['environment_v2']['set']['gateway']['vip']['lan'],
+  },
+  'if' => {
+    'lan' => "eth0",
+    'store' => "eth1",
+  }
+}
+
+node.default['environment_v2']['host']['ns3'] = {
+  'ip' => {
+    'store' => "192.168.126.221",
+    'lan' => "192.168.62.221",
   },
   'gw' => {
     'store' => node['environment_v2']['set']['gateway']['vip']['store'],
