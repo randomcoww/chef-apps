@@ -123,7 +123,7 @@ unbound_manifest = {
   "apiVersion" => "v1",
   "kind" => "Pod",
   "metadata" => {
-    "name" => "dns"
+    "name" => "ns-unbound"
   },
   "spec" => {
     "restartPolicy" => "Always",
@@ -150,7 +150,21 @@ unbound_manifest = {
         #     "protocol" => "UDP"
         #   }
         # ]
-      },
+      }
+    ]
+  }
+}
+
+dnsdist_manifest = {
+  "apiVersion" => "v1",
+  "kind" => "Pod",
+  "metadata" => {
+    "name" => "ns-dnsdist"
+  },
+  "spec" => {
+    "restartPolicy" => "Always",
+    "hostNetwork" => true,
+    "containers" => [
       {
         "name" => "dnsdist",
         "image" => node['kube']['images']['dnsdist'],
@@ -168,4 +182,5 @@ unbound_manifest = {
 
 node['environment_v2']['set']['dns']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['unbound'] = unbound_manifest
+  node.default['kubernetes']['static_pods'][host]['dnsdist'] = dnsdist_manifest
 end
