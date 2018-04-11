@@ -1,10 +1,15 @@
 env_vars = node['environment_v2']['set']['matchbox']['vars']
 
+# ceph_monitors = node['environment_v2']['set']['ceph-mon']['hosts'].map { |e|
+#   "#{node['environment_v2']['host'][e]['ip']['store']}:6789"
+# }
+
 node['environment_v2']['set']['matchbox']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
   data_path = "/var/lib/matchbox"
-  assets_path = "/assets"
+  assets_path = "/var/lib/matchbox/assets"
+  # assets_path = "/assets"
 
   matchbox_manifest = {
     "kind" => "Pod",
@@ -34,11 +39,6 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
               "readOnly" => true
             },
             {
-              "mountPath" => assets_path,
-              "name" => "data-assets-host",
-              "readOnly" => false
-            },
-            {
               "mountPath" => data_path,
               "name" => "data-matchbox",
               "readOnly" => false
@@ -54,14 +54,11 @@ node['environment_v2']['set']['matchbox']['hosts'].each do |host|
           }
         },
         {
-          "name" => "data-assets-host",
-          "hostPath" => {
-            "path" => env_vars["assets_path"]
-          }
-        },
-        {
           "name" => "data-matchbox",
-          "emptyDir" => {}
+          "nfs" => {
+            "server" => node['environment_v2']['set']['nfs']['vip']['store'],
+            "path" => "/data/matchbox"
+          }
         }
       ]
     }

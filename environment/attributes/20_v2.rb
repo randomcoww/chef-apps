@@ -104,7 +104,6 @@ node.default['environment_v2']['set']['matchbox'] = {
   ],
   'vars' => {
     'ssl_path' => "/etc/ssl/certs",
-    "assets_path" => "/data/matchbox/assets"
   }
 }
 
@@ -145,6 +144,12 @@ node.default['environment_v2']['set']['kube-worker'] = {
     # 'ns2',
   ]
 }
+
+# node.default['environment_v2']['set']['ceph-mon'] = {
+#   'hosts' => [
+#     'vmhost1'
+#   ]
+# }
 
 
 ##
