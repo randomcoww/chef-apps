@@ -332,7 +332,7 @@ kube_apiserver_manifest = {
         "-a",
         "#{node['kubernetes']['internal_ssl_base_path']}-ca.pem",
         "-s",
-        "https://vault.#{service_domain}:#{node['environment_v2']['port']['vault']}",
+        "https://etcd.#{service_domain}:#{node['environment_v2']['port']['vault']}",
         "-o",
         node['kubernetes']['apiserver_ssl_base_path'],
         "-i",
