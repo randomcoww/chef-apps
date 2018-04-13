@@ -86,7 +86,7 @@ dnsdist_manifest = {
           "-v",
           "-l",
           "0.0.0.0:#{node['environment_v2']['port']['kea-dns']}",
-        ] + node['environment_v2']['set']['kea']['hosts'].map { |e|
+        ] + node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
           "#{node['environment_v2']['host'][e]['ip']['store']}:#{kea_dns_port_internal}"
         }
       }
@@ -119,7 +119,7 @@ tftp_manifest = {
 
 
 # kea nodes
-node['environment_v2']['set']['kea']['hosts'].each do |host|
+node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
 
   nextserver = node['environment_v2']['host'][host]['ip']['store']
 

@@ -105,15 +105,17 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
   'stub-zone' => [
     {
       'name' => node['environment_v2']['domain']['top'],
-      'stub-addr' => node['environment_v2']['set']['kea']['hosts'].map { |e|
-          "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-        }
+      # 'stub-addr' => node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
+      #     "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
+      #   }
+      'stub-addr' => "#{node['environment_v2']['set']['kea-mysql-data']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
     },
     {
       'name' => node['environment_v2']['domain']['rev'],
-      'stub-addr' => node['environment_v2']['set']['kea']['hosts'].map { |e|
-          "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-        }
+      # 'stub-addr' => node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
+      #     "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
+      #   }
+      'stub-addr' => "#{node['environment_v2']['set']['kea-mysql-data']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
     }
   ]
 })

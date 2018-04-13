@@ -6,7 +6,7 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
   vip_apiserver = node['environment_v2']['set']['kube-master']['vip']['store']
-  vip_vault = node['environment_v2']['set']['vault']['vip']['store']
+  vip_vault = node['environment_v2']['set']['etcd']['vip']['store']
 
   ##https://stosb.com/blog/explaining-my-configs-nftables/
 

@@ -35,16 +35,31 @@ node['environment_v2']['set'].each do |set, c|
 
       sync_groups << "VI_#{key}"
 
+      instance = {
+        'state' => 'BACKUP',
+        'virtual_router_id' => id,
+        'interface' => interface,
+        'priority' => 100,
+        'virtual_ipaddress' => [
+          "#{addr}/#{subnet_mask}"
+        ]
+      }
+
+      if c.has_key?('health_check')
+        configs[host]["vrrp_script CHK_#{set}"] = [
+          {
+            'script' => %Q{"#{c["health_check"]}"},
+            'interval' => 2
+          }
+        ]
+
+        instance['track_script'] = [
+          "CHK_#{set}"
+        ]
+      end
+
       configs[host]["vrrp_instance VI_#{key}"] = [
-        {
-          'state' => 'BACKUP',
-          'virtual_router_id' => id,
-          'interface' => interface,
-          'priority' => 100,
-          'virtual_ipaddress' => [
-            "#{addr}/#{subnet_mask}"
-          ]
-        }
+        instance
       ]
     end
   end

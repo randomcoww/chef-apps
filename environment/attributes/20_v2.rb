@@ -45,26 +45,27 @@ node.default['environment_v2']['set']['dns'] = {
     'ns2',
     'ns3'
   ],
+  ## unbound, dnsdist
   'vip' => {
     'store' => "192.168.126.244",
     'lan' => "192.168.62.244",
-  }
-}
-
-node.default['environment_v2']['set']['kea'] = {
-  'hosts' => [
-    'ns1',
-    'ns2'
-  ]
+  },
+  'health_check' => "ncat -z -w5 localhost 53"
 }
 
 node.default['environment_v2']['set']['kea-mysql-data'] = {
   'hosts' => [
     'ns1',
     'ns2'
-  ]
+  ],
+  ## kea, mysql, kea-resolver, dnsdist
+  'vip' => {
+    'store' => "192.168.126.241",
+  },
+  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['kea-dns']}"
 }
 
+## mysql-mgm
 node.default['environment_v2']['set']['kea-mysql-mgm'] = {
   'hosts' => [
     'ns3',
@@ -115,15 +116,11 @@ node.default['environment_v2']['set']['etcd'] = {
     'data_path' => "/data/etcd",
     'ssl_path' => "/etc/ssl/certs"
   },
+  ## vault
   'vip' => {
     'store' => "192.168.126.243",
-  }
-}
-
-node.default['environment_v2']['set']['vault'] = {
-  'vip' => {
-    'store' => node['environment_v2']['set']['etcd']['vip']['store'],
-  }
+  },
+  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['vault']}"
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
@@ -135,7 +132,8 @@ node.default['environment_v2']['set']['kube-master'] = {
   },
   'vip' => {
     'store' => "192.168.126.245",
-  }
+  },
+  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['kube-master-internal']}"
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
@@ -144,12 +142,6 @@ node.default['environment_v2']['set']['kube-worker'] = {
     # 'ns2',
   ]
 }
-
-# node.default['environment_v2']['set']['ceph-mon'] = {
-#   'hosts' => [
-#     'vmhost1'
-#   ]
-# }
 
 
 ##
