@@ -276,6 +276,13 @@ node.default['environment_v2']['set']['transmission'] = {
   }
 }
 
+node.default['environment_v2']['set']['unifi'] = {
+  'vip' => {
+    'store' => node['environment_v2']['set']['kube-master']['vip']['store']
+  }
+}
+
+## for auto discovery by APs
 node.default['environment_v2']['host']['unifi'] = {
   'ip' => {
     'lan' => node['environment_v2']['set']['kube-master']['vip']['store']
