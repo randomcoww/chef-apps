@@ -50,7 +50,7 @@ node.default['environment_v2']['set']['dns'] = {
     'store' => "192.168.126.244",
     'lan' => "192.168.62.244",
   },
-  'health_check' => "ncat -z -w5 localhost 53"
+  'health_check' => "nc -z -w5 localhost 53"
 }
 
 node.default['environment_v2']['set']['kea-mysql-data'] = {
@@ -62,7 +62,7 @@ node.default['environment_v2']['set']['kea-mysql-data'] = {
   'vip' => {
     'store' => "192.168.126.241",
   },
-  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['kea-dns']}"
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['kea-dns']}"
 }
 
 ## mysql-mgm
@@ -120,7 +120,7 @@ node.default['environment_v2']['set']['etcd'] = {
   'vip' => {
     'store' => "192.168.126.243",
   },
-  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['vault']}"
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['vault']}"
 }
 
 node.default['environment_v2']['set']['kube-master'] = {
@@ -133,7 +133,7 @@ node.default['environment_v2']['set']['kube-master'] = {
   'vip' => {
     'store' => "192.168.126.245",
   },
-  'health_check' => "ncat -z -w5 localhost #{node['environment_v2']['port']['kube-master-internal']}"
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['kube-master-internal']}"
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
