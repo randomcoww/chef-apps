@@ -59,7 +59,9 @@ node['environment_v2']['set'].each do |set, c|
       end
 
       configs[host]["vrrp_instance VI_#{key}"] = [
-        instance
+        instance,
+        "use_vmac vrrp#{id}",
+        "vmac_xmit_base"
       ]
     end
   end
