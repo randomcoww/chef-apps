@@ -1,8 +1,13 @@
+# gateway_ips = node['environment_v2']['set']['gateway']['hosts'].map { |e|
+#   node['environment_v2']['host'][e]['ip']['store']
+# }
+
 node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if']['lan']
   if_store = node['environment_v2']['host'][host]['if']['store']
   if_wan = node['environment_v2']['host'][host]['if']['wan']
+  if_sync = node['environment_v2']['host'][host]['if']['sync']
 
   vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
   vip_apiserver = node['environment_v2']['set']['kube-master']['vip']['store']
@@ -14,7 +19,8 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 <<-EOF
 define if_lan = #{if_lan}
 define if_store = #{if_store}
-define if_internal = {#{if_lan}, #{if_store}}
+define if_sync = #{if_sync}
+define if_internal = {#{if_lan}, #{if_store}, #{if_sync}}
 define if_external = #{if_wan}
 
 define vip_haproxy = #{vip_haproxy}
@@ -58,7 +64,7 @@ table ip filter {
     iifname $if_internal tcp dport domain accept;
     iifname $if_internal udp dport domain accept;
     iifname $if_internal udp sport bootps udp dport bootpc accept;
-    # iifname $if_internal pkttype multicast accept;
+    iifname $if_internal pkttype multicast accept;
     iifname $if_internal tcp dport ssh accept;
   }
 
@@ -119,6 +125,60 @@ table ip nat {
 ;
 EOF
 
+
+  conntrack_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
+    "Sync" => [
+      {
+        "Mode FTFW" => [
+          "DisableExternalCache" => "on"
+        ],
+        "Multicast Default" => [
+          {
+            "IPv4_address" => "225.0.0.51",
+            "Group" => 3781,
+            "IPv4_interface" => node['environment_v2']['host'][host]['ip']['sync'],
+            "Interface" => if_sync,
+            "SndSocketBuffer" => 1249280,
+            "RcvSocketBuffer" => 1249280,
+            "Checksum" => "on",
+          }
+        ]
+      }
+    ],
+    "General" => [
+      {
+        "HashSize" => 32768,
+        "HashLimit" => 131072,
+        "LogFile" => "/dev/stdout",
+        "LockFile" => "/var/lock/conntrack.lock",
+        "NetlinkBufferSize" => 2097152,
+        "NetlinkBufferSizeMaxGrowth" => 8388608,
+        "UNIX" => [
+          {
+            "Path" => "/var/run/conntrackd.ctl",
+            "Backlog" => 20
+          }
+        ],
+        "Filter From Kernelspace" => [
+          {
+            "Protocol Accept" => [
+              "icmp",
+              "TCP",
+              "UDP",
+            ],
+            "Address Ignore" => ([
+              "127.0.0.1",
+            ] +
+              node['environment_v2']['set']['gateway']['vip'].values +
+              node['environment_v2']['host'][host]['ip'].values
+            ).map { |e| "IPv4_address #{e}" }
+          }
+        ]
+      }
+    ]
+  })
+
+
   gateway_manifest = {
     "apiVersion" => "v1",
     "kind" => "Pod",
@@ -126,9 +186,9 @@ EOF
       "name" => "nftables"
     },
     "spec" => {
-      "restartPolicy" => "OnFailure",
+      "restartPolicy" => "Always",
       "hostNetwork" => true,
-      "containers" => [
+      "initContainers" => [
         {
           "name" => "nftables",
           "image" => node['kube']['images']['nftables'],
@@ -143,6 +203,25 @@ EOF
             {
               "name" => "CONFIG",
               "value" => nftables_rules
+            }
+          ]
+        }
+      ],
+      "containers" => [
+        {
+          "name" => "conntrack",
+          "image" => node['kube']['images']['conntrack'],
+          "securityContext" => {
+            "capabilities" => {
+              "add" => [
+                "NET_ADMIN"
+              ]
+            }
+          },
+          "env" => [
+            {
+              "name" => "CONFIG",
+              "value" => conntrack_config
             }
           ]
         }
