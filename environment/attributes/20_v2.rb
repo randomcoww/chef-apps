@@ -240,9 +240,7 @@ node.default['environment_v2']['host']['vmhost1'] = {
     'store' => '192.168.126.251',
   },
   'if' => {
-    'lan' => "ens1f1",
     'store' => "host_bridge",
-    'wan' => "eno2",
   }
 }
 
@@ -251,9 +249,7 @@ node.default['environment_v2']['host']['vmhost2'] = {
     'store' => '192.168.126.252',
   },
   'if' => {
-    'lan' => "ens1f1",
     'store' => "host_bridge",
-    'wan' => "eno2",
   },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
