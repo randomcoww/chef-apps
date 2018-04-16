@@ -1,7 +1,3 @@
-# gateway_ips = node['environment_v2']['set']['gateway']['hosts'].map { |e|
-#   node['environment_v2']['host'][e]['ip']['store']
-# }
-
 node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   if_lan = node['environment_v2']['host'][host]['if']['lan']
