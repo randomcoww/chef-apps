@@ -106,7 +106,6 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
     end
   end
 
-
   systemd = [
     {
       "name" => "kubelet.service",
@@ -117,8 +116,8 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
             %Q{RKT_RUN_ARGS="#{[
               "--insecure-options=image",
               "--uuid-file-save=/var/run/kubelet-pod.uuid",
-              "--volume var-log,kind=host,source=/var/log",
-              "--mount volume=var-log,target=/var/log",
+              # "--volume var-log,kind=host,source=/var/log",
+              # "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
               "--mount volume=dns,target=/etc/resolv.conf"
             ].join(' ')}"}
@@ -130,17 +129,20 @@ node['environment_v2']['set']['gateway']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--register-node=true",
-            "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
+            # "--register-node=true",
+            # "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
+            # "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            "--make-iptables-util-chains=false",
-            "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-            "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            # "--hostname-override=#{ip}",
+            # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
+            # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            # "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--docker-disable-shared-pid=false",
             "--image-gc-high-threshold=0",
             "--image-gc-low-threshold=0",
+            # "--feature-gates=CustomPodDNS=true"
           ].join(' '),
           "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid",
           "Restart" => "always",

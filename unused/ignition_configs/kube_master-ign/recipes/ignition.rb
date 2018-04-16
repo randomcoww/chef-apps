@@ -11,18 +11,6 @@ base = {
 }
 
 
-cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
-)
-ca = cert_generator.root_ca
-
-
-etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
-)
-etcd_ca = etcd_cert_generator.root_ca
-
-
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -58,45 +46,6 @@ flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
 
-  ##
-  ## etcd ssl
-  ##
-  etcd_key = etcd_cert_generator.generate_key
-  etcd_cert = etcd_cert_generator.node_cert(
-    [
-      ['CN', "etcd-#{host}"]
-    ],
-    etcd_key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {}
-  )
-
-  ##
-  ## kube ssl
-  ##
-  key = cert_generator.generate_key
-  cert = cert_generator.node_cert(
-    [
-      ['CN', "kube-#{host}"]
-    ],
-    key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {
-      'DNS.1' => 'kubernetes',
-      'DNS.2' => 'kubernetes.default',
-      'DNS.3' => 'kubernetes.default.svc',
-      'DNS.4' => "kubernetes.default.svc.#{node['kubernetes']['cluster_domain']}",
-      'IP.1' => node['kubernetes']['cluster_service_ip'],
-      'IP.2' => node['environment_v2']['set']['haproxy']['vip']['store']
-    }
-  )
-
   directories = []
 
   files = [
@@ -116,66 +65,21 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
     },
-    ## kube ssl
-    {
-      "path" => node['kubernetes']['key_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(key.to_pem)}"
-    },
-    {
-      "path" => node['kubernetes']['cert_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(cert.to_pem)}"
-    },
-    {
-      "path" => node['kubernetes']['ca_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
-    },
     ## kubeconfig
     {
       "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
-    },
-    ## etcd ssl
-    {
-      "path" => node['etcd']['key_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_key.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['cert_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_cert.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['ca_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_ca.to_pem)}"
-    },
-    ## setup-network-environment
-    {
-      "path" => "/opt/bin/setup-network-environment",
-      "mode" => 493,
-      "contents" => node['environment_v2']['url']['setup_network_environment']
     }
   ]
 
-
   networkd = []
-
 
   systemd = [
     {
       "name" => "kubelet.service",
       "contents" => {
-        "Unit" => {
-          "Requires" => "setup-network-environment.service",
-          "After" => "setup-network-environment.service"
-        },
         "Service" => {
-          "EnvironmentFile" => "/etc/network-environment",
           "Environment" => [
             "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
             %Q{RKT_RUN_ARGS="#{[
@@ -214,20 +118,6 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
         },
         "Install" => {
           "WantedBy" => "multi-user.target"
-        }
-      }
-    },
-    {
-      "name" => "setup-network-environment.service",
-      "contents" => {
-        "Unit" => {
-          "Requires" => "network-online.target",
-          "After" => "network-online.target"
-        },
-        "Service" => {
-          "Type" => "oneshot",
-          "ExecStart" => "/opt/bin/setup-network-environment",
-          "RemainAfterExit" => "yes"
         }
       }
     }

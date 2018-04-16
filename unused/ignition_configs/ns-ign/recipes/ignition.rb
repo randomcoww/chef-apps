@@ -11,37 +11,37 @@ base = {
 }
 
 
-kube_config = {
-  "apiVersion" => "v1",
-  "kind" => "Config",
-  "clusters" => [
-    {
-      "name" => node['kubernetes']['cluster_name'],
-      "cluster" => {
-        "server" => "http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
-      }
-    }
-  ],
-  "users" => [
-    {
-      "name" => "kube",
-    }
-  ],
-  "contexts" => [
-    {
-      "name" => "kube-context",
-      "context" => {
-        "cluster" => node['kubernetes']['cluster_name'],
-        "user" => "kube"
-      }
-    }
-  ],
-  "current-context" => "kube-context"
-}
-
-
-cni_conf = JSON.pretty_generate(node['kubernetes']['cni_conf'].to_hash)
-flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
+# kube_config = {
+#   "apiVersion" => "v1",
+#   "kind" => "Config",
+#   "clusters" => [
+#     {
+#       "name" => node['kubernetes']['cluster_name'],
+#       "cluster" => {
+#         "server" => "http://127.0.0.1:#{node['kubernetes']['insecure_port']}"
+#       }
+#     }
+#   ],
+#   "users" => [
+#     {
+#       "name" => "kube",
+#     }
+#   ],
+#   "contexts" => [
+#     {
+#       "name" => "kube-context",
+#       "context" => {
+#         "cluster" => node['kubernetes']['cluster_name'],
+#         "user" => "kube"
+#       }
+#     }
+#   ],
+#   "current-context" => "kube-context"
+# }
+#
+#
+# cni_conf = JSON.pretty_generate(node['kubernetes']['cni_conf'].to_hash)
+# flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
 
 
 node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
@@ -56,23 +56,23 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
       "mode" => 420,
       "contents" => "data:,#{host}"
     },
-    ## flannel
-    {
-      "path" => node['kubernetes']['flanneld_conf_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
-    },
-    {
-      "path" => node['kubernetes']['cni_conf_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
-    },
-    ## kubeconfig
-    {
-      "path" => node['kubernetes']['client']['kubeconfig_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
-    },
+    # ## flannel
+    # {
+    #   "path" => node['kubernetes']['flanneld_conf_path'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(flannel_cfg)}"
+    # },
+    # {
+    #   "path" => node['kubernetes']['cni_conf_path'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
+    # },
+    # ## kubeconfig
+    # {
+    #   "path" => node['kubernetes']['client']['kubeconfig_path'],
+    #   "mode" => 420,
+    #   "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
+    # },
   ]
 
 
@@ -127,8 +127,8 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
             %Q{RKT_RUN_ARGS="#{[
               "--insecure-options=image",
               "--uuid-file-save=/var/run/kubelet-pod.uuid",
-              "--volume var-log,kind=host,source=/var/log",
-              "--mount volume=var-log,target=/var/log",
+              # "--volume var-log,kind=host,source=/var/log",
+              # "--mount volume=var-log,target=/var/log",
               "--volume dns,kind=host,source=/etc/resolv.conf",
               "--mount volume=dns,target=/etc/resolv.conf"
             ].join(' ')}"}
@@ -140,16 +140,16 @@ node['environment_v2']['set']['dns']['hosts'].uniq.each do |host|
           ],
           "ExecStart" => [
             "/usr/lib/coreos/kubelet-wrapper",
-            "--register-node=true",
-            "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
-            "--network-plugin=cni",
+            # "--register-node=true",
+            # "--cni-conf-dir=#{::File.dirname(node['kubernetes']['cni_conf_path'])}",
+            # "--network-plugin=cni",
             "--container-runtime=docker",
             "--allow-privileged=true",
             "--manifest-url=#{node['environment_v2']['url']['manifests']}/#{host}",
-            "--hostname-override=#{ip}",
-            "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
-            "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
-            "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
+            # "--hostname-override=#{ip}",
+            # "--cluster_dns=#{node['kubernetes']['cluster_dns_ip']}",
+            # "--cluster_domain=#{node['kubernetes']['cluster_domain']}",
+            # "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
             "--docker-disable-shared-pid=false",
             "--image-gc-high-threshold=0",
             "--image-gc-low-threshold=0",

@@ -11,12 +11,6 @@ base = {
 }
 
 
-cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'kubernetes_ssl', [['CN', 'kube-ca']]
-)
-ca = cert_generator.root_ca
-
-
 kube_config = {
   "apiVersion" => "v1",
   "kind" => "Config",
@@ -25,7 +19,7 @@ kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['haproxy']['kube-master']['port']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['port']['kube-master']}"
       }
     }
   ],
@@ -57,22 +51,6 @@ flannel_cfg = JSON.pretty_generate(node['kubernetes']['flanneld_conf'].to_hash)
 
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
 
-  ##
-  ## kube ssl
-  ##
-  key = cert_generator.generate_key
-  cert = cert_generator.node_cert(
-    [
-      ['CN', "kube-#{host}"]
-    ],
-    key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {}
-  )
-
   directories = []
 
   files = [
@@ -92,33 +70,11 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(cni_conf)}"
     },
-    ## kube cert
-    {
-      "path" => node['kubernetes']['key_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(key.to_pem)}"
-    },
-    {
-      "path" => node['kubernetes']['cert_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(cert.to_pem)}"
-    },
-    {
-      "path" => node['kubernetes']['ca_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(ca.to_pem)}"
-    },
     ## kubeconfig
     {
       "path" => node['kubernetes']['client']['kubeconfig_path'],
       "mode" => 420,
       "contents" => "data:;base64,#{Base64.encode64(kube_config.to_hash.to_yaml)}"
-    },
-    ## setup-network-environment
-    {
-      "path" => "/opt/bin/setup-network-environment",
-      "mode" => 493,
-      "contents" => node['environment_v2']['url']['setup_network_environment']
     }
   ]
 
@@ -128,14 +84,53 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
 
   systemd = [
     {
+      "name" => "generate-certs.service",
+      "contents" => {
+        "Service" => {
+          "ExecStartPre" => [
+            "/usr/bin/mkdir -p /var/log/containers",
+            "-/usr/bin/rkt rm --uuid-file=/var/run/generate-certs.uuid"
+          ],
+          "ExecStart" => [
+            "/usr/bin/rkt",
+            "run",
+            "--insecure-options=image",
+            "--uuid-file-save=/var/run/generate-certs.uuid",
+            "--volume dns,kind=host,source=/etc/resolv.conf",
+            "--mount volume=dns,target=/etc/resolv.conf",
+
+            "--volume internalcerts-apiserver,kind=host,source=#{node['kubernetes']['apiserver_ssl_host_path']},readOnly=false",
+            "--mount volume=internalcerts-apiserver,target=#{node['kubernetes']['apiserver_ssl_path']}",
+            "--hosts-entry host",
+
+            "--stage1-from-dir=stage1-fly.aci",
+            "docker://#{node['kube']['images']['cfssl']}",
+            "--exec=/gencert_wrapper.sh",
+            "--",
+
+            "-p",
+            "kubernetes",
+            "-o",
+            node['kubernetes']['apiserver_ssl_base_path']
+          ].join(' '),
+          "ExecStop" => "-/usr/bin/rkt stop --uuid-file=/var/run/generate-certs.uuid",
+          "Type" => "oneshot",
+          "Restart" => "on-failure",
+          "RestartSec" => 10
+        },
+        "Install" => {
+          "WantedBy" => "multi-user.target"
+        }
+      }
+    },
+    {
       "name" => "kubelet.service",
       "contents" => {
         "Unit" => {
-          "Requires" => "setup-network-environment.service",
-          "After" => "setup-network-environment.service"
+          "Requires" => "generate-certs.service",
+          "After" => "generate-certs.service"
         },
         "Service" => {
-          "EnvironmentFile" => "/etc/network-environment",
           "Environment" => [
             "KUBELET_IMAGE_TAG=v#{node['kubernetes']['version']}_coreos.0",
             %Q{RKT_RUN_ARGS="#{[
@@ -179,20 +174,6 @@ node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
         },
         "Install" => {
           "WantedBy" => "multi-user.target"
-        }
-      }
-    },
-    {
-      "name" => "setup-network-environment.service",
-      "contents" => {
-        "Unit" => {
-          "Requires" => "network-online.target",
-          "After" => "network-online.target"
-        },
-        "Service" => {
-          "Type" => "oneshot",
-          "ExecStart" => "/opt/bin/setup-network-environment",
-          "RemainAfterExit" => "yes"
         }
       }
     }

@@ -15,18 +15,6 @@ domain = [
   node['environment_v2']['domain']['top']
 ].join('.')
 
-## client
-etcd_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_ssl', [['CN', 'etcd-ca']]
-)
-etcd_ca = etcd_cert_generator.root_ca
-
-## peer
-etcd_peer_cert_generator = OpenSSLHelper::CertGenerator.new(
-  'deploy_config', 'etcd_peer_ssl', [['CN', 'etcd-peer-ca']]
-)
-etcd_peer_ca = etcd_peer_cert_generator.root_ca
-
 ## --initial-cluster option for IP based config
 initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
     "#{e}=https://#{node['environment_v2']['host'][e]['ip']['store']}:2380"
@@ -36,44 +24,6 @@ initial_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
 node['environment_v2']['set']['etcd']['hosts'].each do |host|
   ip = node['environment_v2']['host'][host]['ip']['store']
 
-  ##
-  ## etcd ssl
-  ##
-  etcd_key = etcd_cert_generator.generate_key
-  etcd_cert = etcd_cert_generator.node_cert(
-    [
-      ['CN', "etcd-#{host}"]
-    ],
-    etcd_key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {
-      'DNS.1' => [host, domain].join('.'),
-      'IP.1' => ip
-    }
-  )
-
-  ##
-  ## etcd peer ssl
-  ##
-  etcd_peer_key = etcd_peer_cert_generator.generate_key
-  etcd_peer_cert = etcd_peer_cert_generator.node_cert(
-    [
-      ['CN', "etcd-peer-#{host}"]
-    ],
-    etcd_peer_key,
-    {
-      "basicConstraints" => "CA:FALSE",
-      "keyUsage" => 'nonRepudiation, digitalSignature, keyEncipherment',
-    },
-    {
-      'DNS.1' => [host, domain].join('.'),
-      'IP.1' => ip
-    }
-  )
-
   directories = []
 
   files = [
@@ -81,38 +31,6 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
       "path" => "/etc/hostname",
       "mode" => 420,
       "contents" => "data:,#{host}"
-    },
-    ## etcd ssl
-    {
-      "path" => node['etcd']['key_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_key.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['cert_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_cert.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['ca_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_ca.to_pem)}"
-    },
-    ## etcd peer ssl
-    {
-      "path" => node['etcd']['key_peer_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_key.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['cert_peer_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_cert.to_pem)}"
-    },
-    {
-      "path" => node['etcd']['ca_peer_path'],
-      "mode" => 420,
-      "contents" => "data:;base64,#{Base64.encode64(etcd_peer_ca.to_pem)}"
     },
     ## setup-network-environment
     # {
@@ -174,7 +92,7 @@ node['environment_v2']['set']['etcd']['hosts'].each do |host|
     "ETCD_LISTEN_CLIENT_URLS" => "https://#{ip}:2379",
     "ETCD_INITIAL_CLUSTER" => initial_cluster,
     "ETCD_INITIAL_CLUSTER_STATE" => "new",
-    "ETCD_INITIAL_CLUSTER_TOKEN" => node['etcd']['cluster_name'],
+    "ETCD_INITIAL_CLUSTER_TOKEN" => node['kubernetes']['etcd_cluster_name'],
 
     "ETCD_TRUSTED_CA_FILE" => node['etcd']['ca_path'],
     "ETCD_CERT_FILE" => node['etcd']['cert_path'],
