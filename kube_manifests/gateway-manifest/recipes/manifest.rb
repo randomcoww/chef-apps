@@ -132,7 +132,7 @@ EOF
           {
             "IPv4_address" => "225.0.0.51",
             "Group" => 3781,
-            "IPv4_interface" => node['environment_v2']['host'][host]['ip']['sync'],
+            # "IPv4_interface" => node['environment_v2']['host'][host]['ip']['sync'],
             "Interface" => if_sync,
             "SndSocketBuffer" => 1249280,
             "RcvSocketBuffer" => 1249280,
@@ -157,16 +157,16 @@ EOF
         ],
         "Filter From Kernelspace" => [
           {
-            "Protocol Accept" => [
-              "icmp",
-              "TCP",
-              "UDP",
-            ],
+            # "Protocol Accept" => [
+            #   "icmp",
+            #   "TCP",
+            #   "UDP",
+            # ],
             "Address Ignore" => ([
               "127.0.0.1",
             ] +
-              node['environment_v2']['set']['gateway']['vip'].values +
-              node['environment_v2']['host'][host]['ip'].values
+              # node['environment_v2']['host'][host]['ip'].values +
+              node['environment_v2']['set']['gateway']['vip'].values
             ).map { |e| "IPv4_address #{e}" }
           }
         ]

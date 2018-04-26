@@ -14,6 +14,8 @@ node['environment_v2']['set'].each do |set, c|
     configs[host] ||= {}
     sync_groups = []
 
+    host_config = node['environment_v2']['host'][host]
+
     configs[host]['global_defs'] = [
       {
         'vrrp_version' => 3
@@ -26,9 +28,13 @@ node['environment_v2']['set'].each do |set, c|
       }
     ]
 
+    if host_config.has_key?('notify_scripts')
+      configs[host]["vrrp_sync_group VG_#{set}"] += host_config['notify_scripts']
+    end
+
     c['vip'].each do |i, addr|
       key = "#{set}_#{i}"
-      interface = node['environment_v2']['host'][host]['if'][i]
+      interface = host_config['if'][i]
       subnet_mask = node['environment_v2']['subnet'][i].split('/').last
 
       id = keepalived_bag.get_or_create("VI_#{key}_id", rand(255))
@@ -60,8 +66,8 @@ node['environment_v2']['set'].each do |set, c|
 
       configs[host]["vrrp_instance VI_#{key}"] = [
         instance,
-        "use_vmac vrrp#{id}",
-        "vmac_xmit_base"
+        # "use_vmac vrrp#{id}",
+        # "vmac_xmit_base"
       ]
     end
   end
