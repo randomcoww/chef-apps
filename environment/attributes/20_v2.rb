@@ -40,12 +40,7 @@ node.default['environment_v2']['set']['gateway'] = {
   'vip' => {
     'store' => "192.168.126.240",
     'lan' => "192.168.62.240",
-  },
-  # 'notify_scripts' => [
-  #   %Q{notify_master "ip link set eth2 up"},
-  #   %Q{notify_backup "ip link set eth2 down"},
-  #   %Q{notify_fault "ip link set eth2 down"}
-  # ]
+  }
 }
 
 node.default['environment_v2']['set']['dns'] = {
