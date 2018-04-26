@@ -1,4 +1,4 @@
-unbound_dns_internal = 53532
+# unbound_dns_internal = 53532
 
 a_records = []
 cname_records = []
@@ -73,7 +73,7 @@ end
 node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::ConfigGenerator.generate_from_hash({
   'server' => {
     'interface-automatic' => true,
-    'port' => unbound_dns_internal,
+    'port' => node['environment_v2']['port']['unbound-dns'],
     'interface' => '0.0.0.0',
     'num-threads' => 2,
     'do-ip6' => false,
@@ -157,32 +157,32 @@ unbound_manifest = {
   }
 }
 
-dnsdist_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "ns-dnsdist"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "dnsdist",
-        "image" => node['kube']['images']['dnsdist'],
-        "args" => [
-          "-v",
-          "-l",
-          "0.0.0.0:53",
-        ] + node['environment_v2']['set']['dns']['hosts'].map { |e|
-          "#{node['environment_v2']['host'][e]['ip']['store']}:#{unbound_dns_internal}"
-        }
-      }
-    ]
-  }
-}
+# dnsdist_manifest = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     "name" => "ns-dnsdist"
+#   },
+#   "spec" => {
+#     "restartPolicy" => "Always",
+#     "hostNetwork" => true,
+#     "containers" => [
+#       {
+#         "name" => "dnsdist",
+#         "image" => node['kube']['images']['dnsdist'],
+#         "args" => [
+#           "-v",
+#           "-l",
+#           "0.0.0.0:53",
+#         ] + node['environment_v2']['set']['dns']['hosts'].map { |e|
+#           "#{node['environment_v2']['host'][e]['ip']['store']}:#{unbound_dns_internal}"
+#         }
+#       }
+#     ]
+#   }
+# }
 
 node['environment_v2']['set']['dns']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['unbound'] = unbound_manifest
-  node.default['kubernetes']['static_pods'][host]['dnsdist'] = dnsdist_manifest
+  # node.default['kubernetes']['static_pods'][host]['dnsdist'] = dnsdist_manifest
 end

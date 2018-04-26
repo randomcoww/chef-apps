@@ -24,8 +24,9 @@ node.default['environment_v2']['port']['kube-master-insecure'] = 62080
 node.default['environment_v2']['port']['vault'] = 48889
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
-node.default['environment_v2']['port']['kea-dns'] = 53531
 node.default['environment_v2']['port']['etcd'] = 52379
+node.default['environment_v2']['port']['kea-dns'] = 53531
+node.default['environment_v2']['port']['unbound-dns'] = 53
 
 ##
 ## sets

@@ -67,32 +67,32 @@ mysqld_manifest = {
   }
 }
 
-kea_dns_port_internal = 53530
-
-dnsdist_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "name" => "kea-dnsdist"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "dnsdist",
-        "image" => node['kube']['images']['dnsdist'],
-        "args" => [
-          "-v",
-          "-l",
-          "0.0.0.0:#{node['environment_v2']['port']['kea-dns']}",
-        ] + node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
-          "#{node['environment_v2']['host'][e]['ip']['store']}:#{kea_dns_port_internal}"
-        }
-      }
-    ]
-  }
-}
+# kea_dns_port_internal = 53530
+#
+# dnsdist_manifest = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     "name" => "kea-dnsdist"
+#   },
+#   "spec" => {
+#     "restartPolicy" => "Always",
+#     "hostNetwork" => true,
+#     "containers" => [
+#       {
+#         "name" => "dnsdist",
+#         "image" => node['kube']['images']['dnsdist'],
+#         "args" => [
+#           "-v",
+#           "-l",
+#           "0.0.0.0:#{node['environment_v2']['port']['kea-dns']}",
+#         ] + node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
+#           "#{node['environment_v2']['host'][e]['ip']['store']}:#{kea_dns_port_internal}"
+#         }
+#       }
+#     ]
+#   }
+# }
 
 tftp_manifest = {
   "apiVersion" => "v1",
@@ -281,7 +281,7 @@ node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
             # "-w",
             # node['mysql_credentials']['kea']['password'],
             "-listen",
-            "#{kea_dns_port_internal}"
+            "#{node['environment_v2']['port']['kea-dns']}"
           ]
         }
       ]
@@ -291,7 +291,7 @@ node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
 
   node.default['kubernetes']['static_pods'][host]['kea-mysql'] = kea_manifest
   node.default['kubernetes']['static_pods'][host]['kea-tftp'] = tftp_manifest
-  node.default['kubernetes']['static_pods'][host]['kea-dnsdist'] = dnsdist_manifest
+  # node.default['kubernetes']['static_pods'][host]['kea-dnsdist'] = dnsdist_manifest
 end
 
 # kea mysql-data
