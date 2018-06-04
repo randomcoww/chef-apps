@@ -2,76 +2,23 @@
 # https://coreos.com/os/docs/latest/generate-self-signed-certificates.html
 # https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/docs/04-certificate-authority.md
 
+env_vars = node['environment_v2']['set']['cfssl']['vars']
+ca_base = ::File.join(env_vars["ssl_path"], "ca")
+ssl_base = ::File.join(env_vars["ssl_path"], "cfssl")
+
 ssl_config = {
   "signing" => {
     "default" => {
-      "auth_key" => "key1",
-      "expiry" => "26280h"
+      "expiry" => "8760h"
     },
     "profiles" => {
-      "intermediate" => {
-        "auth_key" => "key1",
-        "expiry" => "43800h",
-        "usages" => [
-          "signing",
-          "key encipherment",
-          "cert sign",
-          "crl sign"
-        ],
-        "ca_constraint" => {
-          "is_ca" => true,
-          "max_path_len" => 1
-        }
-      },
       "kubernetes" => {
-        "auth_key" => "key1",
-        "expiry" => "43800h",
-        "usages" => [
-          "signing",
-          "key encipherment",
-          "server auth",
-          "client auth"
-        ]
-      },
-      "server" => {
-        "auth_key" => "key1",
-        "expiry" => "43800h",
-        "usages" => [
-          "signing",
-          "key encipherment",
-          "server auth"
-        ]
-      },
-      "client" => {
-        "auth_key" => "key1",
-        "expiry" => "43800h",
-        "usages" => [
-          "signing",
-          "key encipherment",
-          "client auth"
-        ]
-      },
-      "peer" => {
-        "auth_key" => "key1",
-        "expiry" => "43800h",
-        "usages" => [
-          "signing",
-          "key encipherment",
-          "server auth",
-          "client auth"
-        ]
+        "usages" => ["signing", "key encipherment", "server auth", "client auth"],
+        "expiry" => "8760h"
       }
-    }
-  },
-  "auth_keys" => {
-    "key1" => {
-      "key" => "245f62575040243f3d544926562f4a5d",
-      "type" => "standard"
     }
   }
 }.to_json
-
-env_vars = node['environment_v2']['set']['ca']['vars']
 
 
 cfssl_manifest = {
@@ -94,9 +41,11 @@ cfssl_manifest = {
         "args" => [
           # "serve",
           "-address=0.0.0.0",
-          "-port=#{node['environment_v2']['port']['ca-internal']}",
-          "-ca=/certs/root_ca/root_ca.pem",
-          "-ca-key=/certs/root_ca/root_ca-key.pem",
+          "-port=#{node['environment_v2']['port']['cfssl']}",
+          "-ca=#{ca_base}.pem",
+          "-ca-key=#{ca_base}-key.pem",
+          "-tls-key=#{ssl_base}.pem",
+          "-tls-cert=#{ssl_base}-key.pem"
           # "-config=/certs/config.json",
         ],
         "env" => [
@@ -107,22 +56,16 @@ cfssl_manifest = {
         ],
         "volumeMounts" => [
           {
-            "name" => "certs",
-            "mountPath" => "/certs"
+            "mountPath" => env_vars["ssl_path"],
+            "name" => "ssl-cfssl",
+            "readOnly" => false
           }
-        ],
-        # "ports" => [
-        #   {
-        #     "containerPort" => 8888,
-        #     "hostPort" => 8888,
-        #     "protocol" => "TCP"
-        #   }
-        # ]
+        ]
       }
     ],
     "volumes" => [
       {
-        "name" => "certs",
+        "name" => "ssl-cfssl",
         "hostPath" => {
           "path" => env_vars["ssl_path"]
         }
@@ -131,6 +74,6 @@ cfssl_manifest = {
   }
 }
 
-node['environment_v2']['set']['ca']['hosts'].each do |host|
+node['environment_v2']['set']['cfssl']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['cfssl'] = cfssl_manifest
 end
