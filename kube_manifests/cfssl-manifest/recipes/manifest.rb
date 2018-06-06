@@ -44,8 +44,8 @@ cfssl_manifest = {
           "-port=#{node['environment_v2']['port']['cfssl']}",
           "-ca=#{ca_base}.pem",
           "-ca-key=#{ca_base}-key.pem",
-          "-tls-key=#{ssl_base}.pem",
-          "-tls-cert=#{ssl_base}-key.pem"
+          "-tls-cert=#{ssl_base}.pem",
+          "-tls-key=#{ssl_base}-key.pem",
           # "-config=/certs/config.json",
         ],
         "env" => [
