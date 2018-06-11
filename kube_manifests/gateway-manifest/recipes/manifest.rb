@@ -7,7 +7,6 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
   vip_apiserver = node['environment_v2']['set']['kube-master']['vip']['store']
-  vip_vault = node['environment_v2']['set']['etcd']['vip']['store']
 
   ##https://stosb.com/blog/explaining-my-configs-nftables/
 
@@ -21,10 +20,8 @@ define if_external = #{if_wan}
 
 define vip_haproxy = #{vip_haproxy}
 define vip_apiserver = #{vip_apiserver}
-define vip_vault = #{vip_vault}
 
 table ip filter {
-
   chain base_checks {
     ct state {established, related} accept;
     ct state invalid drop;
@@ -78,7 +75,6 @@ table ip filter {
 
     iifname $if_internal ip daddr $vip_haproxy accept;
     iifname $if_internal ip daddr $vip_apiserver accept;
-    iifname $if_internal ip daddr $vip_vault accept;
 
     ip daddr $vip_apiserver ct status dnat accept;
   }
@@ -88,9 +84,7 @@ table ip filter {
   }
 }
 
-
 table ip nat {
-
   set tcp_dnat {
     type inet_service; flags interval;
     elements = {
@@ -100,7 +94,6 @@ table ip nat {
 
   chain prerouting {
     type nat hook prerouting priority 0; policy accept;
-
     tcp dport @tcp_dnat dnat $vip_apiserver;
   }
 
@@ -114,7 +107,6 @@ table ip nat {
 
   chain postrouting {
     type nat hook postrouting priority 100; policy accept;
-
     oifname $if_external masquerade;
   }
 }

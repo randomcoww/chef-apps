@@ -102,22 +102,16 @@ node.default['kube_manifests']['ns']['unbound_config'] = NsdResourceHelper::Conf
   'remote-control' => {
     'control-enable' => true
   },
-  'stub-zone' => [
-    {
-      'name' => node['environment_v2']['domain']['top'],
-      # 'stub-addr' => node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
-      #     "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-      #   }
-      'stub-addr' => "#{node['environment_v2']['set']['kea-mysql-data']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-    },
-    {
-      'name' => node['environment_v2']['domain']['rev'],
-      # 'stub-addr' => node['environment_v2']['set']['kea-mysql-data']['hosts'].map { |e|
-      #     "#{node['environment_v2']['host'][e]['ip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-      #   }
-      'stub-addr' => "#{node['environment_v2']['set']['kea-mysql-data']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
-    }
-  ]
+  # 'stub-zone' => [
+  #   {
+  #     'name' => node['environment_v2']['domain']['top'],
+  #     'stub-addr' => "#{node['environment_v2']['set']['kea']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
+  #   },
+  #   {
+  #     'name' => node['environment_v2']['domain']['rev'],
+  #     'stub-addr' => "#{node['environment_v2']['set']['kea']['vip']['store']}@#{node['environment_v2']['port']['kea-dns']}"
+  #   }
+  # ]
 })
 
 
@@ -139,19 +133,7 @@ unbound_manifest = {
             "name" => "CONFIG",
             "value" => node['kube_manifests']['ns']['unbound_config']
           }
-        ],
-        # "ports" => [
-        #   {
-        #     "containerPort" => 53,
-        #     "hostPort" => 53,
-        #     "protocol" => "TCP"
-        #   },
-        #   {
-        #     "containerPort" => 53,
-        #     "hostPort" => 53,
-        #     "protocol" => "UDP"
-        #   }
-        # ]
+        ]
       }
     ]
   }

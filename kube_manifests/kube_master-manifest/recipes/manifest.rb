@@ -1,102 +1,8 @@
-env_vars = node['environment_v2']['set']['kube-master']['vars']
+host_count = node['environment_v2']['set']['kube-master']['hosts'].length
 
-domain = [
-  node['environment_v2']['domain']['host'],
-  node['environment_v2']['domain']['top']
-].join('.')
-
-
-flannel_manifest = {
-  "kind" => "Pod",
-  "apiVersion" => "v1",
-  "metadata" => {
-    "name" => "kube-flannel-ds",
-    "namespace" => "kube-system",
-  },
-  "spec" => {
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "kube-flannel",
-        "image" => node['kube']['images']['flannel'],
-        "command" => [
-          "/opt/bin/flanneld",
-          "--ip-masq",
-          "--kube-subnet-mgr",
-          "--kubeconfig-file=#{node['kubernetes']['client']['kubeconfig_path']}"
-        ],
-        "securityContext" => {
-          "privileged" => true
-        },
-        "env" => [
-          {
-            "name" => "POD_NAME",
-            "valueFrom" => {
-              "fieldRef" => {
-                "fieldPath" => "metadata.name"
-              }
-            }
-          },
-          {
-            "name" => "POD_NAMESPACE",
-            "valueFrom" => {
-              "fieldRef" => {
-                "fieldPath" => "metadata.namespace"
-              }
-            }
-          }
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "run",
-            "mountPath" => "/run"
-          },
-          {
-            "name" => "flannel-cfg",
-            "mountPath" => "/etc/kube-flannel/"
-          },
-          {
-            "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
-            "readOnly" => true
-          },
-          {
-            "mountPath": "/etc/ssl/certs",
-            "name": "ssl-certs-host",
-            "readOnly": true
-          }
-        ]
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "run",
-        "hostPath" => {
-          "path" => "/run"
-        }
-      },
-      {
-        "name" => "flannel-cfg",
-        "hostPath" => {
-          "path" => "/etc/kube-flannel"
-        }
-      },
-      {
-        "name" => "kubeconfig",
-        "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
-        }
-      },
-      {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => env_vars['ssl_path']
-        }
-      }
-    ]
-  }
-}
-
+etcd_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+    "https://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['etcd']}"
+  }.join(",")
 
 kube_scheduler_manifest = {
   "kind" => "Pod",
@@ -115,8 +21,8 @@ kube_scheduler_manifest = {
         "command" => [
           "/hyperkube",
           "scheduler",
-          "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}",
-          "--leader-elect=true"
+          "--config=#{::File.join(node['kubernetes']['kubernetes_path'], "kube-scheduler.yaml")}",
+          "--v=2"
         ],
         "livenessProbe" => {
           "httpGet" => {
@@ -131,13 +37,8 @@ kube_scheduler_manifest = {
         "volumeMounts": [
           {
             "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+            "mountPath" => node['kubernetes']['kubernetes_path'],
             "readOnly" => true
-          },
-          {
-            "mountPath": "/etc/ssl/certs",
-            "name": "ssl-certs-host",
-            "readOnly": true
           }
         ]
       }
@@ -146,76 +47,12 @@ kube_scheduler_manifest = {
       {
         "name" => "kubeconfig",
         "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
-        }
-      },
-      {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => env_vars['ssl_path']
+          "path" => node['kubernetes']['kubernetes_path']
         }
       }
     ]
   }
 }
-
-kube_proxy_manifest = {
-  "apiVersion": "v1",
-  "kind": "Pod",
-  "metadata": {
-    "name": "kube-proxy",
-    "namespace": "kube-system"
-  },
-  "spec": {
-    "hostNetwork": true,
-    "containers": [
-      {
-        "name": "kube-proxy",
-        "image": node['kube']['images']['hyperkube'],
-        "command": [
-          "/hyperkube",
-          "proxy",
-          "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
-        ],
-        "securityContext": {
-          "privileged": true
-        },
-        "volumeMounts": [
-          {
-            "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
-            "readOnly" => true
-          },
-          {
-            "mountPath": "/etc/ssl/certs",
-            "name": "ssl-certs-host",
-            "readOnly": true
-          }
-        ]
-      }
-    ],
-    "volumes": [
-      {
-        "name" => "kubeconfig",
-        "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
-        }
-      },
-      {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => env_vars['ssl_path']
-        }
-      }
-    ]
-  }
-}
-
-## --etcd-servers option
-# etcd_servers = node['environment_v2']['set']['etcd']['hosts'].map { |e|
-#     "https://#{node['environment_v2']['host'][e]['ip']['store']}:2379"
-#   }.join(",")
-
 
 kube_haproxy_manifest = {
   "apiVersion" => "v1",
@@ -261,7 +98,7 @@ kube_haproxy_manifest = {
         ],
         "args" => [
           "-kubeconfig",
-          node['kubernetes']['client']['kubeconfig_path'],
+          ::File.join(node['kubernetes']['kubernetes_path'], "kube-haproxy.kubeconfig"),
           "-output",
           node['kube_manifests']['haproxy']['config_path'],
           "-pid",
@@ -278,7 +115,7 @@ kube_haproxy_manifest = {
           },
           {
             "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+            "mountPath" => node['kubernetes']['kubernetes_path'],
             "readOnly" => true
           }
         ]
@@ -296,18 +133,12 @@ kube_haproxy_manifest = {
       {
         "name" => "kubeconfig",
         "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
+          "path" => node['kubernetes']['kubernetes_path']
         }
       }
     ]
   }
 }
-
-service_domain = [
-  node['environment_v2']['domain']['vip'],
-  node['environment_v2']['domain']['top']
-].join('.')
-
 
 kube_apiserver_manifest = {
   "kind" => "Pod",
@@ -319,48 +150,6 @@ kube_apiserver_manifest = {
   "spec" => {
     "hostNetwork" => true,
     "restartPolicy" => 'Always',
-    "initContainers" => [
-      "name" => "kube-vault-writer",
-      "image" => node['kube']['images']['vault_reader'],
-      "args" => [
-        "-r",
-        "apiserver",
-        "-c",
-        "#{node['kubernetes']['internal_ssl_base_path']}.pem",
-        "-k",
-        "#{node['kubernetes']['internal_ssl_base_path']}-key.pem",
-        "-a",
-        "#{node['kubernetes']['internal_ssl_base_path']}-ca.pem",
-        "-s",
-        "https://etcd.#{service_domain}:#{node['environment_v2']['port']['vault']}",
-        "-o",
-        node['kubernetes']['apiserver_ssl_base_path'],
-        "-i",
-        (node['environment_v2']['set']['kube-master']['vip'].values + [
-          '127.0.0.1',
-          node['kubernetes']['cluster_service_ip'],
-        ]).compact.join(','),
-        "-n",
-        [
-          'kubernetes.default',
-          ['*', service_domain].join('.')
-        ].join(','),
-        "-t",
-        "3"
-      ],
-      "volumeMounts" => [
-        {
-          "name" => "ssl-certs-host",
-          "mountPath" => "/etc/ssl/certs",
-          "readOnly" => true
-        },
-        {
-          "name" => "apiserver-certs",
-          "mountPath" => node['kubernetes']['apiserver_ssl_path'],
-          "readOnly" => false
-        }
-      ],
-    ],
     "containers" => [
       {
         "name" => "kube-apiserver",
@@ -368,34 +157,40 @@ kube_apiserver_manifest = {
         "command" => [
           "/hyperkube",
           "apiserver",
+          "--secure-port=#{node['environment_v2']['port']['kube-master']}",
+          "--allow-privileged=true",
+          "--apiserver-count=#{host_count}",
+          "--audit-log-maxage=30",
+          "--audit-log-maxbackup=#{host_count}",
+          "--audit-log-maxsize=100",
+          "--audit-log-path=/var/log/audit.log",
+          "--authorization-mode=Node,RBAC",
           "--bind-address=0.0.0.0",
-          "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds",
-          "--insecure-bind-address=127.0.0.1",
-          "--secure-port=#{node['kubernetes']['secure_port']}",
-          "--insecure-port=#{node['kubernetes']['insecure_port']}",
+          "--client-ca-file=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
+          "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
+          "--enable-swagger-ui=true",
+          "--etcd-cafile=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
+          "--etcd-certfile=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
+          "--etcd-keyfile=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
+          "--etcd-servers=#{etcd_cluster}",
+          "--event-ttl=1h",
+          "--experimental-encryption-provider-config=#{::File.join(node['kubernetes']['kubernetes_path'], "encryption-config.yaml")}",
+          "--kubelet-certificate-authority=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
+          "--kubelet-client-certificate=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
+          "--kubelet-client-key=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
+          "--kubelet-https=true",
+          "--runtime-config=api/all",
+          "--service-account-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "service-account.pem")}",
           "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          # "--etcd-servers=#{node['kube_manifests']['etcd']['etcd_servers']}",
-          "--etcd-servers=https://haproxy.#{service_domain}:#{node['environment_v2']['port']['etcd']}",
-          "--etcd-cafile=#{node['kubernetes']['etcd_ssl_base_path']}-ca.pem",
-          "--etcd-certfile=#{node['kubernetes']['etcd_ssl_base_path']}.pem",
-          "--etcd-keyfile=#{node['kubernetes']['etcd_ssl_base_path']}-key.pem",
-          "--tls-cert-file=#{node['kubernetes']['apiserver_ssl_base_path']}.pem",
-          "--tls-private-key-file=#{node['kubernetes']['apiserver_ssl_base_path']}-key.pem",
-          "--client-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
-          "--service-account-key-file=#{node['kubernetes']['service_account_key_path']}",
-          # "--basic-auth-file=#{node['kubernetes']['basic_auth_path']}",
-          # "--token-auth-file=#{node['kubernetes']['token_file_path']}",
-          "--allow-privileged=true"
+          "--service-node-port-range=30000-32767",
+          "--tls-cert-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
+          "--tls-private-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
+          "--v=2"
         ],
         "volumeMounts" => [
           {
-            "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl/certs",
-            "readOnly" => true
-          },
-          {
-            "name" => "apiserver-certs",
-            "mountPath" => node['kubernetes']['apiserver_ssl_path'],
+            "name" => "kubeconfig",
+            "mountPath" => node['kubernetes']['kubernetes_path'],
             "readOnly" => true
           }
         ],
@@ -403,42 +198,59 @@ kube_apiserver_manifest = {
           "httpGet" => {
             "scheme" => "HTTP",
             "host" => "127.0.0.1",
-            "port" => node['kubernetes']['insecure_port'],
+            "port" => 8080,
             "path" => "/healthz"
           },
           "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         }
-      },
+      }
+    ],
+    "volumes" => [
+      {
+        "name" => "kubeconfig",
+        "hostPath" => {
+          "path" => node['kubernetes']['kubernetes_path']
+        }
+      }
+    ]
+  }
+}
+
+kube_controller_manager_manifest = {
+  "kind" => "Pod",
+  "apiVersion" => "v1",
+  "metadata" => {
+    "namespace" => "kube-system",
+    "name" => "kube-controller-manager"
+  },
+  "spec" => {
+    "hostNetwork" => true,
+    "restartPolicy" => 'Always',
+    "containers" => [
       {
         "name" => "kube-controller-manager",
         "image" => node['kube']['images']['hyperkube'],
         "command" => [
           "/hyperkube",
           "controller-manager",
-          "--allocate-node-cidrs=true",
-          "--cluster-name=#{node['kubernetes']['cluster_name']}",
+          "--address=0.0.0.0",
           "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
-          "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
-          "--service-account-private-key-file=#{node['kubernetes']['service_account_key_path']}",
-          "--root-ca-file=#{node['kubernetes']['apiserver_ssl_base_path']}-ca.pem",
+          "--cluster-name=kubernetes",
+          "--cluster-signing-cert-file=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
+          "--cluster-signing-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "ca-key.pem")}",
+          "--kubeconfig=#{::File.join(node['kubernetes']['kubernetes_path'], "kube-controller-manager.kubeconfig")}",
           "--leader-elect=true",
-          "--kubeconfig=#{node['kubernetes']['client']['kubeconfig_path']}"
+          "--root-ca-file=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
+          "--service-account-private-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "service-account-key.pem")}",
+          "--service-cluster-ip-range=#{node['kubernetes']['service_ip_range']}",
+          "--use-service-account-credentials=true",
+          "--v=2"
         ],
         "volumeMounts" => [
           {
             "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
-            "readOnly" => true
-          },
-          {
-            "name" => "ssl-certs-host",
-            "mountPath" => "/etc/ssl/certs",
-            "readOnly" => true
-          },
-          {
-            "name" => "apiserver-certs",
-            "mountPath" => node['kubernetes']['apiserver_ssl_path'],
+            "mountPath" => node['kubernetes']['kubernetes_path'],
             "readOnly" => true
           }
         ],
@@ -456,23 +268,9 @@ kube_apiserver_manifest = {
     ],
     "volumes" => [
       {
-        "name" => "ssl-certs-host",
-        "hostPath" => {
-          "path" => env_vars['ssl_path']
-        }
-      },
-      {
-        "name" => "etcd-certs",
-        "emptyDir" => {}
-      },
-      {
-        "name" => "apiserver-certs",
-        "emptyDir" => {}
-      },
-      {
         "name" => "kubeconfig",
         "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
+          "path" => node['kubernetes']['kubernetes_path']
         }
       }
     ]
@@ -481,9 +279,8 @@ kube_apiserver_manifest = {
 
 
 node['environment_v2']['set']['kube-master']['hosts'].each do |host|
-  node.default['kubernetes']['static_pods'][host]['flannel'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest'] = kube_apiserver_manifest
+  node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest'] = kube_scheduler_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
   node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
 end

@@ -21,10 +21,10 @@ tftp_manifest = {
   }
 }
 
-env_vars = node['environment_v2']['set']['kea-mysql-data']['vars']
+env_vars = node['environment_v2']['set']['kea']['vars']
 
 # kea nodes
-node['environment_v2']['set']['kea-mysql-data']['hosts'].each do |host|
+node['environment_v2']['set']['kea']['hosts'].each do |host|
 
   nextserver = node['environment_v2']['host'][host]['ip']['store']
 

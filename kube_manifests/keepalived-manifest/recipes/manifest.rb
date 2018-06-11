@@ -43,6 +43,7 @@ node['environment_v2']['set'].each do |set, c|
 
       instance = {
         'state' => 'BACKUP',
+        'strict_mode' => 'off',
         'virtual_router_id' => id,
         'interface' => interface,
         'priority' => 100,
