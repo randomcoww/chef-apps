@@ -35,6 +35,9 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
   }
 }.merge(services))
 
+backend = node['environment_v2']['set']['kube-master']['hosts'].map { |host|
+  "  server #{host} #{node['environment_v2']['host'][host]['ip']['store']}:#{node['environment_v2']['port']['kube-master']} check"
+}.join($/)
 
 haproxy_template = <<-EOF
 frontend apiserver
@@ -42,8 +45,7 @@ frontend apiserver
   bind *:#{node['environment_v2']['port']['kube-master']}
   maxconn 2000
 backend apiserver
-  {{range $nodename, $n := $.Nodes}}{{if $n.Address}}server {{$nodename}} {{$n.Address}}:#{node['environment_v2']['port']['kube-master']} check{{end}}
-  {{end}}
+#{backend}
 {{range $name, $s := $.Services}}{{range $portname, $p := $s.Ports}}frontend {{$name}}_{{$portname}}
   default_backend {{$name}}_{{$portname}}
   bind *:{{$p.TargetPort}}
