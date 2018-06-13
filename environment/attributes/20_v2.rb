@@ -62,7 +62,7 @@ node.default['environment_v2']['set']['matchbox'] = {
     'ssl_path' => "/etc/ssl/certs"
   },
   'vip' => {
-    'store' => "192.168.126.245",
+    'store' => "192.168.126.242",
   },
   'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['matchbox-http']}"
 }
@@ -92,9 +92,9 @@ node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     "controller-0",
   ],
-  'vars' => {
-    'ssl_path' => "/etc/ssl/certs"
-  },
+  # 'vars' => {
+  #   'ssl_path' => "/etc/ssl/certs"
+  # },
   'vip' => {
     'store' => "192.168.126.245",
   },
@@ -103,37 +103,39 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    # 'ns1',
-    # 'ns2',
-  ]
-}
-
-node.default['environment_v2']['set']['haproxy'] = {
-  'hosts' => [
-    'controller-0',
+    "worker-0",
   ],
   'vip' => {
-    'store' => "192.168.126.242",
-  },
-  'lb' => {
-    # 'matchbox' => {
-    #   "http" => {
-    #     "hostport" => 48080,
-    #     "port" => node['environment_v2']['port']['matchbox-http'],
-    #   },
-    #   "rpc" => {
-    #     "hostport" => 48081,
-    #     "port" => node['environment_v2']['port']['matchbox-rpc'],
-    #   }
-    # },
-    # 'etcd' => {
-    #   'default' => {
-    #     "hostport" => 2379,
-    #     "port" => node['environment_v2']['port']['etcd'],
-    #   }
-    # }
+    'store' => "192.168.126.246",
   }
 }
+
+# node.default['environment_v2']['set']['haproxy'] = {
+#   'hosts' => [
+#     'controller-0',
+#   ],
+#   'vip' => {
+#     'store' => "192.168.126.246",
+#   },
+#   'lb' => {
+#     # 'matchbox' => {
+#     #   "http" => {
+#     #     "hostport" => 48080,
+#     #     "port" => node['environment_v2']['port']['matchbox-http'],
+#     #   },
+#     #   "rpc" => {
+#     #     "hostport" => 48081,
+#     #     "port" => node['environment_v2']['port']['matchbox-rpc'],
+#     #   }
+#     # },
+#     # 'etcd' => {
+#     #   'default' => {
+#     #     "hostport" => 2379,
+#     #     "port" => node['environment_v2']['port']['etcd'],
+#     #   }
+#     # }
+#   }
+# }
 
 
 ##
@@ -157,6 +159,15 @@ node.default['environment_v2']['host']['provisioner-0'] = {
 node.default['environment_v2']['host']['controller-0'] = {
   'ip' => {
     'store' => "192.168.126.219",
+  },
+  'if' => {
+    'store' => "eth0",
+  }
+}
+
+node.default['environment_v2']['host']['worker-0'] = {
+  'ip' => {
+    'store' => "192.168.126.220",
   },
   'if' => {
     'store' => "eth0",

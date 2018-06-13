@@ -1,14 +1,15 @@
 host_count = node['environment_v2']['set']['kube-master']['hosts'].length
 
-etcd_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
-    "https://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['etcd']}"
-  }.join(",")
+# etcd_cluster = node['environment_v2']['set']['etcd']['hosts'].map { |e|
+#     "https://#{node['environment_v2']['host'][e]['ip']['store']}:#{node['environment_v2']['port']['etcd']}"
+#   }.join(",")
+etcd_cluster = "https://127.0.0.1:#{node['environment_v2']['port']['etcd']}"
 
 kube_scheduler_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    "namespace" => "kube-system",
+    # "namespace" => "kube-system",
     "name" => "kube-scheduler"
   },
   "spec" => {
@@ -54,97 +55,12 @@ kube_scheduler_manifest = {
   }
 }
 
-kube_haproxy_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    "namespace" => "kube-system",
-    "name" => "kube-haproxy"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "haproxy",
-        "image" => node['kube']['images']['haproxy'],
-        "args" => [
-          "haproxy",
-          "-V",
-          "-f",
-          node['kube_manifests']['haproxy']['config_path'],
-          "-p",
-          node['kube_manifests']['haproxy']['pid_path'],
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
-          },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          }
-        ]
-      },
-      {
-        "name" => "kube-haproxy",
-        "image" => node['kube']['images']['kube_haproxy'],
-        "env" => [
-          {
-            "name" => "CONFIG",
-            "value" => node['kube_manifests']['haproxy']['template']
-          }
-        ],
-        "args" => [
-          "-kubeconfig",
-          ::File.join(node['kubernetes']['kubernetes_path'], "kube-haproxy.kubeconfig"),
-          "-output",
-          node['kube_manifests']['haproxy']['config_path'],
-          "-pid",
-          node['kube_manifests']['haproxy']['pid_path']
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
-          },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
-          },
-          {
-            "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['kubernetes_path'],
-            "readOnly" => true
-          }
-        ]
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "haproxy-config",
-        "emptyDir" => {}
-      },
-      {
-        "name" => "haproxy-pid",
-        "emptyDir" => {}
-      },
-      {
-        "name" => "kubeconfig",
-        "hostPath" => {
-          "path" => node['kubernetes']['kubernetes_path']
-        }
-      }
-    ]
-  }
-}
 
 kube_apiserver_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    "namespace" => "kube-system",
+    # "namespace" => "kube-system",
     "name" => "kube-apiserver"
   },
   "spec" => {
@@ -174,7 +90,7 @@ kube_apiserver_manifest = {
           "--etcd-keyfile=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
           "--etcd-servers=#{etcd_cluster}",
           "--event-ttl=1h",
-          "--experimental-encryption-provider-config=#{::File.join(node['kubernetes']['kubernetes_path'], "encryption-config.yaml")}",
+          # "--experimental-encryption-provider-config=#{::File.join(node['kubernetes']['kubernetes_path'], "encryption-config.yaml")}",
           "--kubelet-certificate-authority=#{::File.join(node['kubernetes']['kubernetes_path'], "ca.pem")}",
           "--kubelet-client-certificate=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
           "--kubelet-client-key=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
@@ -185,6 +101,7 @@ kube_apiserver_manifest = {
           "--service-node-port-range=30000-32767",
           "--tls-cert-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
           "--tls-private-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
+          "--storage-backend=etcd3",
           "--v=2"
         ],
         "volumeMounts" => [
@@ -217,11 +134,12 @@ kube_apiserver_manifest = {
   }
 }
 
+
 kube_controller_manager_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    "namespace" => "kube-system",
+    # "namespace" => "kube-system",
     "name" => "kube-controller-manager"
   },
   "spec" => {
@@ -282,5 +200,4 @@ node['environment_v2']['set']['kube-master']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['kube-apiserver_manifest'] = kube_apiserver_manifest
   node.default['kubernetes']['static_pods'][host]['kube-controller-manager_manifest'] = kube_controller_manager_manifest
   node.default['kubernetes']['static_pods'][host]['kube-scheduler_manifest'] = kube_scheduler_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
 end

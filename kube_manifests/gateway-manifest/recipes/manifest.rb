@@ -5,8 +5,7 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
   if_wan = node['environment_v2']['host'][host]['if']['wan']
   if_sync = node['environment_v2']['host'][host]['if']['sync']
 
-  vip_haproxy = node['environment_v2']['set']['haproxy']['vip']['store']
-  vip_apiserver = node['environment_v2']['set']['kube-master']['vip']['store']
+  vip_haproxy = node['environment_v2']['set']['kube-worker']['vip']['store']
 
   ##https://stosb.com/blog/explaining-my-configs-nftables/
 
@@ -19,7 +18,6 @@ define if_internal = {#{if_lan}, #{if_store}, #{if_sync}}
 define if_external = #{if_wan}
 
 define vip_haproxy = #{vip_haproxy}
-define vip_apiserver = #{vip_apiserver}
 
 table ip filter {
   chain base_checks {
@@ -74,9 +72,7 @@ table ip filter {
     iifname $if_internal udp dport @udp_fwd accept;
 
     iifname $if_internal ip daddr $vip_haproxy accept;
-    iifname $if_internal ip daddr $vip_apiserver accept;
-
-    ip daddr $vip_apiserver ct status dnat accept;
+    ip daddr $vip_haproxy ct status dnat accept;
   }
 
   chain output {
@@ -94,7 +90,7 @@ table ip nat {
 
   chain prerouting {
     type nat hook prerouting priority 0; policy accept;
-    tcp dport @tcp_dnat dnat $vip_apiserver;
+    tcp dport @tcp_dnat dnat $vip_haproxy;
   }
 
   chain input {

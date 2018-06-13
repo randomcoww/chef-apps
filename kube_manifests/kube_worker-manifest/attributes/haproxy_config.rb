@@ -1,5 +1,8 @@
 services = {}
 
+node.default['kube_manifests']['haproxy']['config_path'] = '/etc/haproxy/haproxy.cfg'
+node.default['kube_manifests']['haproxy']['pid_path'] = '/var/run/haproxy.pid'
+
 haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
     # 'user' => 'haproxy',
@@ -14,7 +17,7 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
     ],
     'maxconn' => 1024,
     # 'master-worker' => 'exit-on-failure',
-    'pidfile' => '/var/run/haproxy.pid'
+    'pidfile' => node['kube_manifests']['haproxy']['pid_path']
   },
   'defaults' => {
     'timeout' => [
@@ -39,7 +42,7 @@ frontend apiserver
   bind *:#{node['environment_v2']['port']['kube-master']}
   maxconn 2000
 backend apiserver
-  {{range $nodename, $n := $.Nodes}}{{if $n.Address}}server {{$nodename}} {{$n.Address}}:#{node['environment_v2']['port']['kube-master-internal']} check{{end}}
+  {{range $nodename, $n := $.Nodes}}{{if $n.Address}}server {{$nodename}} {{$n.Address}}:#{node['environment_v2']['port']['kube-master']} check{{end}}
   {{end}}
 {{range $name, $s := $.Services}}{{range $portname, $p := $s.Ports}}frontend {{$name}}_{{$portname}}
   default_backend {{$name}}_{{$portname}}
@@ -53,5 +56,3 @@ EOF
 
 # node.default['kube_manifests']['haproxy']['config'] = haproxy_config
 node.default['kube_manifests']['haproxy']['template'] = [haproxy_config, haproxy_template].join($/)
-node.default['kube_manifests']['haproxy']['config_path'] = '/etc/haproxy/haproxy.cfg'
-node.default['kube_manifests']['haproxy']['pid_path'] = '/run/haproxy.pid'
