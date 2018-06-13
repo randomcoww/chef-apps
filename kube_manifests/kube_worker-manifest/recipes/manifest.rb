@@ -20,19 +20,41 @@ flannel_manifest = {
           "/opt/bin/flanneld",
           "--ip-masq",
           "--kube-subnet-mgr",
-          "--kubeconfig-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kube-flannel.kubeconfig")}"
+          "--kubeconfig-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubelet.kubeconfig")}"
         ],
         "securityContext" => {
-          "capabilities" => {
-            "add" => [
-              "NET_ADMIN"
-            ]
-          }
+          "privileged" => true
         },
+        "env" => [
+          {
+            "name" => "POD_NAME",
+            "valueFrom" => {
+              "fieldRef" => {
+                "fieldPath" => "metadata.name"
+              }
+            }
+          },
+          {
+            "name" => "POD_NAMESPACE",
+            "valueFrom" => {
+              "fieldRef" => {
+                "fieldPath" => "metadata.namespace"
+              }
+            }
+          }
+        ],
         "volumeMounts" => [
           {
+            "name" => "run",
+            "mountPath" => "/run",
+          },
+          {
+            "name" => "flannel-cfg",
+            "mountPath" => "/etc/kube-flannel",
+          },
+          {
             "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['client']['kubeconfig_path'],
+            "mountPath" => node['kubernetes']['kubernetes_path'],
             "readOnly" => true
           }
         ]
@@ -40,9 +62,21 @@ flannel_manifest = {
     ],
     "volumes" => [
       {
+        "name" => "run",
+        "hostPath" => {
+          "path" => "/run"
+        }
+      },
+      {
+        "name" => "flannel-cfg",
+        "hostPath" => {
+          "path" => "/etc/kube-flannel"
+        }
+      },
+      {
         "name" => "kubeconfig",
         "hostPath" => {
-          "path" => node['kubernetes']['client']['kubeconfig_path']
+          "path" => node['kubernetes']['kubernetes_path']
         }
       }
     ]
@@ -70,11 +104,7 @@ kube_proxy_manifest = {
           "--config=#{::File.join(node['kubernetes']['kubernetes_path'], "kube-proxy-config.yaml")}"
         ],
         "securityContext" => {
-          "capabilities" => {
-            "add" => [
-              "NET_ADMIN"
-            ]
-          }
+          "privileged" => true
         },
         "volumeMounts" => [
           {
@@ -119,7 +149,7 @@ kube_haproxy_manifest = {
         ],
         "args" => [
           "-kubeconfig",
-          ::File.join(node['kubernetes']['kubernetes_path'], "kube-haproxy.kubeconfig"),
+          ::File.join(node['kubernetes']['kubernetes_path'], "kubelet.kubeconfig"),
           "-output",
           node['kube_manifests']['haproxy']['config_path'],
           "-pid",
