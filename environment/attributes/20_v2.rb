@@ -19,7 +19,7 @@ node.default['environment_v2']['domain']['host'] = 'host'
 ## ports
 ##
 
-node.default['environment_v2']['port']['kube-master'] = 56443
+node.default['environment_v2']['port']['controller'] = 56443
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
 node.default['environment_v2']['port']['etcd'] = 52379
@@ -92,13 +92,10 @@ node.default['environment_v2']['set']['kube-master'] = {
   'hosts' => [
     "controller-0",
   ],
-  # 'vars' => {
-  #   'ssl_path' => "/etc/ssl/certs"
-  # },
   'vip' => {
     'store' => "192.168.126.245",
   },
-  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['kube-master']}"
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['controller']}"
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
@@ -166,9 +163,6 @@ node.default['environment_v2']['host']['controller-0'] = {
 }
 
 node.default['environment_v2']['host']['worker-0'] = {
-  'ip' => {
-    'store' => "192.168.126.220",
-  },
   'if' => {
     'store' => "eth0",
   }

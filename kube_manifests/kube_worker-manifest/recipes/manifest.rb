@@ -144,25 +144,25 @@ kube_haproxy_manifest = {
         "env" => [
           {
             "name" => "CONFIG",
-            "value" => node['kube_manifests']['haproxy']['template']
+            "value" => node['kube_worker']['haproxy']['template']
           }
         ],
         "args" => [
           "-kubeconfig",
           ::File.join(node['kubernetes']['kubernetes_path'], "kubelet.kubeconfig"),
           "-output",
-          node['kube_manifests']['haproxy']['config_path'],
+          node['kube_worker']['haproxy']['config_path'],
           "-pid",
-          node['kube_manifests']['haproxy']['pid_path']
+          node['kube_worker']['haproxy']['pid_path']
         ],
         "volumeMounts" => [
           {
             "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
+            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
           },
           {
             "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
           },
           {
             "name" => "kubeconfig",
@@ -178,18 +178,18 @@ kube_haproxy_manifest = {
           "haproxy",
           "-V",
           "-f",
-          node['kube_manifests']['haproxy']['config_path'],
+          node['kube_worker']['haproxy']['config_path'],
           "-p",
-          node['kube_manifests']['haproxy']['pid_path'],
+          node['kube_worker']['haproxy']['pid_path'],
         ],
         "volumeMounts" => [
           {
             "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['config_path'])
+            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
           },
           {
             "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_manifests']['haproxy']['pid_path'])
+            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
           }
         ]
       }

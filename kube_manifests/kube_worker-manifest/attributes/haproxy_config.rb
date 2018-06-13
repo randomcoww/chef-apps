@@ -1,7 +1,10 @@
-services = {}
+node.default['kube_worker']['haproxy']['config_path'] = '/etc/haproxy/haproxy.cfg'
+node.default['kube_worker']['haproxy']['pid_path'] = '/var/run/haproxy.pid'
 
-node.default['kube_manifests']['haproxy']['config_path'] = '/etc/haproxy/haproxy.cfg'
-node.default['kube_manifests']['haproxy']['pid_path'] = '/var/run/haproxy.pid'
+backend = {}
+node['environment_v2']['set']['kube-master']['hosts'].each do |host|
+  backend["server #{host}"] = "#{node['environment_v2']['host'][host]['ip']['store']}:#{node['environment_v2']['port']['controller']} check"
+end
 
 haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
   'global' => {
@@ -17,7 +20,7 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
     ],
     'maxconn' => 1024,
     # 'master-worker' => 'exit-on-failure',
-    'pidfile' => node['kube_manifests']['haproxy']['pid_path']
+    'pidfile' => node['kube_worker']['haproxy']['pid_path']
   },
   'defaults' => {
     'timeout' => [
@@ -32,20 +35,16 @@ haproxy_config = HaproxyHelper::ConfigGenerator.generate_from_hash({
       'dontlognull',
       'redispatch'
     ],
-  }
-}.merge(services))
-
-backend = node['environment_v2']['set']['kube-master']['hosts'].map { |host|
-  "  server #{host} #{node['environment_v2']['host'][host]['ip']['store']}:#{node['environment_v2']['port']['kube-master']} check"
-}.join($/)
+  },
+  'frontend controller' => {
+    'default_backend' => 'controller',
+    'bind' => "*:#{node['environment_v2']['port']['controller']}",
+    'maxconn' => 2000
+  },
+  'backend controller' => backend
+})
 
 haproxy_template = <<-EOF
-frontend apiserver
-  default_backend apiserver
-  bind *:#{node['environment_v2']['port']['kube-master']}
-  maxconn 2000
-backend apiserver
-#{backend}
 {{range $name, $s := $.Services}}{{range $portname, $p := $s.Ports}}frontend {{$name}}_{{$portname}}
   default_backend {{$name}}_{{$portname}}
   bind *:{{$p.TargetPort}}
@@ -56,5 +55,5 @@ backend {{$name}}_{{$portname}}
 {{end}}{{end}}
 EOF
 
-# node.default['kube_manifests']['haproxy']['config'] = haproxy_config
-node.default['kube_manifests']['haproxy']['template'] = [haproxy_config, haproxy_template].join($/)
+# node.default['kube_worker']['haproxy']['config'] = haproxy_config
+node.default['kube_worker']['haproxy']['template'] = [haproxy_config, haproxy_template].join($/)

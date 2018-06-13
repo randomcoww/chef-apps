@@ -19,7 +19,7 @@ kube_config = {
       "name" => node['kubernetes']['cluster_name'],
       "cluster" => {
         "certificate-authority" => node['kubernetes']['ca_path'],
-        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['port']['kube-master']}"
+        "server" => "https://#{node['environment_v2']['set']['haproxy']['vip']['store']}:#{node['environment_v2']['port']['controller']}"
       }
     }
   ],
