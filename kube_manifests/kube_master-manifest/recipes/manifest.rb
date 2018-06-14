@@ -73,7 +73,7 @@ kube_apiserver_manifest = {
         "command" => [
           "/hyperkube",
           "apiserver",
-          "--secure-port=#{node['environment_v2']['port']['controller']}",
+          "--secure-port=#{node['environment_v2']['port']['controller-internal']}",
           "--allow-privileged=true",
           "--apiserver-count=#{host_count}",
           "--audit-log-maxage=30",

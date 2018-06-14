@@ -217,5 +217,5 @@ kube_haproxy_manifest = {
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|
   node.default['kubernetes']['static_pods'][host]['flannel'] = flannel_manifest
   node.default['kubernetes']['static_pods'][host]['kube-proxy_manifest'] = kube_proxy_manifest
-  node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
+  # node.default['kubernetes']['static_pods'][host]['kube-haproxy_manifest'] = kube_haproxy_manifest
 end
