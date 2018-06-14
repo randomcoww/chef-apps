@@ -4,7 +4,7 @@
 
 node.default['kubernetes']['version'] = '1.10.3'
 node.default['kubernetes']['cluster_name'] = 'kube_cluster'
-node.default['kubernetes']['cluster_domain'] = 'kubernetes.default'
+node.default['kubernetes']['cluster_domain'] = 'cluster.local'
 
 ## pod network
 node.default['kubernetes']['cluster_cidr'] = '10.200.0.0/16'

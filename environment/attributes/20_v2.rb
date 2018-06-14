@@ -1,6 +1,7 @@
 node.default['environment_v2']['subnet']['lan'] = "192.168.62.0/23"
 node.default['environment_v2']['subnet']['store'] = "192.168.126.0/23"
 node.default['environment_v2']['subnet']['sync'] = "192.168.190.0/23"
+node.default['environment_v2']['subnet']['metallb'] = "192.168.127.128/25"
 
 node.default['environment_v2']['netmask']['lan'] = '255.255.254.0'
 node.default['environment_v2']['netmask']['store'] = '255.255.254.0'
@@ -114,10 +115,7 @@ node.default['environment_v2']['set']['kube-master'] = {
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
     "worker-0",
-  ],
-  # 'vip' => {
-  #   'store' => "192.168.126.246",
-  # }
+  ]
 }
 
 
