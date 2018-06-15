@@ -127,91 +127,91 @@ kube_proxy_manifest = {
 }
 
 
-kube_haproxy_manifest = {
-  "apiVersion" => "v1",
-  "kind" => "Pod",
-  "metadata" => {
-    # "namespace" => "kube-system",
-    "name" => "kube-haproxy"
-  },
-  "spec" => {
-    "restartPolicy" => "Always",
-    "hostNetwork" => true,
-    "containers" => [
-      {
-        "name" => "kube-haproxy",
-        "image" => node['kube']['images']['kube_haproxy'],
-        "env" => [
-          {
-            "name" => "CONFIG",
-            "value" => node['kube_worker']['haproxy']['template']
-          }
-        ],
-        "args" => [
-          "-kubeconfig",
-          ::File.join(node['kubernetes']['kubernetes_path'], "kubelet.kubeconfig"),
-          "-output",
-          node['kube_worker']['haproxy']['config_path'],
-          "-pid",
-          node['kube_worker']['haproxy']['pid_path']
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
-          },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
-          },
-          {
-            "name" => "kubeconfig",
-            "mountPath" => node['kubernetes']['kubernetes_path'],
-            "readOnly" => true
-          }
-        ]
-      },
-      {
-        "name" => "haproxy",
-        "image" => node['kube']['images']['haproxy'],
-        "args" => [
-          "haproxy",
-          "-V",
-          "-f",
-          node['kube_worker']['haproxy']['config_path'],
-          "-p",
-          node['kube_worker']['haproxy']['pid_path'],
-        ],
-        "volumeMounts" => [
-          {
-            "name" => "haproxy-config",
-            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
-          },
-          {
-            "name" => "haproxy-pid",
-            "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
-          }
-        ]
-      }
-    ],
-    "volumes" => [
-      {
-        "name" => "haproxy-config",
-        "emptyDir" => {}
-      },
-      {
-        "name" => "haproxy-pid",
-        "emptyDir" => {}
-      },
-      {
-        "name" => "kubeconfig",
-        "hostPath" => {
-          "path" => node['kubernetes']['kubernetes_path']
-        }
-      }
-    ]
-  }
-}
+# kube_haproxy_manifest = {
+#   "apiVersion" => "v1",
+#   "kind" => "Pod",
+#   "metadata" => {
+#     # "namespace" => "kube-system",
+#     "name" => "kube-haproxy"
+#   },
+#   "spec" => {
+#     "restartPolicy" => "Always",
+#     "hostNetwork" => true,
+#     "containers" => [
+#       {
+#         "name" => "kube-haproxy",
+#         "image" => node['kube']['images']['kube_haproxy'],
+#         "env" => [
+#           {
+#             "name" => "CONFIG",
+#             "value" => node['kube_worker']['haproxy']['template']
+#           }
+#         ],
+#         "args" => [
+#           "-kubeconfig",
+#           ::File.join(node['kubernetes']['kubernetes_path'], "kubelet.kubeconfig"),
+#           "-output",
+#           node['kube_worker']['haproxy']['config_path'],
+#           "-pid",
+#           node['kube_worker']['haproxy']['pid_path']
+#         ],
+#         "volumeMounts" => [
+#           {
+#             "name" => "haproxy-config",
+#             "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
+#           },
+#           {
+#             "name" => "haproxy-pid",
+#             "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
+#           },
+#           {
+#             "name" => "kubeconfig",
+#             "mountPath" => node['kubernetes']['kubernetes_path'],
+#             "readOnly" => true
+#           }
+#         ]
+#       },
+#       {
+#         "name" => "haproxy",
+#         "image" => node['kube']['images']['haproxy'],
+#         "args" => [
+#           "haproxy",
+#           "-V",
+#           "-f",
+#           node['kube_worker']['haproxy']['config_path'],
+#           "-p",
+#           node['kube_worker']['haproxy']['pid_path'],
+#         ],
+#         "volumeMounts" => [
+#           {
+#             "name" => "haproxy-config",
+#             "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['config_path'])
+#           },
+#           {
+#             "name" => "haproxy-pid",
+#             "mountPath" => ::File.dirname(node['kube_worker']['haproxy']['pid_path'])
+#           }
+#         ]
+#       }
+#     ],
+#     "volumes" => [
+#       {
+#         "name" => "haproxy-config",
+#         "emptyDir" => {}
+#       },
+#       {
+#         "name" => "haproxy-pid",
+#         "emptyDir" => {}
+#       },
+#       {
+#         "name" => "kubeconfig",
+#         "hostPath" => {
+#           "path" => node['kubernetes']['kubernetes_path']
+#         }
+#       }
+#     ]
+#   }
+# }
 
 
 node['environment_v2']['set']['kube-worker']['hosts'].each do |host|

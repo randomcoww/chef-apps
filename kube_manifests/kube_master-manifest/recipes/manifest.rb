@@ -32,7 +32,7 @@ kube_scheduler_manifest = {
             "port" => 10251,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 15,
+          "initialDelaySeconds" => 60,
           "timeoutSeconds" => 15
         },
         "volumeMounts": [
@@ -119,7 +119,7 @@ kube_apiserver_manifest = {
             "port" => 8080,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 15,
+          "initialDelaySeconds" => 60,
           "timeoutSeconds" => 15
         }
       }
@@ -181,7 +181,7 @@ kube_controller_manager_manifest = {
             "port" => 10252,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 15,
+          "initialDelaySeconds" => 60,
           "timeoutSeconds" => 15
         }
       }
