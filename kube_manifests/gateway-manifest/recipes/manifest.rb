@@ -3,7 +3,6 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
   if_lan = node['environment_v2']['host'][host]['if']['lan']
   if_store = node['environment_v2']['host'][host]['if']['store']
   if_wan = node['environment_v2']['host'][host]['if']['wan']
-  if_sync = node['environment_v2']['host'][host]['if']['sync']
 
   ip_passthrough = node['environment_v2']['set']['kube-master']['vip']['store']
   subnet_metallb = node['environment_v2']['subnet']['metallb']
@@ -12,7 +11,7 @@ node['environment_v2']['set']['gateway']['hosts'].each do |host|
 
   nftables_rules =
 <<-EOF
-define if_internal = {#{if_lan}, #{if_store}, #{if_sync}}
+define if_internal = {#{if_lan}, #{if_store}}
 define if_external = #{if_wan}
 
 table ip filter {
@@ -107,60 +106,6 @@ table ip nat {
 ;
 EOF
 
-
-  conntrack_config = KeepalivedHelper::ConfigGenerator.generate_from_hash({
-    "Sync" => [
-      {
-        "Mode FTFW" => [
-          "DisableExternalCache" => "on"
-        ],
-        "Multicast Default" => [
-          {
-            "IPv4_address" => "225.0.0.51",
-            "Group" => 3781,
-            # "IPv4_interface" => node['environment_v2']['host'][host]['ip']['sync'],
-            "Interface" => if_sync,
-            "SndSocketBuffer" => 1249280,
-            "RcvSocketBuffer" => 1249280,
-            "Checksum" => "on",
-          }
-        ]
-      }
-    ],
-    "General" => [
-      {
-        "HashSize" => 32768,
-        "HashLimit" => 131072,
-        "LogFile" => "/dev/stdout",
-        "LockFile" => "/var/lock/conntrack.lock",
-        "NetlinkBufferSize" => 2097152,
-        "NetlinkBufferSizeMaxGrowth" => 8388608,
-        "UNIX" => [
-          {
-            "Path" => "/var/run/conntrackd.ctl",
-            "Backlog" => 20
-          }
-        ],
-        "Filter From Kernelspace" => [
-          {
-            # "Protocol Accept" => [
-            #   "icmp",
-            #   "TCP",
-            #   "UDP",
-            # ],
-            "Address Ignore" => ([
-              "127.0.0.1",
-            ] +
-              # node['environment_v2']['host'][host]['ip'].values +
-              node['environment_v2']['set']['gateway']['vip'].values
-            ).map { |e| "IPv4_address #{e}" }
-          }
-        ]
-      }
-    ]
-  })
-
-
   gateway_manifest = {
     "apiVersion" => "v1",
     "kind" => "Pod",
@@ -168,9 +113,9 @@ EOF
       "name" => "nftables"
     },
     "spec" => {
-      "restartPolicy" => "Always",
+      "restartPolicy" => "OnFailure",
       "hostNetwork" => true,
-      "initContainers" => [
+      "containers" => [
         {
           "name" => "nftables",
           "image" => node['kube']['images']['nftables'],
@@ -185,25 +130,6 @@ EOF
             {
               "name" => "CONFIG",
               "value" => nftables_rules
-            }
-          ]
-        }
-      ],
-      "containers" => [
-        {
-          "name" => "conntrack",
-          "image" => node['kube']['images']['conntrack'],
-          "securityContext" => {
-            "capabilities" => {
-              "add" => [
-                "NET_ADMIN"
-              ]
-            }
-          },
-          "env" => [
-            {
-              "name" => "CONFIG",
-              "value" => conntrack_config
             }
           ]
         }
