@@ -102,6 +102,7 @@ kube_apiserver_manifest = {
           "--tls-cert-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes.pem")}",
           "--tls-private-key-file=#{::File.join(node['kubernetes']['kubernetes_path'], "kubernetes-key.pem")}",
           "--storage-backend=etcd3",
+          "--kubelet-preferred-address-types=InternalIP,InternalDNS",
           "--v=2"
         ],
         "volumeMounts" => [

@@ -114,7 +114,7 @@ node.default['environment_v2']['set']['kube-master'] = {
 
 node.default['environment_v2']['set']['kube-worker'] = {
   'hosts' => [
-    "worker-0",
+    "worker",
   ]
 }
 
@@ -146,7 +146,7 @@ node.default['environment_v2']['host']['controller-0'] = {
   }
 }
 
-node.default['environment_v2']['host']['worker-0'] = {
+node.default['environment_v2']['host']['worker'] = {
   'if' => {
     'store' => "eth0",
   }
