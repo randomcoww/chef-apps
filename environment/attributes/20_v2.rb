@@ -38,7 +38,7 @@ node.default['environment_v2']['port']['unbound-dns'] = 53
 
 node.default['environment_v2']['set']['gateway'] = {
   'hosts' => [
-    'provisioner-0',
+    'provisioner',
   ],
   'vip' => {
     'store' => "192.168.126.240",
@@ -48,7 +48,7 @@ node.default['environment_v2']['set']['gateway'] = {
 
 node.default['environment_v2']['set']['dns'] = {
   'hosts' => [
-    'provisioner-0',
+    'provisioner',
   ],
   'vip' => {
     'store' => "192.168.126.244",
@@ -59,7 +59,7 @@ node.default['environment_v2']['set']['dns'] = {
 
 node.default['environment_v2']['set']['kea'] = {
   'hosts' => [
-    'provisioner-0',
+    'provisioner',
   ],
   'vars' => {
     'mount_path' => "/data/kea",
@@ -69,7 +69,7 @@ node.default['environment_v2']['set']['kea'] = {
 
 node.default['environment_v2']['set']['matchbox'] = {
   'hosts' => [
-    'provisioner-0',
+    'provisioner',
   ],
   'vars' => {
     'mount_path' => "/data/matchbox",
@@ -123,12 +123,12 @@ node.default['environment_v2']['set']['kube-worker'] = {
 ## hosts
 ##
 
-node.default['environment_v2']['host']['provisioner-0'] = {
-  'ip' => {
-    'store' => "192.168.126.218",
-    'lan' => "192.168.62.218",
-    'sync' => "192.168.190.218",
-  },
+node.default['environment_v2']['host']['provisioner'] = {
+  # 'ip' => {
+  #   'store' => "192.168.126.218",
+  #   'lan' => "192.168.62.218",
+  #   'sync' => "192.168.190.218",
+  # },
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
@@ -147,9 +147,9 @@ node.default['environment_v2']['host']['controller-0'] = {
 }
 
 node.default['environment_v2']['host']['worker'] = {
-  'if' => {
-    'store' => "eth0",
-  }
+  # 'if' => {
+  #   'store' => "eth0",
+  # }
 }
 
 
@@ -160,21 +160,23 @@ node.default['environment_v2']['host']['worker'] = {
 node.default['environment_v2']['host']['store-0'] = {
   'ip' => {
     'store' => '192.168.126.251',
-    'lan' => '192.168.62.251',
+    # 'lan' => '192.168.62.251',
   },
-  'if' => {
-    'store' => "store_bridge",
-    'lan' => "lan_bridge",
-  }
+  # 'if' => {
+  #   'store' => "store_bridge",
+  #   'lan' => "lan_bridge",
+  # }
 }
 
 node.default['environment_v2']['host']['store-1'] = {
   'ip' => {
     'store' => '192.168.126.252',
+    # 'lan' => '192.168.62.252',
   },
-  'if' => {
-    'store' => "store_bridge",
-  },
+  # 'if' => {
+  #   'store' => "store_bridge",
+  #   'lan' => "lan_bridge",
+  # },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",
