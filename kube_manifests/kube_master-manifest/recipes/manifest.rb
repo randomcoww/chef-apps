@@ -9,7 +9,7 @@ kube_scheduler_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    # "namespace" => "kube-system",
+    "namespace" => "kube-system",
     "name" => "kube-scheduler"
   },
   "spec" => {
@@ -32,7 +32,7 @@ kube_scheduler_manifest = {
             "port" => 10251,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 60,
+          "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         },
         "volumeMounts": [
@@ -60,7 +60,7 @@ kube_apiserver_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    # "namespace" => "kube-system",
+    "namespace" => "kube-system",
     "name" => "kube-apiserver"
   },
   "spec" => {
@@ -119,7 +119,7 @@ kube_apiserver_manifest = {
             "port" => 8080,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 60,
+          "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         }
       }
@@ -140,7 +140,7 @@ kube_controller_manager_manifest = {
   "kind" => "Pod",
   "apiVersion" => "v1",
   "metadata" => {
-    # "namespace" => "kube-system",
+    "namespace" => "kube-system",
     "name" => "kube-controller-manager"
   },
   "spec" => {
@@ -181,7 +181,7 @@ kube_controller_manager_manifest = {
             "port" => 10252,
             "path" => "/healthz"
           },
-          "initialDelaySeconds" => 60,
+          "initialDelaySeconds" => 15,
           "timeoutSeconds" => 15
         }
       }

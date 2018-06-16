@@ -7,7 +7,7 @@ flannel_manifest = {
   "kind" => "Pod",
   "metadata" => {
     "name" => "kube-flannel",
-    # "namespace" => "kube-system",
+    "namespace" => "kube-system",
   },
   "spec" => {
     "restartPolicy" => "Always",
@@ -89,7 +89,7 @@ kube_proxy_manifest = {
   "kind" => "Pod",
   "metadata" => {
     "name" => "kube-proxy",
-    # "namespace": "kube-system"
+    "namespace": "kube-system"
   },
   "spec" => {
     "restartPolicy" => "Always",
