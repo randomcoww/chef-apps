@@ -29,7 +29,6 @@ node.default['environment_v2']['port']['matchbox-rpc-internal'] = 58081
 node.default['environment_v2']['port']['etcd'] = 52379
 node.default['environment_v2']['port']['unbound-dns'] = 53
 
-
 ##
 ## sets
 ##
@@ -45,14 +44,14 @@ node.default['environment_v2']['set']['gateway'] = {
 }
 
 node.default['environment_v2']['set']['dns'] = {
-  'hosts' => [
-    'provisioner',
-  ],
+  # 'hosts' => [
+  #   'provisioner',
+  # ],
   'vip' => {
-    'store' => "192.168.126.244",
-    'lan' => "192.168.62.244",
+    'store' => "192.168.127.254",
+    'lan' => "192.168.127.254",
   },
-  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['unbound-dns']}"
+  # 'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['unbound-dns']}"
 }
 
 node.default['environment_v2']['set']['kea'] = {

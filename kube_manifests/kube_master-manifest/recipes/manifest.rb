@@ -18,10 +18,9 @@ kube_scheduler_manifest = {
     "containers" => [
       {
         "name" => "kube-scheduler",
-        "image" => node['kube']['images']['hyperkube'],
+        "image" => node['kube']['images']['kube-scheduler'],
         "command" => [
-          "/hyperkube",
-          "scheduler",
+          "kube-scheduler",
           "--config=#{::File.join(node['kubernetes']['kubernetes_path'], "kube-scheduler.yaml")}",
           "--v=2"
         ],
@@ -69,10 +68,9 @@ kube_apiserver_manifest = {
     "containers" => [
       {
         "name" => "kube-apiserver",
-        "image" => node['kube']['images']['hyperkube'],
+        "image" => node['kube']['images']['kube-apiserver'],
         "command" => [
-          "/hyperkube",
-          "apiserver",
+          "kube-apiserver",
           "--secure-port=#{node['environment_v2']['port']['controller-internal']}",
           "--allow-privileged=true",
           "--apiserver-count=#{host_count}",
@@ -149,10 +147,9 @@ kube_controller_manager_manifest = {
     "containers" => [
       {
         "name" => "kube-controller-manager",
-        "image" => node['kube']['images']['hyperkube'],
+        "image" => node['kube']['images']['kube-controller-manager'],
         "command" => [
-          "/hyperkube",
-          "controller-manager",
+          "kube-controller-manager",
           "--address=0.0.0.0",
           "--cluster-cidr=#{node['kubernetes']['cluster_cidr']}",
           "--allocate-node-cidrs=true",

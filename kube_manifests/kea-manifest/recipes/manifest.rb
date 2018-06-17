@@ -152,10 +152,14 @@ node['environment_v2']['set']['kea']['hosts'].each do |host|
       "volumes" => [
         {
           "name" => "lease-path",
-          "nfs" => {
-            "server" => node['environment_v2']['set']['nfs']['vip']['store'],
-            "path" => env_vars["mount_path"]
-          }
+          # "nfs" => {
+          #   "server" => node['environment_v2']['set']['nfs']['vip']['store'],
+          #   "path" => env_vars["mount_path"]
+          # }
+          # "hostPath" => {
+          #   "path" => env_vars["lease_path"]
+          # }
+          "emptyDir" => {}
         }
       ]
     }
