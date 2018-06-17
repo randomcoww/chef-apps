@@ -19,16 +19,11 @@ node.default['environment_v2']['domain']['host'] = 'host'
 ##
 
 node.default['environment_v2']['port']['controller'] = 56443
-node.default['environment_v2']['port']['controller-internal'] = 56443
-
 node.default['environment_v2']['port']['matchbox-http'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc'] = 58081
-node.default['environment_v2']['port']['matchbox-http-internal'] = 58080
-node.default['environment_v2']['port']['matchbox-rpc-internal'] = 58081
-
 node.default['environment_v2']['port']['etcd'] = 52379
 node.default['environment_v2']['port']['etcd-peer'] = 52380
-node.default['environment_v2']['port']['unbound-dns'] = 53
+node.default['environment_v2']['port']['unbound'] = 53
 
 ##
 ## sets
@@ -45,14 +40,10 @@ node.default['environment_v2']['set']['gateway'] = {
 }
 
 node.default['environment_v2']['set']['dns'] = {
-  # 'hosts' => [
-  #   'provisioner',
-  # ],
   'vip' => {
     'store' => "192.168.127.254",
     'lan' => "192.168.127.254",
-  },
-  # 'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['unbound-dns']}"
+  }
 }
 
 node.default['environment_v2']['set']['kea'] = {
@@ -78,7 +69,7 @@ node.default['environment_v2']['set']['matchbox'] = {
   'vip' => {
     'store' => "192.168.126.242",
   },
-  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['matchbox-http-internal']}",
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['matchbox-http']}",
 }
 
 node.default['environment_v2']['set']['etcd'] = {
@@ -99,15 +90,7 @@ node.default['environment_v2']['set']['kube-master'] = {
   'vip' => {
     'store' => "192.168.126.245",
   },
-  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['controller-internal']}",
-  # 'lb' => {
-  #   'kube-master' => {
-  #     "default" => {
-  #       "hostport" => node['environment_v2']['port']['controller-internal'],
-  #       "port" => node['environment_v2']['port']['controller'],
-  #     }
-  #   }
-  # }
+  'health_check' => "nc -z -w5 localhost #{node['environment_v2']['port']['controller']}"
 }
 
 node.default['environment_v2']['set']['kube-worker'] = {
@@ -122,10 +105,6 @@ node.default['environment_v2']['set']['kube-worker'] = {
 ##
 
 node.default['environment_v2']['host']['provisioner'] = {
-  # 'ip' => {
-  #   'store' => "192.168.126.218",
-  #   'lan' => "192.168.62.218",
-  # },
   'if' => {
     'lan' => "eth0",
     'store' => "eth1",
@@ -142,11 +121,7 @@ node.default['environment_v2']['host']['controller-0'] = {
   }
 }
 
-node.default['environment_v2']['host']['worker'] = {
-  # 'if' => {
-  #   'store' => "eth0",
-  # }
-}
+node.default['environment_v2']['host']['worker'] = {}
 
 
 ##
@@ -156,23 +131,13 @@ node.default['environment_v2']['host']['worker'] = {
 node.default['environment_v2']['host']['store-0'] = {
   'ip' => {
     'store' => '192.168.126.251',
-    # 'lan' => '192.168.62.251',
-  },
-  # 'if' => {
-  #   'store' => "store_bridge",
-  #   'lan' => "lan_bridge",
-  # }
+  }
 }
 
 node.default['environment_v2']['host']['store-1'] = {
   'ip' => {
     'store' => '192.168.126.252',
-    # 'lan' => '192.168.62.252',
   },
-  # 'if' => {
-  #   'store' => "store_bridge",
-  #   'lan' => "lan_bridge",
-  # },
   # 'passthrough_hba' => {
   #   'domain' => "0x0000",
   #   'bus' => "0x01",

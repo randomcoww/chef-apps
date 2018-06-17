@@ -71,7 +71,7 @@ kube_apiserver_manifest = {
         "image" => node['kube']['images']['kube-apiserver'],
         "command" => [
           "kube-apiserver",
-          "--secure-port=#{node['environment_v2']['port']['controller-internal']}",
+          "--secure-port=#{node['environment_v2']['port']['controller']}",
           "--allow-privileged=true",
           "--apiserver-count=#{host_count}",
           "--audit-log-maxage=30",
