@@ -27,6 +27,7 @@ node.default['environment_v2']['port']['matchbox-http-internal'] = 58080
 node.default['environment_v2']['port']['matchbox-rpc-internal'] = 58081
 
 node.default['environment_v2']['port']['etcd'] = 52379
+node.default['environment_v2']['port']['etcd-peer'] = 52380
 node.default['environment_v2']['port']['unbound-dns'] = 53
 
 ##
