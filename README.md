@@ -1,6 +1,4 @@
-## Deprecated - replaced with https://github.com/randomcoww/terraform
-
-## chef-environment
+## Deprecated - chef-environment
 
 Configuration source for https://github.com/randomcoww/environment-config
 
